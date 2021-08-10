@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_sgca_ebu/pages/Docentes.dart';
-import 'package:proyecto_sgca_ebu/pages/Egresados.dart';
-import 'package:proyecto_sgca_ebu/pages/Estudiantes.dart';
-import 'package:proyecto_sgca_ebu/pages/Principal.dart';
-import 'package:proyecto_sgca_ebu/pages/Representantes.dart';
+import 'package:proyecto_sgca_ebu/components/UI.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_sgca_ebu/providers/AccessProvider.dart';
+import 'package:proyecto_sgca_ebu/providers/Pesta%C3%B1aProvider.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => PestanaProvider()),
+    ChangeNotifierProvider(create: (_) => AccessProvider())
+  ], child: MyApp()));
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SGCA-EBU',
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => Principal(),
-        '/estudiantes': (context) => Estudiantes(),
-        '/docentes': (context) => Docentes(),
-        '/egresados': (context) => Egresados(),
-        '/representantes': (context) => Representantes(),
-      },
-    );
+        title: 'SGCA-EBU',
+        debugShowCheckedModeBanner: false,
+        home: UIScaffold());
   }
 }
