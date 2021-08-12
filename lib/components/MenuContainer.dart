@@ -13,18 +13,21 @@ class MenuContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 110,
+      padding: EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           icon,
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: alignment,
-            children: [
-              Padding(padding: EdgeInsets.symmetric(vertical: 5)),
-              ...body,
-              Padding(padding: EdgeInsets.symmetric(vertical: 5)),
-            ],
+          Flexible(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: alignment,
+              children: [
+                Padding(padding: EdgeInsets.symmetric(vertical: 5)),
+                ...body,
+                Padding(padding: EdgeInsets.symmetric(vertical: 5)),
+              ],
+            ),
           )
         ],
       ),

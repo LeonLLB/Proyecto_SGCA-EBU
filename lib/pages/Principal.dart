@@ -59,7 +59,7 @@ class Principal extends StatelessWidget {
         Padding(padding: EdgeInsets.symmetric(vertical: 10)),
         MenuContainer(body: [
           Text(
-            'Usuarios pendientes de\nregistro:',
+            'Usuarios pendientes de registro:',
             style: normalText,
             textAlign: TextAlign.center,
           ),
@@ -106,7 +106,7 @@ class Principal extends StatelessWidget {
         ], icon: Icon(Icons.assignment_ind, size: 60)),
         Padding(padding: EdgeInsets.symmetric(vertical: 10)),
         MenuContainer(body: [
-          Text('Estudiantes del Grado\nAsignado:',
+          Text('Estudiantes del Grado Asignado:',
               style: normalText, textAlign: TextAlign.center),
           Text('28', style: boldText),
         ], icon: Icon(Icons.face, size: 60)),
