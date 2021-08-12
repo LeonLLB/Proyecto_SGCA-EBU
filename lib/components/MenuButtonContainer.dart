@@ -22,7 +22,9 @@ class MenuButtonContainer extends StatelessWidget {
               textAlign: TextAlign.center),
           Padding(padding: EdgeInsets.symmetric(vertical: 2.5)),
           Text(texts['desc']!,
-              style: TextStyle(fontSize: 16, color: Colors.black),
+              style: TextStyle(
+                  fontSize: (texts['desc']!.length > 55) ? 15.5 : 16,
+                  color: Colors.black),
               textAlign: TextAlign.center)
         ], icon: Icon(icon, size: 60, color: Colors.black)));
   }
