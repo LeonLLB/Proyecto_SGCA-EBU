@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
 
 class MenuContainer extends StatelessWidget {
-  final Widget body;
+  final List<Widget> body;
   final Widget icon;
-  MenuContainer({required this.body, required this.icon});
+  final CrossAxisAlignment alignment;
+  MenuContainer(
+      {required this.body,
+      required this.icon,
+      this.alignment: CrossAxisAlignment.center});
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 110,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [icon, body],
+        children: [
+          icon,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: alignment,
+            children: [
+              Padding(padding: EdgeInsets.symmetric(vertical: 5)),
+              ...body,
+              Padding(padding: EdgeInsets.symmetric(vertical: 5)),
+            ],
+          )
+        ],
       ),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
