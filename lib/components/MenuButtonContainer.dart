@@ -13,19 +13,18 @@ class MenuButtonContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
         onPressed: onPressed,
-        child: MenuContainer(body: [
-          Text(texts['label']!,
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
-              textAlign: TextAlign.center),
-          Padding(padding: EdgeInsets.symmetric(vertical: 2.5)),
-          Text(texts['desc']!,
-              style: TextStyle(
-                  fontSize: (texts['desc']!.length > 55) ? 15.5 : 16,
-                  color: Colors.black),
-              textAlign: TextAlign.center)
-        ], icon: Icon(icon, size: 60, color: Colors.black)));
+        child: MenuContainer(
+          body: [
+            Text(texts['label']!,
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+                textAlign: TextAlign.center),
+            Padding(padding: EdgeInsets.symmetric(vertical: 2.5))
+          ],
+          icon: Icon(icon, size: 32, color: Colors.black),
+          height: 60,
+        ));
   }
 }

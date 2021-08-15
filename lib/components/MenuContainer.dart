@@ -4,15 +4,17 @@ class MenuContainer extends StatelessWidget {
   final List<Widget> body;
   final Widget icon;
   final CrossAxisAlignment alignment;
+  final double height;
   MenuContainer(
       {required this.body,
       required this.icon,
-      this.alignment: CrossAxisAlignment.center});
+      this.alignment: CrossAxisAlignment.center,
+      this.height: 110});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 110,
+      height: height,
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

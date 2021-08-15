@@ -12,8 +12,7 @@ class UIScaffold extends StatelessWidget {
         title: Center(
             child: Text(context.watch<PestanaProvider>().textoDelAppBar)),
       ),
-      body: swapPage(context.watch<PestanaProvider>().zonaID,
-          context.watch<PestanaProvider>().pestanaID),
+      body: Pestana(),
       bottomNavigationBar: _bottomAppBar(context),
       floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.white,

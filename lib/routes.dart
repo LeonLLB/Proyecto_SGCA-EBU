@@ -4,56 +4,65 @@ import 'package:proyecto_sgca_ebu/pages/Egresados/Egresados.dart';
 import 'package:proyecto_sgca_ebu/pages/Estudiantes/Estudiantes.dart';
 import 'package:proyecto_sgca_ebu/pages/Principal.dart';
 import 'package:proyecto_sgca_ebu/pages/Representantes/Representantes.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_sgca_ebu/providers/Pesta%C3%B1aProvider.dart';
 
-Widget swapPage(int zonaId, int pestanaId) {
-  switch (zonaId) {
-    case 0:
-      return Principal();
-    case 1:
-      return _swapPestanaEstudiantes(pestanaId);
-    case 2:
-      return _swapPestanaDocente(pestanaId);
-    case 3:
-      return _swapPestanaEgresados(pestanaId);
-    case 4:
-      return _swapPestanaRepresentantes(pestanaId);
-    default:
-      return Principal();
-  }
+class Pestana extends StatefulWidget {
+  Pestana({Key? key}) : super(key: key);
+
+  @override
+  _PestanaState createState() => _PestanaState();
 }
 
-Widget _swapPestanaDocente(int pestanaId) {
-  switch (pestanaId) {
-    case 0:
-      return Docentes();
-    default:
-      return Docentes();
-  }
-}
+class _PestanaState extends State<Pestana> {
+  double opacity = 0;
 
-Widget _swapPestanaEstudiantes(int pestanaId) {
-  switch (pestanaId) {
-    case 0:
-      return Estudiantes();
-    default:
-      return Estudiantes();
+  void cambiarOpacity() {
+    opacity = 0;
+    setState(() {});
+    Future.delayed(Duration(milliseconds: 300), () {
+      opacity = 1;
+      setState(() {});
+    });
   }
-}
 
-Widget _swapPestanaEgresados(int pestanaId) {
-  switch (pestanaId) {
-    case 0:
-      return Egresados();
-    default:
-      return Egresados();
+  final Map<int, Map<int, Widget>> paginas = {
+    //MAIN
+    0: {
+      0: Principal(),
+    },
+    //ESTUDIANTES
+    1: {
+      0: Estudiantes(),
+    },
+    //DOCENTES
+    2: {
+      0: Docentes(),
+    },
+    //EGRESADOS
+    3: {
+      0: Egresados(),
+    },
+    //REPRESENTANTES
+    4: {
+      0: Representantes(),
+    },
+    //ADMIN
+    //5:
+  };
+
+  @override
+  void didUpdateWidget(covariant Pestana oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    cambiarOpacity();
   }
-}
 
-Widget _swapPestanaRepresentantes(int pestanaId) {
-  switch (pestanaId) {
-    case 0:
-      return Representantes();
-    default:
-      return Representantes();
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+        opacity: opacity,
+        duration: Duration(milliseconds: 300),
+        child: paginas[context.watch<PestanaProvider>().zonaID]![
+            context.watch<PestanaProvider>().pestanaID]!);
   }
 }
