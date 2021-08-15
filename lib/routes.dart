@@ -58,6 +58,12 @@ class _PestanaState extends State<Pestana> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    cambiarOpacity();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnimatedOpacity(
         opacity: opacity,
