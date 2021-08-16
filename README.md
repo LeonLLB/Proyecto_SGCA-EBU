@@ -1,10 +1,6 @@
 # Sistema de Gestión y Control Académico - Escuela Basica Uriapara (SGCA-EBU)
 
-Utilizando el stack **MERN**:
-**M**ongo
-**E**xpress
-**R**eact - 17.0.1
-**N**ode - 14.15
+Desarrollo de un sistema de gestion y control academico para la administracion de la informacion en la institucion. Mi proyecto socio tecnologico III, desarrollado con **Flutter**
 
 ## Listas de historias de usuarios
 | Numero | Requisito | Prioridad |
