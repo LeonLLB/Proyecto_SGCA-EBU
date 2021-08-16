@@ -1,4 +1,4 @@
-#Sistema de Gestión y Control Académico - Escuela Basica Uriapara (SGCA-EBU)
+# Sistema de Gestión y Control Académico - Escuela Basica Uriapara (SGCA-EBU)
 
 Utilizando el stack **MERN**:
 **M**ongo
