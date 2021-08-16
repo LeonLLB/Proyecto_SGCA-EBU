@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:proyecto_sgca_ebu/controllers/Usuarios.dart';
 import 'components/UI.dart';
 import 'pages/Login.dart';
 import 'pages/Signup.dart';
@@ -18,12 +19,15 @@ Future main() async {
 }
 
 class MyApp extends StatelessWidget {
+  final controladorUsuarios = UsuariosController();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SGCA-EBU',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/main',
+      initialRoute:
+          (controladorUsuarios.estaAutenticado()) ? '/main' : '/login',
       routes: {
         '/login': (context) => LoginPagina(),
         '/registrar': (context) => SignupPage(),
