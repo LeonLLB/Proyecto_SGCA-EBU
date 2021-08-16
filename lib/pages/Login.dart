@@ -59,7 +59,10 @@ class _LoginPaginaState extends State<LoginPagina> {
                       if (_formKey.currentState!.validate()) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Iniciando sesión')),
+                          //TODO: Implementar logica de inicio de sesión
                         );
+
+                        Navigator.pushNamed(context, '/main');
                       }
                     },
                     child:

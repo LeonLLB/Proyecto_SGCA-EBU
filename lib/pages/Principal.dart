@@ -10,12 +10,12 @@ class Principal extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.all(10),
       children: (context.watch<AccessProvider>().rol == 'admin')
-          ? menuSwap(1)
-          : menuSwap(2),
+          ? menuSwap(context, 1)
+          : menuSwap(context, 2),
     );
   }
 
-  List<Widget> menuSwap(int version) {
+  List<Widget> menuSwap(BuildContext context, int version) {
     final DateTime now = DateTime.now();
     final DateTime formatted = new DateTime(now.year, now.month, now.day);
     final String fecha =
@@ -68,7 +68,11 @@ class Principal extends StatelessWidget {
         Padding(padding: EdgeInsets.symmetric(vertical: 10)),
         Align(
           child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text('Cerrando sesión')));
+                Navigator.pushNamed(context, '/login');
+              },
               child: Text('Cerrar sesión', style: normalText),
               style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.all(12.5),
@@ -113,7 +117,11 @@ class Principal extends StatelessWidget {
         Padding(padding: EdgeInsets.symmetric(vertical: 10)),
         Align(
           child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text('Cerrando sesión')));
+                Navigator.pushNamed(context, '/login');
+              },
               child: Text('Cerrar sesión', style: normalText),
               style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.all(12.5),
