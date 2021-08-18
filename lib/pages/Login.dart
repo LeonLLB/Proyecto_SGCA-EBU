@@ -21,7 +21,7 @@ class _LoginPaginaState extends State<LoginPagina> {
           key: _formKey,
           child: Center(
             child: Container(
-              height: 265,
+              height: 312,
               margin: EdgeInsets.all(10),
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
