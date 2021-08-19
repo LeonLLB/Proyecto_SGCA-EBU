@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_sgca_ebu/components/MenuButtonContainer.dart';
 import 'package:proyecto_sgca_ebu/providers/AccessProvider.dart';
+import 'package:proyecto_sgca_ebu/providers/Pesta%C3%B1aProvider.dart';
 
 class Estudiantes extends StatelessWidget {
   @override
@@ -9,17 +10,23 @@ class Estudiantes extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.all(2),
       children: (context.watch<AccessProvider>().rol == 'admin')
-          ? swapMenu(1)
-          : swapMenu(2),
+          ? swapMenu(1, context)
+          : swapMenu(2, context),
     );
   }
 
-  List<Widget> swapMenu(int version) {
+  List<Widget> swapMenu(int version, BuildContext context) {
     if (version == 1 /* ADMIN */) {
       return [
-        MenuButtonContainer(texts: {
-          'label': 'Inscribir Estudiante Inicial',
-        }, icon: Icons.person_add, onPressed: () {}),
+        MenuButtonContainer(
+            texts: {
+              'label': 'Inscribir Estudiante Inicial',
+            },
+            icon: Icons.person_add,
+            onPressed: () {
+              context.read<PestanaProvider>().cambiarPagina(
+                  zona: 1, numPage: 1, appBarText: 'Inscribir estudiante');
+            }),
         Padding(padding: EdgeInsets.symmetric(vertical: 0.5)),
         MenuButtonContainer(texts: {
           'label': 'Inscribir Estudiante Regular',

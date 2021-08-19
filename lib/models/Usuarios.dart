@@ -20,7 +20,7 @@ class Usuario {
       required this.direccion,
       required this.rol});
 
-  Usuario.fromMap(Map<String, String> usuario) {
+  /* Usuario.fromMap(Map<String, String> usuario) {
     if (usuario['id'] != null) {
       this.id = usuario['id'];
     }
@@ -34,5 +34,5 @@ class Usuario {
     this.numero = usuario['Telefono'];
     this.direccion = usuario['Direccion'];
     this.rol = usuario['Rango'];
-  }
+  } */
 }

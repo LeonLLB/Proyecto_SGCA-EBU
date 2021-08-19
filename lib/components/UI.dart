@@ -9,6 +9,7 @@ class UIScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading:false,
         title: Center(
             child: Text(context.watch<PestanaProvider>().textoDelAppBar)),
       ),

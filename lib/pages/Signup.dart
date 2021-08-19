@@ -24,9 +24,10 @@ class _SignupPageState extends State<SignupPage> {
 
     return Scaffold(
         appBar: AppBar(
+            automaticallyImplyLeading: false,
             title: Center(
-          child: Text('SGCA-EBU'),
-        )),
+              child: Text('SGCA-EBU'),
+            )),
         body: Form(
           key: _formKey,
           child: Center(

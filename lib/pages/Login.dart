@@ -14,9 +14,10 @@ class _LoginPaginaState extends State<LoginPagina> {
 
     return Scaffold(
         appBar: AppBar(
+            automaticallyImplyLeading: false,
             title: Center(
-          child: Text('SGCA-EBU'),
-        )),
+              child: Text('SGCA-EBU'),
+            )),
         body: Form(
           key: _formKey,
           child: Center(
@@ -28,7 +29,7 @@ class _LoginPaginaState extends State<LoginPagina> {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: Colors.blue, width: 4),
                   color: Colors.grey[200]),
-              child: Column(children: [
+              child: ListView(children: [
                 TextFormField(
                   decoration: InputDecoration(
                       icon: Icon(Icons.person), labelText: 'Cedula'),
