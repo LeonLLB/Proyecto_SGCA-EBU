@@ -4,7 +4,7 @@ import 'package:proyecto_sgca_ebu/components/MenuContainer.dart';
 class MenuButtonContainer extends StatelessWidget {
   final Map<String, String> texts;
   final IconData icon;
-  final onPressed;
+  final Function() onPressed;
 
   MenuButtonContainer(
       {required this.texts, required this.icon, required this.onPressed});

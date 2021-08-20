@@ -7,7 +7,7 @@ import 'pages/Login.dart';
 import 'pages/Signup.dart';
 import 'providers/AccessProvider.dart';
 import 'providers/Pesta%C3%B1aProvider.dart';
-import 'providers/SupabaseClient.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future main() async {
   await dotenv.load(fileName: '.env');
@@ -33,6 +33,11 @@ class MyApp extends StatelessWidget {
         '/registrar': (context) => SignupPage(),
         '/main': (context) => UIScaffold(),
       },
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [Locale('es', 'VE')],
     );
   }
 }
