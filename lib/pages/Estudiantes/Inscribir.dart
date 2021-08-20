@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_sgca_ebu/components/ContainerInput.dart';
 import 'package:proyecto_sgca_ebu/components/DualInputApellidoNombre.dart';
+import 'package:proyecto_sgca_ebu/models/Estudiante.dart';
+import 'package:proyecto_sgca_ebu/models/Representantes.dart';
 
 class EstudianteInscribir extends StatefulWidget {
   @override
@@ -48,6 +50,14 @@ class _EstudianteInscribirState extends State<EstudianteInscribir> {
                 icono: Icon(Icons.location_on, size: 36, color: Colors.black)),
             //TODO: FECHA DE NACIMIENTO
             //TODO: GENEROS
+            Container(
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.grey, width: 4),
+                  color: Colors.grey[200]),
+            ),
             Center(
                 child: Text('Representante',
                     style:
@@ -74,7 +84,7 @@ class _EstudianteInscribirState extends State<EstudianteInscribir> {
             //TODO: CONDICIONES DE INGRESO
 
             ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     //TODO: Implementar logica de inscripcion
 

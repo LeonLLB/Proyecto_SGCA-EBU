@@ -20,19 +20,25 @@ class Usuario {
       required this.direccion,
       required this.rol});
 
-  /* Usuario.fromMap(Map<String, String> usuario) {
-    if (usuario['id'] != null) {
-      this.id = usuario['id'];
-    }
-    if (usuario['Contraseña'] != null) {
-      this.password = usuario['Contraseña'];
-    }
-    this.nombres = usuario['Nombres'];
-    this.apellidos = usuario['Apellidos'];
-    this.cedula = usuario['Cedula'];
-    this.correo = usuario['Correo'];
-    this.numero = usuario['Telefono'];
-    this.direccion = usuario['Direccion'];
-    this.rol = usuario['Rango'];
-  } */
+  Usuario.fromJSON(Map<String, dynamic> usuario)
+      : nombres = usuario['Nombres'],
+        apellidos = usuario['Apellidos'],
+        cedula = usuario['Cedula'],
+        correo = usuario['Correo'],
+        numero = usuario['Telefono'],
+        direccion = usuario['Direccion'],
+        rol = usuario['Rango'],
+        id = usuario['id'],
+        password = usuario['Contraseña'];
+
+  Map<String, dynamic> toJson() => {
+        'nombres': this.nombres,
+        'apellidos': this.apellidos,
+        'cedula': this.cedula,
+        'correo': this.correo,
+        'numero': this.numero,
+        'direccion': this.direccion,
+        'rol': this.rol,
+        'id': this.id,
+      };
 }
