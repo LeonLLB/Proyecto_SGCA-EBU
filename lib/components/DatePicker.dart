@@ -27,6 +27,7 @@ class _DatePickerState extends State<DatePicker> {
         date = fechaSeleccion.toString().split(' ')[0];
         fechaAMostrar = cambiarFecha(date!);
         controlador.text = fechaAMostrar!;
+        onChanged(date!);
         setState(() {});
       }
     });
@@ -64,6 +65,11 @@ class _DatePickerState extends State<DatePicker> {
                 controller: controlador,
                 decoration: InputDecoration(labelText: label),
                 readOnly: true,
+                validator: (String? val) {
+                  if (val!.isEmpty) {
+                    return 'Es obligatorio ingresar la fecha';
+                  }
+                },
                 onTap: onTap),
           )
         ]),

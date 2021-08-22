@@ -1,1 +1,0 @@
-typedef RadioDecisions = List<int>;

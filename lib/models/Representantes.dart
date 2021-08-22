@@ -23,11 +23,10 @@ class Representante {
         telefono = representante['Telefono'];
 
   Map<String, String> toJson() => {
-        'id': id.toString(),
-        'nombres': nombres,
-        'apellidos': apellidos,
-        'ubicacion': ubicacion,
-        'cedula': cedula,
-        'telefono': telefono
+        'Nombres': nombres,
+        'Apellidos': apellidos,
+        'Ubicacion': ubicacion,
+        'Cedula': cedula,
+        'Telefono': telefono
       };
 }

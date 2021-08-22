@@ -5,12 +5,14 @@ class DualInputApellidosNombres extends StatelessWidget {
   final TextEditingController nombreControlador;
   final String labelRest;
   final IconData icono;
+  final bool unEditable;
 
   DualInputApellidosNombres(
       {required this.apellidoControlador,
       required this.nombreControlador,
       required this.labelRest,
-      required this.icono});
+      required this.icono,
+      this.unEditable: false});
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +33,7 @@ class DualInputApellidosNombres extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextFormField(
+                  readOnly: unEditable,
                   decoration: InputDecoration(
                       labelText: 'Nombres del ${this.labelRest}'),
                   controller: this.nombreControlador,
@@ -41,6 +44,7 @@ class DualInputApellidosNombres extends StatelessWidget {
                   },
                 ),
                 TextFormField(
+                  readOnly: unEditable,
                   decoration: InputDecoration(
                       labelText: 'Apellidos del ${this.labelRest}'),
                   controller: this.apellidoControlador,

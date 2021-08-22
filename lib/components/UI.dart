@@ -9,7 +9,7 @@ class UIScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading:false,
+        automaticallyImplyLeading: false,
         title: Center(
             child: Text(context.watch<PestanaProvider>().textoDelAppBar)),
       ),
@@ -19,7 +19,7 @@ class UIScaffold extends StatelessWidget {
           backgroundColor: Colors.white,
           child: Icon(Icons.home, color: Colors.black),
           onPressed: () {
-            context.read<PestanaProvider>().cambiarPagina(zona: 0);
+            context.read<PestanaProvider>().cambiarPagina(zona: 0, numPage: 0);
           }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
