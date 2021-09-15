@@ -15,18 +15,17 @@ Desarrollo de un sistema de gestion y control academico para la administracion d
 | 8 | Generar documentos en PDF | 68 |
 | 9 | Generar resumen estadistico | 97 |
 | 10 | Manejar ficha de inscripcion | 95 |
-| 11 | Usar el sistema sin internet | 73 |
-| 12 | Registrar la asistencia de estudiantes | 97 |
+| 11 | Registrar la asistencia de estudiantes | 97 |
 
 
 ## Planificacion de entrega de iteraciones
 | **_Sprint 1_**| **_Sprint 2_**  | **_Sprint 3_** |
 | ----------- | ----------- | ------------| 
-| **H1** | **H12** | **H7** |
-| **H2** | **H9** | **H11** |
-| **H3** | **H6** | **H8** |
-| **H4** | **H10** | - |
-| **H5** | - | - |
+| **H1** | **H4** | **H6** |
+| **H2** | **H5** | **H7** |
+| **H3** | **H9** | **H8** |
+| - | **H11** | **H10** |
+| * | - | - |
 
 
 | Historia de usuario (por orden de prioridad)| Sprint | Progreso |
@@ -34,12 +33,13 @@ Desarrollo de un sistema de gestion y control academico para la administracion d
 |**H1**|**1**| 0% |
 |**H2**|1| 0%|
 |**H3**|1| 0% |
-|**H4**|1| 0% |
-|**H5**|1| 0% |
-|**H12**|**2**| 0% |
-|**H6**|2| 0%|
-|**H7**|2| 0% |
-|**H10**|2| 0%|
-|**H7**|**3**| 0% |
-|**H11**|3| 0% |
-|**H9**|3| 0% |
+|**H4**|**2**| 0% |
+|**H5**|2| 0% |
+|**H9**|2| 0% |
+|**H11**|2| 0% |
+|**H6**|**3**| 0%|
+|**H7**|3| 0% |
+|**H8**|3| 0% |
+|**H10**|3| 0%|
+
+
