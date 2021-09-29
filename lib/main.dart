@@ -1,43 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:proyecto_sgca_ebu/controllers/Usuarios.dart';
-import 'components/UI.dart';
-import 'pages/Login.dart';
-import 'pages/Signup.dart';
-import 'providers/AccessProvider.dart';
-import 'providers/Pesta%C3%B1aProvider.dart';
+import 'dart:io';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:proyecto_sgca_ebu/pages/Login.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:window_size/window_size.dart';
 
-Future main() async {
-  await dotenv.load(fileName: '.env');
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    setWindowTitle(
+        "Sistema de Gestión y Control Académico - Escuela Basica Uriapara");
+    setWindowMinSize(Size(375, 600));
+    setWindowMaxSize(Size(950, 1000));
+  }
 
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_) => PestanaProvider()),
-    ChangeNotifierProvider(create: (_) => AccessProvider())
-  ], child: MyApp()));
+  return runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final controladorUsuarios = UsuariosController();
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SGCA-EBU',
       debugShowCheckedModeBanner: false,
-      initialRoute:
-          (controladorUsuarios.estaAutenticado()) ? '/main' : '/login',
-      routes: {
-        '/login': (context) => LoginPagina(),
-        '/registrar': (context) => SignupPage(),
-        '/main': (context) => UIScaffold(),
-      },
+      title: 'SGCA - EBU',
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
       supportedLocales: [Locale('es', 'VE')],
+      home: LoginPage()
     );
   }
 }

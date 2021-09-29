@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "A new Flutter project." "\0"
+            VALUE "FileDescription", "SGCA-EBU." "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "proyecto_sgca_ebu" "\0"
+            VALUE "InternalName", "Sistema de Gestion y Control Academico - Escuela Basica Uriapara" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2021 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "proyecto_sgca_ebu.exe" "\0"
-            VALUE "ProductName", "proyecto_sgca_ebu" "\0"
+            VALUE "OriginalFilename", "SGCA-EBU.exe" "\0"
+            VALUE "ProductName", "Sistema de Gestion y Control Academico - Escuela Basica Uriapara" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

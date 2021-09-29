@@ -1,65 +1,36 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:proyecto_sgca_ebu/pages/Estudiantes/Estudiantes.dart';
-import 'package:proyecto_sgca_ebu/pages/Estudiantes/Inscribir.dart';
-import 'package:proyecto_sgca_ebu/pages/Docentes/Docentes.dart';
-import 'package:proyecto_sgca_ebu/pages/Egresados/Egresados.dart';
-import 'package:proyecto_sgca_ebu/pages/Principal.dart';
-import 'package:proyecto_sgca_ebu/pages/Representantes/Inscribir.dart';
-import 'package:proyecto_sgca_ebu/pages/Representantes/Representantes.dart';
-import 'package:provider/provider.dart';
-import 'package:proyecto_sgca_ebu/providers/Pesta%C3%B1aProvider.dart';
+import 'package:proyecto_sgca_ebu/pages/index.dart';
 
-class Pestana extends StatefulWidget {
-  Pestana({Key? key}) : super(key: key);
+final Map<String, Widget> _routes = {
+  '/login':LoginPage(),
+};
 
-  @override
-  _PestanaState createState() => _PestanaState();
-}
+Route toPage (String pageName){
 
-class _PestanaState extends State<Pestana> {
-  double opacity = 0;
+  assert(_routes[pageName] != null, "La ruta solicitada ($pageName) no existe");
 
-  void cambiarOpacity() {
-    opacity = 0;
-    setState(() {});
-    Future.delayed(Duration(milliseconds: 300), () {
-      opacity = 1;
-      setState(() {});
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => _routes[pageName]!,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+
+      if (Platform.isAndroid || Platform.isIOS) {
+        var animacion = Tween(begin: Offset(0.0, 1.0), end: Offset.zero)
+        .chain(CurveTween(curve: Curves.ease));
+
+        return SlideTransition(
+          position: animation.drive(animacion),
+          child: child,
+        );
+      }
+      else{
+        var animacion = Tween(begin:0.0,end:1.0)
+        .chain(CurveTween(curve: Curves.ease));
+
+        return FadeTransition(
+          opacity: animation.drive(animacion),
+          child:child
+        );
+      }
     });
-  }
-
-  final List<List<Widget>> paginas = [
-    [Principal()],
-    [
-      Estudiantes(),
-      EstudianteInscribir(),
-    ],
-    [Docentes()],
-    [Egresados()],
-    [
-      Representantes(),
-      RepresentanteInscribir(),
-    ]
-  ];
-
-  @override
-  void didUpdateWidget(covariant Pestana oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    cambiarOpacity();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    cambiarOpacity();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedOpacity(
-        opacity: opacity,
-        duration: Duration(milliseconds: 300),
-        child: paginas[context.watch<PestanaProvider>().zonaID]
-            [context.watch<PestanaProvider>().pestanaID]);
-  }
 }
