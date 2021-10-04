@@ -4,6 +4,7 @@ import 'package:proyecto_sgca_ebu/pages/index.dart';
 
 final Map<String, Widget> _routes = {
   '/login':LoginPage(),
+  '/registrar':RegisterPage(),
 };
 
 Route toPage (String pageName){

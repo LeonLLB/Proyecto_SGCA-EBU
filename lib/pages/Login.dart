@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
 import 'package:proyecto_sgca_ebu/components/UI.dart';
+import 'package:proyecto_sgca_ebu/routes.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -32,34 +34,24 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,                  
               children: [
-                Expanded(
-                  child: TextFormField(
-                      controller: controladores['Cedula'],
-                      decoration: InputDecoration(
-                        icon: Icon(Icons.person),
-                        labelText: 'Cedula'                        
-                      ),
-                      maxLength:9,
-                      validator: (val){
-                        if (val == null || val.isEmpty) return 'Introduzca la cedula';
-                        else if (int.tryParse(val) == null) return 'Introduzca solo números';
-                      },
-                    ),
+                SimplifiedTextFormField(
+                  controlador: controladores['Cedula']!,
+                  labelText: 'Cedula',
+                  icon: Icon(Icons.person),
+                  validators: TextFormFieldValidators(
+                    required: true,
+                    isNumeric: true,
+                    charLength: 9,
+                  )
                 ),
-                Expanded(
-                  child: TextFormField(
-                      controller: controladores['Contraseña'],
-                      decoration: InputDecoration(
-                        icon: Icon(Icons.lock),
-                        labelText: 'Contraseña'                        
-                      ),
-                      obscureText:true,
-                      validator: (val){
-                        if (val == null || val.isEmpty) return 'Introduzca la contraseña';
-                      },
-                    ),
+                SimplifiedTextFormField(
+                  controlador: controladores['Contraseña']!,
+                  labelText: 'Contraseña',
+                  icon: Icon(Icons.lock),
+                  validators: TextFormFieldValidators(required:true),
+                  obscureText: true,
                 ),
-                TextButton(onPressed: (){}, child: Text(
+                TextButton(onPressed: (){toPage('/registrar');}, child: Text(
                   'Iniciar sesión',style:TextStyle(fontSize: 20,fontWeight:FontWeight.w600))),
                 TextButton(onPressed: (){}, child: Text(
                   'Registrar',style:TextStyle(fontSize: 20,fontWeight:FontWeight.w600)))
