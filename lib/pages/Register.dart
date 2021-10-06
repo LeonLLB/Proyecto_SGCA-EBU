@@ -3,13 +3,19 @@ import 'package:proyecto_sgca_ebu/components/DoubleTextFormFields.dart';
 import 'package:proyecto_sgca_ebu/components/RadioInputsRowList.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
 import 'package:proyecto_sgca_ebu/components/UI.dart';
+import 'package:proyecto_sgca_ebu/controllers/Usuarios.dart';
+import 'package:proyecto_sgca_ebu/routes.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
 
+enum roles {docente, admin}
+
 class _RegisterPageState extends State<RegisterPage> {
+
+  roles nivelAcceso = roles.docente;
 
   final _formKey = GlobalKey<FormState>();
   
@@ -96,12 +102,53 @@ class _RegisterPageState extends State<RegisterPage> {
                   })
                 ]
               ),
-              RadioInputRowList(
-                groupValue: groupValue,
-                values: values,
-                labels: labels,
-                onChanged: onChanged
-              )            
+              RadioInputRowList<roles>(
+                groupValue: nivelAcceso,
+                values: [roles.docente,roles.admin],
+                labels: ['Docente','Administrador'],
+                onChanged: (val){
+                  setState(() {
+                    controladores['Rol'] = val.toString().split('.')[1];
+                    nivelAcceso = val!;
+                  });
+                }
+              ),
+              FutureBuilder(
+                builder: (BuildContext context, AsyncSnapshot data){
+                  if(data.hasData && data.data as bool == false ){
+
+                    controladores['AdminCedula'] = TextEditingController();
+                    controladores['AdminContraseña'] = TextEditingController();
+
+                    return Column(
+                      children: [
+                        Center(child:Text('Confirmación por un administrador')),
+                        DoubleTextFormFields(
+                          controladores: [
+                            controladores['AdminCedula'],
+                            controladores['AdminContraseña']
+                          ],
+                          iconos: [Icon(Icons.person),Icon(Icons.lock)],
+                          labelTexts: ['Cedula','Contraseña'],
+                          obscureTexts:[false,true],
+                          validators: [
+                            TextFormFieldValidators(required:true,isNumeric:true),
+                            TextFormFieldValidators(required:true),
+                          ]
+                        ),
+                      ],
+                    );
+                  }
+                  else{
+                    return Container();
+                  }
+                },
+                future: controladorUsuario.existenAdministradores()
+              ),
+              TextButton(onPressed: (){}, child: Text(
+                'Registrar al sistena',style:TextStyle(fontSize: 20,fontWeight:FontWeight.w600))),
+              TextButton(onPressed: (){toPage('/login');}, child: Text(
+                'Iniciar sesión',style:TextStyle(fontSize: 20,fontWeight:FontWeight.w600)))   
             ],
           )
         )

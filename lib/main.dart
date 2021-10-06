@@ -11,10 +11,16 @@ void initDB() async {
 
   final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
   //Usuarios
-  final resultadoUsuarios = await db.query(Usuarios.testInitializer);
-  if(resultadoUsuarios.isEmpty){
-    await db.execute(Usuarios.tableInitializer);
+  try {
+    final resultadoUsuarios = await db.rawQuery(Usuarios.testInitializer);
+    if(resultadoUsuarios.isEmpty){
+      await db.execute(Usuarios.tableInitializer);
+    }
+  } catch (e) {
+    print(e.toString().contains('no such table').toString());
+    throw e;
   }
+  
 
 }
 void main() {

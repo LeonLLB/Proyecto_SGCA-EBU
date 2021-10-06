@@ -16,7 +16,7 @@ class TextFormFieldValidators {
     this.isEmail : false,
     this.extraValidator
   }){
-    assert((this.isNumeric == true) && (this.isNotNumeric == true));
+    assert(!(this.isNumeric && this.isNotNumeric));
   }
 
 }
