@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 TextButton(onPressed: (){}, child: Text(
                   'Iniciar sesión',style:TextStyle(fontSize: 20,fontWeight:FontWeight.w600))),
-                TextButton(onPressed: (){toPage('/registrar');}, child: Text(
+                TextButton(onPressed: (){Navigator.pushReplacement(context, toPage('/registrar')) ;}, child: Text(
                   'Registrar',style:TextStyle(fontSize: 20,fontWeight:FontWeight.w600)))
               ],
             ),

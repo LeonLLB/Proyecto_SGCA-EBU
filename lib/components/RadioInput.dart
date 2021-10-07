@@ -18,7 +18,7 @@ class RadioInput<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: [
         Radio<T>(
           value: value,

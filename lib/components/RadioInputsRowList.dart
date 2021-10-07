@@ -14,12 +14,13 @@ class RadioInputRowList<T> extends StatelessWidget {
     required this.labels,
     required this.onChanged}
   ){
-    assert(values.length != labels.length, "Por cada valor debe haber un descriptor, valores = ${values.length} , descriptores = ${labels.length}");
+    assert(values.length == labels.length, "Por cada valor debe haber un descriptor, valores = ${values.length} , descriptores = ${labels.length}");
   }
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: values.asMap().entries.map((value) => RadioInput<T>(
         groupValue: groupValue,
         value: value.value,

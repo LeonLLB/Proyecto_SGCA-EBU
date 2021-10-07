@@ -15,21 +15,17 @@ Route toPage (String pageName){
     pageBuilder: (context, animation, secondaryAnimation) => _routes[pageName]!,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
 
+      final curvedAnimation = CurvedAnimation(parent:animation,curve:Curves.easeInOut);
+     
       if (Platform.isAndroid || Platform.isIOS) {
-        var animacion = Tween(begin: Offset(0.0, 1.0), end: Offset.zero)
-        .chain(CurveTween(curve: Curves.ease));
-
         return SlideTransition(
-          position: animation.drive(animacion),
+          position: Tween<Offset>(begin: Offset(0.0, -1.0),end: Offset.zero).animate(curvedAnimation),
           child: child,
         );
       }
       else{
-        var animacion = Tween(begin:0.0,end:1.0)
-        .chain(CurveTween(curve: Curves.ease));
-
         return FadeTransition(
-          opacity: animation.drive(animacion),
+          opacity: Tween<double>(begin:0.0,end:1.0).animate(curvedAnimation),
           child:child
         );
       }

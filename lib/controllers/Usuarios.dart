@@ -4,17 +4,17 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 class _UsuariosControllers {
 
   Future<bool> existenAdministradores() async{
-    final db = await databaseFactoryFfi.openDatabase('sgca_ebu_database.db');
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
-    final result = await db.query('usuarios',where: 'rol = ?',whereArgs: ['admin']);
+    final result = await db.query(Usuarios.tableName,where: 'rol = ?',whereArgs: ['A']);
 
     return (result.isEmpty && result.length == 0);
   }
 
   Future<int> registrar(Usuarios usuario) async {
-    final db = await databaseFactoryFfi.openDatabase('sgca_ebu_database.db');
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
-    final result = await db.insert('usuarios', usuario.toJson());
+    final result = await db.insert(Usuarios.tableName, usuario.toJson(withId: false));
     db.close();
     return result;
     
