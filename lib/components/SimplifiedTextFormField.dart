@@ -54,15 +54,15 @@ class SimplifiedTextFormField extends StatelessWidget {
         ) return 'El campo "$labelText" no puede estar vacio';
         else if (
           validators.isNumeric && 
-          (val != null && int.tryParse(val) == null) 
+          (val!.isNotEmpty && int.tryParse(val) == null) 
         ) return 'El campo "$labelText" solo acepta valores numericos';
         else if (
           validators.isNotNumeric &&
-          (val != null && val.contains(RegExp(r'[0-9]')))
+          (val!.isNotEmpty && val.contains(RegExp(r'[0-9]')))
         ) return 'El campo "$labelText" no acepta valores numericos';
         else if(
           validators.isEmail && 
-          (val != null && (!val.contains('@') && !val.endsWith('.com')))
+          (val!.isNotEmpty && (!val.contains('@') && !val.endsWith('.com')))
         ) return 'El campo "$labelText" no es un correo valido';   
         
         if(validators.extraValidator != null){

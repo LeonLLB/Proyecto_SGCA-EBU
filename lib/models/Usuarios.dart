@@ -22,11 +22,11 @@ class Usuarios {
   static final String tableInitializer = '''
   
     CREATE TABLE Usuarios(
-      id INT PRIMARY KEY NOT NULL,
+		  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       nombres VARCHAR(20) NOT NULL, 
       apellidos VARCHAR(20) NOT NULL,
       cedula INT UNIQUE NOT NULL,
-      contraseña VARCHAR(8) NOT NULL,
+      contraseña VARCHAR(255) NOT NULL,
       correo VARCHAR(50) ,
       numero VARCHAR(11),
       direccion VARCHAR(30),
@@ -38,7 +38,7 @@ class Usuarios {
   String hashPassword(String password)
   =>  DBCrypt().hashpw(password, DBCrypt().gensalt());
 
-  // const String comparePassword(){}
+  bool comparePassword(String password) => DBCrypt().checkpw(password, this.contrasena);
 
   Usuarios({
     required this.nombres,
@@ -66,7 +66,7 @@ class Usuarios {
     nombres = usuario['nombres'],
     apellidos = usuario['apellidos'],
     contrasena = usuario['contraseña'],
-    cedula = int.parse(usuario['cedula']),
+    cedula = (usuario['cedula']).runtimeType == int ? (usuario['cedula']) : int.parse((usuario['cedula'])),
     correo = usuario['correo'],
     numero = usuario['numero'],
     direccion = usuario['direccion'],
