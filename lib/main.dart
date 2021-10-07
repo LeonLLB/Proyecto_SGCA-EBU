@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:proyecto_sgca_ebu/Providers/SessionProvider.dart';
 import 'package:proyecto_sgca_ebu/pages/Login.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:window_size/window_size.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:proyecto_sgca_ebu/models/index.dart';
+import 'package:provider/provider.dart';
 
-void initDB() async {
-
-  final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
-  //Usuarios
+void initTable(String tableInitializer,String testInitializer,db) async{
   try {
-    await db.rawQuery(Usuarios.testInitializer);
+    await db.rawQuery(testInitializer);
   } catch (e) {
     if(e.toString().contains('no such table')){
-      await db.execute(Usuarios.tableInitializer);
+      await db.execute(tableInitializer);
     }
     else{
       throw e;
     }    
   }
+}
+
+void initDB() async {
+
+  final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+  //Usuarios
+  initTable(Usuarios.tableInitializer,Usuarios.testInitializer,db);
   
 
 }
@@ -37,7 +43,9 @@ void main() {
   sqfliteFfiInit();
   initDB();
 
-  return runApp(MyApp());
+  return runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => SessionProvider()),
+  ], child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
