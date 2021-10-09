@@ -36,7 +36,7 @@ void main() {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     setWindowTitle(
         "Sistema de Gestión y Control Académico - Escuela Basica Uriapara");
-    setWindowMinSize(Size(375, 600));
+    setWindowMinSize(Size(800, 600));
     setWindowMaxSize(Size(950, 1000));
   }
 

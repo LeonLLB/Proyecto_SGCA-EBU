@@ -53,7 +53,7 @@ class HomeMenu extends StatelessWidget {
             ),
             Expanded(child: 
               Container(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.symmetric(vertical:15,horizontal:25),
                 height: double.infinity,
                 child:SidePageView()
               ),
