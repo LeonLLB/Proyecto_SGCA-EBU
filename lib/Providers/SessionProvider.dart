@@ -14,7 +14,7 @@ class SessionProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  set usuario(Usuarios usuario){
+  set usuario(Usuarios? usuario){
     this._user = usuario;
     notifyListeners();
   }

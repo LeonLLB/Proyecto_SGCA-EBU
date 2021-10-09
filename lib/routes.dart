@@ -2,18 +2,24 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:proyecto_sgca_ebu/pages/index.dart';
 
-final Map<String, Widget> _routes = {
-  '/login':LoginPage(),
-  '/registrar':RegisterPage(),
-  '/home':HomeMenu(),
+final Map<String, Widget> routes = {
+  '/login'         :LoginPage(),
+  '/registrar'     :RegisterPage(),
+  '/home'          :HomeMenu(),
+  '-estudiantes'   :EstudiantesMenu(),
+  '-docentes'      :DocentesMenu(),
+  '-representantes':RepresentantesMenu(),
+  '-egresados'     :EgresadosMenu(),
+  '-admin'         :AdminMenu(),
 };
 
 Route toPage (String pageName){
 
-  assert(_routes[pageName] != null, "La ruta solicitada ($pageName) no existe");
+  assert(routes[pageName] != null, "La ruta solicitada ($pageName) no existe");
+  assert(pageName.startsWith('/'),'La ruta $pageName no es valida,quiza sea solamente utilizable de manera interna');
 
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => _routes[pageName]!,
+    pageBuilder: (context, animation, secondaryAnimation) => routes[pageName]!,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
 
       final curvedAnimation = CurvedAnimation(parent:animation,curve:Curves.easeInOut);
