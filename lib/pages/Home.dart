@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:proyecto_sgca_ebu/Providers/PageProvider.dart';
 import 'package:proyecto_sgca_ebu/Providers/SessionProvider.dart';
 import 'package:proyecto_sgca_ebu/components/CustomSideBarItem.dart';
+import 'package:proyecto_sgca_ebu/components/PageBreadCumbs.dart';
 import 'package:proyecto_sgca_ebu/components/SidePageView.dart';
 import 'package:proyecto_sgca_ebu/components/SuccesSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/UI.dart';
@@ -53,9 +54,15 @@ class HomeMenu extends StatelessWidget {
             ),
             Expanded(child: 
               Container(
-                padding: EdgeInsets.symmetric(vertical:15,horizontal:25),
+                padding: EdgeInsets.symmetric(horizontal:25),
                 height: double.infinity,
-                child:SidePageView()
+                child:Column(
+                  children: [
+                    PageBreadCumbs(),
+                    Padding(padding:EdgeInsets.symmetric(vertical:5)),
+                    SidePageView(),
+                  ],
+                )
               ),
             )
           ],

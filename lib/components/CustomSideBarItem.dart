@@ -27,7 +27,27 @@ class CustomSideBarItem extends StatelessWidget {
       leading:Icon(icon,color:(route == page) ? Color(0xff96baff) : Colors.black ),
       title:Text(label, style: TextStyle(color: (route == page) ? Color(0xff96baff) : Colors.black)),
       onTap:(){
-        Provider.of<PageProvider>(context,listen:false).page = route;
+        if (route != page) {          
+          
+          final conditionOfSubstraction = Provider.of<PageProvider>(context,listen:false).history.length > 1;
+          Provider.of<PageProvider>(context,listen:false).page = route;
+          
+          if(!route.startsWith('/')){
+            if (conditionOfSubstraction) {
+              Provider.of<PageProvider>(context,listen:false).substractFromHistory();
+              Provider.of<PageProvider>(context,listen:false).addToHistory(label,route);
+            }else{
+              Provider.of<PageProvider>(context,listen:false).addToHistory(label,route);
+            }
+          }
+
+          else if(route == '/home'){          
+            if (conditionOfSubstraction) {
+              Provider.of<PageProvider>(context,listen:false).substractFromHistory();
+            }
+          }
+
+        }
       }
     );
   }
