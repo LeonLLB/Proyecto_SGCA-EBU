@@ -3,14 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_sgca_ebu/pages/index.dart';
 
 final Map<String, Widget> routes = {
-  '/login'         :LoginPage(),
-  '/registrar'     :RegisterPage(),
-  '/home'          :HomeMenu(),
-  '-estudiantes'   :EstudiantesMenu(),
-  '-docentes'      :DocentesMenu(),
-  '-representantes':RepresentantesMenu(),
-  '-egresados'     :EgresadosMenu(),
-  '-admin'         :AdminMenu(),
+  '/login'                    :LoginPage(),
+  '/registrar'                :RegisterPage(),
+  '/home'                     :HomeMenu(),
+  '-estudiantes'              :EstudiantesMenu(),
+  '-docentes'                 :DocentesMenu(),
+  '-representantes'           :RepresentantesMenu(),
+  '-egresados'                :EgresadosMenu(),
+  '-admin'                    :AdminMenu(),
+
+  '-estudiantes/inscribir'    :InscribirEstudiante(),
+  '-estudiantes/actualizar'   :ActualizarEstudiante(),
+  '-estudiantes/buscar'       :BuscarEstudiante(),
+  '-estudiantes/estadistica'  :EstadisticaEstudiante(),
+  '-estudiantes/asistencia'   :SubirAsistenciaEstudiante(),
+  '-estudiantes/rendimiento'  :SubirRendimientoEstudiante(),
+  '-estudiantes/matricula'    :MatriculaEstudiante(),
+
+  '-docentes/inscribir'       :InscribirDocente(),
+  '-docentes/actualizar'      :ActualizarDocente(),
+  '-docentes/buscar'          :BuscarDocente(),
+  '-docentes/matricula'       :MatriculaDocente(),
+  '-docentes/asignar'         :AsignarDocente(),
+
+  '-representantes/inscribir' :InscribirRepresentante(),
+  '-representantes/actualizar':ActualizarRepresentante(),
+  '-representantes/buscar'    :BuscarRepresentante(),
+  '-representantes/visualizar':VisualizarRepresentante(),
 };
 
 Route toPage (String pageName){

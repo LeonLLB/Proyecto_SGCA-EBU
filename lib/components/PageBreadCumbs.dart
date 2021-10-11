@@ -9,10 +9,15 @@ void changePage (BuildContext context,String route, String label){
   if (route != page) {          
           
     final conditionOfSubstraction = Provider.of<PageProvider>(context,listen:false).history.length > 1;
+    final finalConditionOfSubstraction = Provider.of<PageProvider>(context,listen:false).history.length > 2;
     Provider.of<PageProvider>(context,listen:false).page = route;
     
     if(!route.startsWith('/')){
-      if (conditionOfSubstraction) {
+      if (finalConditionOfSubstraction) {
+        Provider.of<PageProvider>(context,listen:false).substractFromHistory();
+        Provider.of<PageProvider>(context,listen:false).substractFromHistory();
+        Provider.of<PageProvider>(context,listen:false).addToHistory(label,route);
+      }else if(conditionOfSubstraction){
         Provider.of<PageProvider>(context,listen:false).substractFromHistory();
         Provider.of<PageProvider>(context,listen:false).addToHistory(label,route);
       }else{
@@ -21,7 +26,7 @@ void changePage (BuildContext context,String route, String label){
     }
     else if(route == '/home'){          
       if (conditionOfSubstraction) {
-        Provider.of<PageProvider>(context,listen:false).substractFromHistory();
+        Provider.of<PageProvider>(context,listen:false).history = [{'route':'/home','name':'home'}];
       }
     }
 

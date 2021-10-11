@@ -24,16 +24,21 @@ class CustomSideBarItem extends StatelessWidget {
     final page = Provider.of<PageProvider>(context).page;
 
     return ListTile(
-      leading:Icon(icon,color:(route == page) ? Color(0xff96baff) : Colors.black ),
-      title:Text(label, style: TextStyle(color: (route == page) ? Color(0xff96baff) : Colors.black)),
+      leading:Icon(icon,color:(page.startsWith(route)) ? Color(0xff96baff) : Colors.black ),
+      title:Text(label, style: TextStyle(color: (page.startsWith(route)) ? Color(0xff96baff) : Colors.black)),
       onTap:(){
         if (route != page) {          
           
           final conditionOfSubstraction = Provider.of<PageProvider>(context,listen:false).history.length > 1;
+          final finalConditionOfSubstraction = Provider.of<PageProvider>(context,listen:false).history.length > 2;
           Provider.of<PageProvider>(context,listen:false).page = route;
           
           if(!route.startsWith('/')){
-            if (conditionOfSubstraction) {
+            if (finalConditionOfSubstraction) {
+              Provider.of<PageProvider>(context,listen:false).substractFromHistory();
+              Provider.of<PageProvider>(context,listen:false).substractFromHistory();
+              Provider.of<PageProvider>(context,listen:false).addToHistory(label,route);
+            }else if(conditionOfSubstraction){
               Provider.of<PageProvider>(context,listen:false).substractFromHistory();
               Provider.of<PageProvider>(context,listen:false).addToHistory(label,route);
             }else{
@@ -43,7 +48,7 @@ class CustomSideBarItem extends StatelessWidget {
 
           else if(route == '/home'){          
             if (conditionOfSubstraction) {
-              Provider.of<PageProvider>(context,listen:false).substractFromHistory();
+              Provider.of<PageProvider>(context,listen:false).history = [{'route':'/home','name':'home'}];
             }
           }
 
