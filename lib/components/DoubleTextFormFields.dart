@@ -33,10 +33,11 @@ class DoubleTextFormFields extends StatelessWidget {
           validators: validators[0],
           obscureText: obscureTexts?[0],
         ),
+        (iconos.length == 1 ) ? Padding(padding:EdgeInsets.symmetric(horizontal: 5)) : Padding(padding:EdgeInsets.symmetric(horizontal: 0)),
         SimplifiedTextFormField(
           controlador: controladores[1],
           labelText: labelTexts[1],
-          icon: iconos.length == 1 ? iconos[0] : iconos[1],
+          icon: iconos.length == 1 ? null : iconos[1],
           validators: validators[1],
           obscureText: obscureTexts?[1],
         ), 
