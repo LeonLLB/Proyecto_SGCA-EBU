@@ -30,8 +30,8 @@ Desarrollo de un sistema de gestion y control academico para la administracion d
 
 | Historia de usuario (por orden de prioridad)| Sprint | Progreso |
 | ----------- | ----------- | ----------- |
-|**H1**|**1**| 35% |
-|**H2**|1| 9%|
+|**H1**|**1**| 67% |
+|**H2**|1| 47%|
 |**H3**|1| 0% |
 |**H4**|**2**| 0% |
 |**H5**|2| 0% |
