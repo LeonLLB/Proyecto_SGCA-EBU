@@ -12,7 +12,7 @@ class Estudiante{
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       nombres VARCHAR(20) NOT NULL, 
       apellidos VARCHAR(20) NOT NULL,
-      cedula VARCHAR (12) UNIQUE NOT NULL,
+      cedula VARCHAR(12) UNIQUE NOT NULL,
       lugar_nacimiento VARCHAR(30) NOT NULL,
       fecha_nacimiento VARCHAR(10) NOT NULL,
       genero CHAR(1) NOT NULL

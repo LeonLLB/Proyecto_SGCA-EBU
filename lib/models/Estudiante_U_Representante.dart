@@ -9,12 +9,16 @@ class EstudianteURepresentante{
   
     CREATE TABLE Estudiante_U_Representante(
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-      estudianteID INTEGER NOT NULL REFERENCES Informacion_estudiantes
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-      representanteID INTEGER NOT NULL REFERENCES Representantes
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,,
+      estudianteID INTEGER NOT NULL,
+      representanteID INTEGER NOT NULL,
+      
+      FOREIGN KEY (estudianteID) REFERENCES Estudiante (id)
+      	ON UPDATE CASCADE
+      	ON DELETE CASCADE
+      
+      FOREIGN KEY (representanteID) REFERENCES Representante (id)
+      	ON UPDATE CASCADE
+      	ON DELETE CASCADE
     );
   
   ''';
