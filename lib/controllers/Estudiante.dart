@@ -11,9 +11,9 @@ Future<int> calcularCedulaEscolar ({int? inscripcionYear ,required int cedulaRep
   int anoInscripcion = (inscripcionYear == null) ? (DateTime.now().year - 2000) : inscripcionYear - 2000;
 
   final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
-  final result = await db.query(Estudiante.tableName,where: 'CAST(cedula AS TEXT) LIKE ?',whereArgs: ['%$cedulaRepresentante$anoInscripcion']);
+  final result = await db.query(Estudiante.tableName,where: 'CAST(cedula AS TEXT) LIKE ?',whereArgs: ['%$anoInscripcion$cedulaRepresentante']);
 
-  return int.parse('${result.length + 1}$cedulaRepresentante$anoInscripcion');
+  return int.parse('${result.length + 1}$anoInscripcion$cedulaRepresentante');
 }
 
 

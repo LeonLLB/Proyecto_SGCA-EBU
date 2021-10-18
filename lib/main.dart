@@ -30,7 +30,7 @@ void initDB() async {
   initTable(Estudiante.tableInitializer,Estudiante.testInitializer,db);
   initTable(Representante.tableInitializer,Representante.testInitializer,db);
   initTable(EstudianteURepresentante.tableInitializer,EstudianteURepresentante.testInitializer,db);
-  await db.close();
+
 }
 void main() {
 

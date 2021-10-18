@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_sgca_ebu/components/DoubleTextFormFields.dart';
+import 'package:proyecto_sgca_ebu/components/FailedSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/RadioInputsRowList.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
+import 'package:proyecto_sgca_ebu/components/SuccesSnackbar.dart';
+import 'package:proyecto_sgca_ebu/components/loadingSnackbar.dart';
+import 'package:proyecto_sgca_ebu/controllers/Estudiante.dart';
+import 'package:proyecto_sgca_ebu/controllers/Representante.dart';
+import 'package:proyecto_sgca_ebu/helpers/calcularEdad.dart';
+import 'package:proyecto_sgca_ebu/helpers/formInfoIntoMap.dart';
+import 'package:proyecto_sgca_ebu/models/Estudiante.dart';
+import 'package:proyecto_sgca_ebu/models/Representante.dart';
 
 
 class InscribirEstudiante extends StatefulWidget {
@@ -21,7 +30,10 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
   tipo tipoEstudiante = tipo.e;
   procedencia procedenciaEstudiante = procedencia.e;
 
+  TextEditingController inscripcionYear = TextEditingController(text:DateTime.now().year.toString());
+
   representante existeRepresentante = representante.noExiste;
+  int gradoACursar = 0;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -36,12 +48,39 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
   };
 
   Map<String, dynamic> controladoresRepresentante = {
-    'Nombres':TextEditingController(),
-    'Apellidos':TextEditingController(),
-    'Cedula':TextEditingController(),
-    'Numero':TextEditingController(),
-    'Ubicacion':TextEditingController(),
-  };
+      'Nombres':TextEditingController(),
+      'Apellidos':TextEditingController(),
+      'Cedula':TextEditingController(),
+      'Numero':TextEditingController(),
+      'Ubicacion':TextEditingController(),
+    };
+
+  void resetForm(){
+    controladoresRepresentante = {
+      'Nombres':TextEditingController(),
+      'Apellidos':TextEditingController(),
+      'Cedula':TextEditingController(),
+      'Numero':TextEditingController(),
+      'Ubicacion':TextEditingController(),
+    };
+    controladoresEstudiante = {
+      'Nombres':TextEditingController(),
+      'Apellidos':TextEditingController(),
+      'LugarNacimiento':TextEditingController(),
+      'FechaNacimiento':'',
+      'Genero':'',
+      'Tipo':'',
+      'Procedencia':'',
+    };
+
+    generoEstudiante = genero.e;
+    tipoEstudiante = tipo.e;
+    procedenciaEstudiante = procedencia.e;
+
+    inscripcionYear = TextEditingController(text:DateTime.now().year.toString());
+
+    existeRepresentante = representante.noExiste;
+  }
 
   Future<DateTime?> getDate (BuildContext context,String? date)=>showDatePicker(
     context: context,
@@ -150,6 +189,9 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                       setState(() {
                         controladoresEstudiante['Procedencia'] = val.toString().split('.')[1];
                         procedenciaEstudiante = val!;
+                        if(val == procedencia.Hogar){
+                          gradoACursar = 1;
+                        }
                       });
                     }
                   ),
@@ -221,7 +263,51 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
 
                 Padding(padding:EdgeInsets.symmetric(vertical:5)),
 
-                TextButton(onPressed: (){},
+                _ContenedorForm([Row(children:[SimplifiedTextFormField(
+                  controlador: inscripcionYear,
+                  labelText: 'Año de inscripción',
+                  validators: TextFormFieldValidators(required:true,isNumeric:true)
+                )])]),
+                
+                Padding(padding:EdgeInsets.symmetric(vertical:5)),
+
+                TextButton(onPressed: ()async{
+                  if(
+                    _formKey.currentState!.validate() &&
+                    controladoresEstudiante['FechaNacimiento'] != '' &&
+                    controladoresEstudiante['Genero'] != '' &&
+                    controladoresEstudiante['Tipo'] != '' &&
+                    controladoresEstudiante['Procedencia'] != ''
+                  ){
+                    controladoresEstudiante['Cedula'] = await controladorEstudiante.calcularCedulaEscolar(
+                      cedulaRepresentante: int.parse(controladoresRepresentante['Cedula']),
+                      inscripcionYear: int.parse(inscripcionYear.text)
+                    );
+                    if(controladoresEstudiante['Procedencia'] != 'Hogar'){
+                      gradoACursar = await getGradoACursar(context);
+                    }
+                    if(gradoACursar > 0){
+
+                      final inscripcionConfirmada = await confirmarInscripcion(
+                        controladoresEstudiante,
+                        controladoresRepresentante,
+                        context,(existeRepresentante == representante.existe)
+                      );
+
+                      if(inscripcionConfirmada!){
+                          // crearEstudiante(
+                          //   controladoresEstudiante,
+                          //   controladoresRepresentante,
+                          //   context,(existeRepresentante == representante.existe));
+                      }
+                      
+                    }
+                    
+                  }else{
+                    ScaffoldMessenger.of(context)
+                    .showSnackBar(failedSnackbar('Todos los campos son obligatorios'));
+                  }
+                },
                 child: Text('Inscribir estudiante y representante',
                 style:TextStyle(fontSize: 20,fontWeight:FontWeight.w600))),
 
@@ -233,6 +319,195 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
       ),
     );
   }
+
+  Future<int> getGradoACursar (BuildContext context)async{
+    List<String> grados = ['1er','2do','3er','4to','5to','6to'];
+    switch(await showDialog<String>(context: context, builder: (_)=>SimpleDialog(
+      title: Text('Grado a cursar'),
+      children: grados.map((grado) => SimpleDialogOption(
+        onPressed: (){Navigator.pop(_,grado);},
+        child: Text('$grado grado')
+      )).toList()
+    ))){
+      case '1er':
+        return 1;
+      case '2do':
+        return 2;
+      case '3er':
+        return 3;
+      case '4to':
+        return 4;
+      case '5to':
+        return 5;
+      case '6to':
+        return 6;
+      case null:
+        return gradoACursar;
+      default:
+        return 0;
+    }
+  }
+
+  Future<bool?> confirmarInscripcion(
+    Map<String, dynamic> infoEstudiante,
+    Map<String, dynamic> infoRepresentante,
+    BuildContext context,
+    bool representanteInscrito
+  )async{
+
+    final List<Widget> parteDelEstudiante = [
+      Text('Estudiante',style:TextStyle(fontWeight: FontWeight.bold)),
+      Text('${infoEstudiante["Nombres"]} ${infoEstudiante["Apellidos"]}',style:TextStyle(fontWeight: FontWeight.bold)),
+      Row(children: [
+        Text('C.I Escolar:',style:TextStyle(fontWeight: FontWeight.bold)),
+        Text(infoEstudiante['Cedula'].toString())
+      ]),
+      Row(children: [
+        Text('Edad:',style:TextStyle(fontWeight: FontWeight.bold)),
+        Text('${calcularEdad(infoEstudiante["FechaNacimiento"])} años')
+      ]),
+      Row(children: [
+        Text('Grado a ${(infoEstudiante["Tipo"] == "Repitiente") ? "repetir" : "cursar" }:',style:TextStyle(fontWeight: FontWeight.bold)),
+        Text('$gradoACursar grado')
+      ]),
+    ];
+
+    if(representanteInscrito){
+      final Representante? representante = await controladorRepresentante.buscarRepresentante(int.parse(infoRepresentante['Cedula']));
+      if(representante == null){
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No existe el representante solicitado'));
+        return false;
+      }
+      else{
+        return showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Confirmar inscripción'),
+            content: SingleChildScrollView(
+              child: Center(
+                child: ListBody(
+                  children: [
+                    ...parteDelEstudiante,
+                    Text('Representante',style:TextStyle(fontWeight: FontWeight.bold)),
+                    Text('${representante.nombres} ${representante.apellidos}',style:TextStyle(fontWeight: FontWeight.bold)),
+                    Row(children: [
+                      Text('C.I:',style:TextStyle(fontWeight: FontWeight.bold)),
+                      Text(representante.cedula.toString())
+                    ]),
+                  ],
+                ),
+              )
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Confirmar'),
+              ),
+            ],
+          ),
+        );
+      }
+    }else{
+      return showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text('Confirmar inscripción'),
+          content: SingleChildScrollView(
+            child: Center(
+              child: ListBody(
+                children: [
+                  ...parteDelEstudiante,
+                  Text('Representante',style:TextStyle(fontWeight: FontWeight.bold)),
+                  Text('${infoRepresentante["Nombres"]} ${infoRepresentante["Apellidos"]}',style:TextStyle(fontWeight: FontWeight.bold)),
+                  Row(children: [
+                    Text('C.I:',style:TextStyle(fontWeight: FontWeight.bold)),
+                    Text(infoRepresentante["Cedula"])
+                  ]),
+                ],
+              ),
+            )
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Confirmar'),
+            ),
+          ],
+        ),
+        );
+      }
+    }
+
+  void crearEstudiante(    
+    Map<String, dynamic> infoEstudiante,
+    Map<String, dynamic> infoRepresentante,
+    BuildContext context,
+    bool representanteInscrito) async {
+
+      if(representanteInscrito){
+
+        final Estudiante estudianteAInscribir = Estudiante.fromForm(formInfoIntoMap(infoEstudiante));
+        ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+          message:'Registrando estudiante...',
+          onVisible: () async {
+            try {
+              final result = await controladorEstudiante.registrar(estudianteAInscribir);
+              if(result == -1){
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No existe el representante solicitado'));
+              }
+              else{
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Estudiante creado con exito!'));
+                resetForm();
+              }
+            } catch (e) {
+              print(e);
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Hubo un error al crear el estudiante'));
+            }
+          }
+        ));
+      
+      }else{
+        if(await controladorRepresentante.buscarRepresentante(infoRepresentante['Cedula']) == null){
+          final Representante represententanteAInscribir = Representante.fromForm(formInfoIntoMap(infoRepresentante));
+                    
+          final Estudiante estudianteAInscribir = Estudiante.fromForm(formInfoIntoMap(infoEstudiante));
+        
+          ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+          message:'Registrando estudiante y representante...',
+          onVisible: () async {
+            try {
+              await controladorEstudiante.registrar(estudianteAInscribir,representante:represententanteAInscribir);
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Estudiante y representante creados con exito!'));
+              resetForm();
+            } catch (e) {
+              print(e);
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Hubo un error al crear el estudiante o representante'));
+            }
+          }
+          ));
+        }
+        else{
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Ya existe un representante para esa cedula'));
+        }
+      }
+
+    }    
+  
 }
 
 class _ContenedorForm extends StatelessWidget {
