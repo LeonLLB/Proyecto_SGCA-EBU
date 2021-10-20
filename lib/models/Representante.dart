@@ -46,9 +46,9 @@ class Representante{
     id = representante['id'],
     nombres = representante['nombres'],
     apellidos = representante['apellidos'],
-    cedula = representante['Cedula'],
-    numero = representante['Numero'],
-    ubicacion = representante['Ubicacion'];
+    cedula = representante['cedula'],
+    numero = representante['numero'],
+    ubicacion = representante['ubicacion'];
 
   Map<String,dynamic> toJson({bool withId = true})=>(withId)?{
     'id':id,

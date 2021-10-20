@@ -25,6 +25,7 @@ enum procedencia {e,Hogar,Institucion}
 enum representante {existe,noExiste}
 
 class _InscribirEstudianteState extends State<InscribirEstudiante> {
+  //TODO: YA TODO ESTA LISTA, QUEDA PROBAR QUE FUNCIONE Y NO EXPLOTE
 
   genero generoEstudiante = genero.e;
   tipo tipoEstudiante = tipo.e;
@@ -295,10 +296,10 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                       );
 
                       if(inscripcionConfirmada!){
-                          // crearEstudiante(
-                          //   controladoresEstudiante,
-                          //   controladoresRepresentante,
-                          //   context,(existeRepresentante == representante.existe));
+                        crearEstudiante(
+                          controladoresEstudiante,
+                          controladoresRepresentante,
+                          context,(existeRepresentante == representante.existe));
                       }
                       
                     }
@@ -460,7 +461,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
           message:'Registrando estudiante...',
           onVisible: () async {
             try {
-              final result = await controladorEstudiante.registrar(estudianteAInscribir);
+              final result = await controladorEstudiante.registrar(estudianteAInscribir,cedulaRepresentante: infoRepresentante['Cedula'],gradoDeseado:gradoACursar);
               if(result == -1){
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No existe el representante solicitado'));
@@ -488,7 +489,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
           message:'Registrando estudiante y representante...',
           onVisible: () async {
             try {
-              await controladorEstudiante.registrar(estudianteAInscribir,representante:represententanteAInscribir);
+              await controladorEstudiante.registrar(estudianteAInscribir,representante:represententanteAInscribir,gradoDeseado:gradoACursar);
               ScaffoldMessenger.of(context).removeCurrentSnackBar();
               ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Estudiante y representante creados con exito!'));
               resetForm();

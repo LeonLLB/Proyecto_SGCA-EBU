@@ -1,4 +1,5 @@
 import 'package:proyecto_sgca_ebu/controllers/Representante.dart';
+import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Estudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Estudiante_U_Representante.dart';
 import 'package:proyecto_sgca_ebu/models/Representante.dart';
@@ -17,7 +18,7 @@ Future<int> calcularCedulaEscolar ({int? inscripcionYear ,required int cedulaRep
 }
 
 
-  Future<int> registrar(Estudiante estudiante,{int? cedulaRepresentante,Representante? representante}) async{
+  Future<int> registrar(Estudiante estudiante,{int? cedulaRepresentante,Representante? representante,required int gradoDeseado}) async{
     assert(cedulaRepresentante == null && representante != null,'Haz enviado la cedula y el representante, solo debes mandar unos de ellos');
     assert(cedulaRepresentante != null && representante == null,'Haz enviado la cedula y el representante, solo debes mandar unos de ellos');
     
@@ -26,15 +27,21 @@ Future<int> calcularCedulaEscolar ({int? inscripcionYear ,required int cedulaRep
       final representanteCedula = await controladorRepresentante.buscarRepresentante(cedulaRepresentante);
       if(representanteCedula == null) return -1; // NO EXISTE EL REPRESENTANTE
       
-      final resultEstudiante = await db.insert(Estudiante.tableName,estudiante.toJson(withId: false));
+      int resultEstudiante = await db.insert(Estudiante.tableName,estudiante.toJson(withId: false));
       
-      await db.insert(EstudianteURepresentante.tableName, {'EstudianteID':resultEstudiante,'RepresentanteID':representanteCedula.id});
+      if(resultEstudiante != 0){
+        await db.insert(EstudianteURepresentante.tableName, {'EstudianteID':resultEstudiante,'RepresentanteID':representanteCedula.id});
+        resultEstudiante = await controladorMatriculaEstudiante.registrar(resultEstudiante, gradoDeseado);        
+      }
       db.close();
       return resultEstudiante;
     }else if(representante != null){
       final representanteInsertado = await controladorRepresentante.registrar(representante);
-      final resultEstudiante = await db.insert(Estudiante.tableName,estudiante.toJson(withId: false));
-      await db.insert(EstudianteURepresentante.tableName, {'EstudianteID':resultEstudiante,'RepresentanteID':representanteInsertado});
+      int resultEstudiante = await db.insert(Estudiante.tableName,estudiante.toJson(withId: false));
+      if(resultEstudiante != 0){
+        await db.insert(EstudianteURepresentante.tableName, {'EstudianteID':resultEstudiante,'RepresentanteID':representanteInsertado});
+        resultEstudiante = await controladorMatriculaEstudiante.registrar(resultEstudiante, gradoDeseado);
+      }
       db.close();
       return resultEstudiante;
     }

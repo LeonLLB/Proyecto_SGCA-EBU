@@ -50,10 +50,10 @@ class Estudiante{
     id = estudiante['id'],
     nombres = estudiante['nombres'],
     apellidos = estudiante['apellidos'],
-    cedula = estudiante['Cedula'],
-    lugarNacimiento = estudiante['LugarNacimiento'],
-    fechaNacimiento = DateTime(estudiante['FechaNacimiento'].split('/')[2],estudiante['FechaNacimiento'].split('/')[1],estudiante['FechaNacimiento'].split('/')[0]),
-    genero = estudiante['Genero'];
+    cedula = estudiante['cedula'],
+    lugarNacimiento = estudiante['lugar_nacimiento'],
+    fechaNacimiento = DateTime(estudiante['fecha_nacimiento'].split('/')[2],estudiante['FechaNacimiento'].split('/')[1],estudiante['FechaNacimiento'].split('/')[0]),
+    genero = estudiante['genero'];
 
   Map<String,dynamic> toJson({bool withId = true})=>(withId)?{
     'id':id,

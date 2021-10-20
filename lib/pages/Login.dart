@@ -7,7 +7,6 @@ import 'package:proyecto_sgca_ebu/components/SuccesSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/UI.dart';
 import 'package:proyecto_sgca_ebu/components/loadingSnackbar.dart';
 import 'package:proyecto_sgca_ebu/controllers/Usuarios.dart';
-import 'package:proyecto_sgca_ebu/models/Usuarios.dart';
 import 'package:proyecto_sgca_ebu/routes.dart';
 
 class LoginPage extends StatefulWidget {
