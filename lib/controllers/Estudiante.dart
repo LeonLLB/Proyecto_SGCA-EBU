@@ -33,11 +33,18 @@ Future<int> calcularCedulaEscolar ({int? inscripcionYear ,required int cedulaRep
         await db.insert(EstudianteURepresentante.tableName, {'EstudianteID':resultEstudiante,'RepresentanteID':representanteCedula.id});
         resultEstudiante = await controladorMatriculaEstudiante.registrar(resultEstudiante, gradoDeseado);        
       }
+
       db.close();
+
       return resultEstudiante;
+
     }else if(representante != null){
+
+      if(await controladorRepresentante.buscarRepresentante(representante.cedula) != null) return -1;
+
       final representanteInsertado = await controladorRepresentante.registrar(representante);
       int resultEstudiante = await db.insert(Estudiante.tableName,estudiante.toJson(withId: false));
+      
       if(resultEstudiante != 0){
         await db.insert(EstudianteURepresentante.tableName, {'EstudianteID':resultEstudiante,'RepresentanteID':representanteInsertado});
         resultEstudiante = await controladorMatriculaEstudiante.registrar(resultEstudiante, gradoDeseado);

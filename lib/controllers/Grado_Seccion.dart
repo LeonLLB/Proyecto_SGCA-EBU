@@ -13,10 +13,10 @@ class _AmbientesController{
 
   }
 
-  Future<List<Ambiente>> buscarAmbientesPorGrado(int grado) async {
+  Future<List<Ambiente>?> buscarAmbientesPorGrado(int grado) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
-    final result = await db.query(Ambiente.tableName,where: 'grado = ?',whereArgs: [grado]);
+    final result = await db.query(Ambiente.tableName,orderBy: 'seccion DESC',where: 'grado = ?',whereArgs: [grado]);
 
     db.close();    
     List<Ambiente> listaDeAmbientes = [];
@@ -25,7 +25,22 @@ class _AmbientesController{
       listaDeAmbientes.add(Ambiente.fromMap(ambiente));
     }
         
-    return listaDeAmbientes;
+    return (listaDeAmbientes.length == 0 ) ? null : listaDeAmbientes;
+  }
+
+  Future<List<Ambiente>?> obtenerGrados()async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final result = await db.query(Ambiente.tableName,orderBy: 'grado, seccion');
+    
+    db.close();    
+    List<Ambiente> listaDeAmbientes = [];
+
+    for(var ambiente in result){
+      listaDeAmbientes.add(Ambiente.fromMap(ambiente));
+    }
+    
+    return (listaDeAmbientes.length == 0 ) ? null : listaDeAmbientes;
   }
 
 }

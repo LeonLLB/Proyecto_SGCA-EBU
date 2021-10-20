@@ -30,6 +30,10 @@ final Map<String, Widget> routes = {
   '-representantes/actualizar':ActualizarRepresentante(),
   '-representantes/buscar'    :BuscarRepresentante(),
   '-representantes/visualizar':VisualizarRepresentante(),
+
+  '-admin/inscribirgrado':AdminInscribirGrado(),
+  '-admin/vergrados':AdminVerGrado(),
+  '-admin/cambiarañoescolar':AdminCambiarYearEscolar(),
 };
 
 Route toPage (String pageName){

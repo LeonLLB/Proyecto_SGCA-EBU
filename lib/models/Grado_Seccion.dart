@@ -12,8 +12,10 @@ class Ambiente {
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       grado INTEGER NOT NULL,
       seccion CHAR(1) NOT NULL,
-      turno CHAR(1) NOT NULL
-    )
+      turno CHAR(1) NOT NULL,
+
+      UNIQUE(grado,seccion)
+    );
   
   ''';
 
@@ -30,14 +32,14 @@ class Ambiente {
   });
 
   Ambiente.fromForm(Map<String,dynamic> ambiente) :
-    grado = ambiente['Grado'],
+    grado = int.parse(ambiente['Grado']),
     seccion = ambiente['Sección'],
     turno = ambiente['Turno'];
 
   Ambiente.fromMap(Map<String,dynamic> ambiente) :
     id = ambiente['id'],
     grado = ambiente['grado'],
-    seccion = ambiente['sección'],
+    seccion = ambiente['seccion'],
     turno = ambiente['turno'];
   
   Map<String,dynamic> toJson({bool withId = true}) => (withId) ? {

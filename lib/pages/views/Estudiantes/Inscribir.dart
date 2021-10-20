@@ -25,12 +25,12 @@ enum procedencia {e,Hogar,Institucion}
 enum representante {existe,noExiste}
 
 class _InscribirEstudianteState extends State<InscribirEstudiante> {
-  //TODO: YA TODO ESTA LISTA, QUEDA PROBAR QUE FUNCIONE Y NO EXPLOTE
+  //TODO: YA TODO ESTA LISTO, QUEDA PROBAR QUE FUNCIONE Y NO EXPLOTE
 
   genero generoEstudiante = genero.e;
   tipo tipoEstudiante = tipo.e;
   procedencia procedenciaEstudiante = procedencia.e;
-
+ 
   TextEditingController inscripcionYear = TextEditingController(text:DateTime.now().year.toString());
 
   representante existeRepresentante = representante.noExiste;
@@ -81,6 +81,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
     inscripcionYear = TextEditingController(text:DateTime.now().year.toString());
 
     existeRepresentante = representante.noExiste;
+    setState((){});
   }
 
   Future<DateTime?> getDate (BuildContext context,String? date)=>showDatePicker(
@@ -462,10 +463,22 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
           onVisible: () async {
             try {
               final result = await controladorEstudiante.registrar(estudianteAInscribir,cedulaRepresentante: infoRepresentante['Cedula'],gradoDeseado:gradoACursar);
+              
               if(result == -1){
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No existe el representante solicitado'));
               }
+
+              else if(result == -2){
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo asignar al estudiante a un grado'));
+              }
+
+              else if(result == -3){
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No existe el grado solicitado: $gradoACursar'));
+              }  
+
               else{
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Estudiante creado con exito!'));
@@ -489,10 +502,29 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
           message:'Registrando estudiante y representante...',
           onVisible: () async {
             try {
-              await controladorEstudiante.registrar(estudianteAInscribir,representante:represententanteAInscribir,gradoDeseado:gradoACursar);
-              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Estudiante y representante creados con exito!'));
-              resetForm();
+              final result = await controladorEstudiante.registrar(estudianteAInscribir,representante:represententanteAInscribir,gradoDeseado:gradoACursar);
+              
+              if(result == -1){
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('El representante ya existe'));
+              }
+
+              else if(result == -2){
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo asignar al estudiante a un grado'));
+              }
+
+              else if(result == -3){
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No existe el grado solicitado: $gradoACursar'));
+              }
+
+              else{
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Estudiante y representante creados con exito!'));
+                resetForm();
+              }            
+
             } catch (e) {
               print(e);
               ScaffoldMessenger.of(context).removeCurrentSnackBar();

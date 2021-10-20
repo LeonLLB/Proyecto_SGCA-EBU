@@ -8,7 +8,7 @@ class MatriculaEstudiante{
   static final String tableInitializer = '''
   
     CREATE TABLE Matricula_Estudiantes(
-      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       ambienteID INTEGER NOT NULL,
       estudianteID INTEGER NOT NULL,
       añoEscolar VARCHAR(9) NOT NULL,

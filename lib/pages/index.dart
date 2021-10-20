@@ -26,3 +26,7 @@ export 'package:proyecto_sgca_ebu/pages/views/Representantes/Inscribir.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Representantes/Actualizar.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Representantes/Buscar.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Representantes/Visualizar.dart';
+
+export 'package:proyecto_sgca_ebu/pages/views/Admin/InscribirGrado.dart';
+export 'package:proyecto_sgca_ebu/pages/views/Admin/VerGrados.dart';
+export 'package:proyecto_sgca_ebu/pages/views/Admin/CambiarAñoEscolar.dart';

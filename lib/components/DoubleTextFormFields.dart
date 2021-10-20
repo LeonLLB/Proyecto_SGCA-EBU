@@ -17,7 +17,7 @@ class DoubleTextFormFields extends StatelessWidget {
     this.obscureTexts : const [false,false]
   }){
     assert(this.controladores.length == 2, "Debe haber 2 controladores solamente, hubieron ${this.controladores.length} controladores");
-    assert(this.iconos.length == 0 || this.iconos.length < 3, "Debe haber por lo menos un icono, y un máximo de 2 iconos, hubieron ${this.iconos.length} iconos");
+    assert(this.iconos.length > 0 && this.iconos.length < 3, "Debe haber por lo menos un icono, y un máximo de 2 iconos, hubieron ${this.iconos.length} iconos");
     assert(this.labelTexts.length == 2, "Debe haber 2 descriptores solamente, hubieron ${this.labelTexts.length} descriptores");
     assert(this.validators.length == 2, "Debe haber 2 validadores solamente, hubieron ${this.validators.length} validadores");
   }
