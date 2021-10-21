@@ -23,6 +23,12 @@ class PageProvider extends ChangeNotifier{
     notifyListeners();
   }
 
+  void goBack(){
+    this._page = this._history[this._history.length-2]['route']!;
+    this._history.removeLast();
+    notifyListeners();
+  }
+
   void substractFromHistory(){
     this._history.removeLast();
     notifyListeners();

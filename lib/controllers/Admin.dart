@@ -13,6 +13,16 @@ class _AdminController{
     return result;
   }
 
+  Future<int> actualizarOpcion(String opcionACambiar,Admin opcionActualizada)async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    
+    final result = await db.update(Admin.tableName, opcionActualizada.toJson(withId:true),where: 'opcion = ?',whereArgs:[opcionACambiar] ); //(Admin.tableName,opcion.toJson(withId:false));
+
+    db.close();
+
+    return result;
+  }
+
   Future<List<Admin>?> obtenerOpciones()async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     
@@ -27,6 +37,16 @@ class _AdminController{
     db.close();
 
     return (results.length == 0 ) ? null : results;
+  }
+
+  Future<Admin?> obtenerOpcion(String opcion)async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    
+    final opcionSolicitada = await db.query(Admin.tableName,where: 'opcion = ?',whereArgs:[opcion]);
+
+    db.close();
+
+    return (opcionSolicitada.length == 0) ? null : Admin.fromMap(opcionSolicitada[0]);
   }
 
 }

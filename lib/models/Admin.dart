@@ -22,7 +22,7 @@ class Admin {
   Admin({this.id,required this.opcion, required this.valor});
 
   Admin.fromForm(Map<String,String> opciones) :
-    opcion = opciones['Opcion']!,
+    opcion = opciones['Opción']!,
     valor = opciones['Valor']!;
 
   Admin.fromMap(Map<String,dynamic> opciones) :

@@ -7,6 +7,7 @@ class TextFormFieldValidators {
   int? charLength;
   bool isEmail;
   String? Function(String val)? extraValidator;
+  void Function(String)? onChange;
 
   TextFormFieldValidators({
     this.required : false,
@@ -14,7 +15,8 @@ class TextFormFieldValidators {
     this.isNotNumeric : false,
     this.charLength,
     this.isEmail : false,
-    this.extraValidator
+    this.extraValidator,
+    this.onChange
   }){
     assert(!(this.isNumeric && this.isNotNumeric));
   }
@@ -43,6 +45,7 @@ class SimplifiedTextFormField extends StatelessWidget {
       controller: controlador,
       maxLength: validators.charLength,
       obscureText: obscureText ?? false,
+      onChanged: validators.onChange,
       decoration: InputDecoration(
         icon: icon,
         labelText: labelText,                        
