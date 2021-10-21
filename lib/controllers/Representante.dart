@@ -12,13 +12,13 @@ class _RepresentanteControllers{
     return result;
   }
 
-  Future<Representante?> buscarRepresentante(int cedula) async {
+  Future<Representante?> buscarRepresentante(int cedula,[bool closeDB = true]) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
     final result = await db.query(Representante.tableName,where: 'cedula = ?',whereArgs: [cedula]);
 
-    db.close();
-    return Representante.fromMap(result[0]);
+    if(closeDB) {db.close();}
+    return (result.isEmpty) ? null : Representante.fromMap(result[0]);
   }
 
 }

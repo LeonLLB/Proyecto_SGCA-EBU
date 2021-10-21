@@ -16,7 +16,7 @@ class _AmbientesController{
   Future<List<Ambiente>?> buscarAmbientesPorGrado(int grado) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
-    final result = await db.query(Ambiente.tableName,orderBy: 'seccion DESC',where: 'grado = ?',whereArgs: [grado]);
+    final result = await db.query(Ambiente.tableName,orderBy: 'seccion ASC',where: 'grado = ?',whereArgs: [grado]);
 
     db.close();    
     List<Ambiente> listaDeAmbientes = [];

@@ -38,7 +38,7 @@ class Representante{
   Representante.fromForm(Map<String,dynamic> representante) :
     nombres = representante['Nombres'],
     apellidos = representante['Apellidos'],
-    cedula = representante['Cedula'],
+    cedula = int.parse(representante['Cedula']),
     numero = representante['Numero'],
     ubicacion = representante['Ubicacion'];
 

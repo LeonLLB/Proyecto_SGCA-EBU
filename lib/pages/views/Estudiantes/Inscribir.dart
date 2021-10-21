@@ -282,7 +282,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                     controladoresEstudiante['Procedencia'] != ''
                   ){
                     controladoresEstudiante['Cedula'] = await controladorEstudiante.calcularCedulaEscolar(
-                      cedulaRepresentante: int.parse(controladoresRepresentante['Cedula']),
+                      cedulaRepresentante: int.parse(controladoresRepresentante['Cedula'].text),
                       inscripcionYear: int.parse(inscripcionYear.text)
                     );
                     if(controladoresEstudiante['Procedencia'] != 'Hogar'){
@@ -296,7 +296,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                         context,(existeRepresentante == representante.existe)
                       );
 
-                      if(inscripcionConfirmada!){
+                      if(inscripcionConfirmada != null && inscripcionConfirmada){
                         crearEstudiante(
                           controladoresEstudiante,
                           controladoresRepresentante,
@@ -358,24 +358,30 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
   )async{
 
     final List<Widget> parteDelEstudiante = [
-      Text('Estudiante',style:TextStyle(fontWeight: FontWeight.bold)),
-      Text('${infoEstudiante["Nombres"]} ${infoEstudiante["Apellidos"]}',style:TextStyle(fontWeight: FontWeight.bold)),
-      Row(children: [
-        Text('C.I Escolar:',style:TextStyle(fontWeight: FontWeight.bold)),
-        Text(infoEstudiante['Cedula'].toString())
-      ]),
-      Row(children: [
-        Text('Edad:',style:TextStyle(fontWeight: FontWeight.bold)),
-        Text('${calcularEdad(infoEstudiante["FechaNacimiento"])} años')
-      ]),
-      Row(children: [
-        Text('Grado a ${(infoEstudiante["Tipo"] == "Repitiente") ? "repetir" : "cursar" }:',style:TextStyle(fontWeight: FontWeight.bold)),
-        Text('$gradoACursar grado')
-      ]),
+      Center(child: Text('Estudiante',style:TextStyle(fontWeight: FontWeight.bold))),
+      Center(child: Text('${infoEstudiante["Nombres"].text} ${infoEstudiante["Apellidos"].text}',style:TextStyle(fontWeight: FontWeight.bold))),
+      Center(
+        child: Row(children: [
+          Text('C.I Escolar: ',style:TextStyle(fontWeight: FontWeight.bold)),
+          Text(infoEstudiante['Cedula'].toString())
+        ]),
+      ),
+      Center(
+        child: Row(children: [
+          Text('Edad: ',style:TextStyle(fontWeight: FontWeight.bold)),
+          Text('${calcularEdad(infoEstudiante["FechaNacimiento"])} años')
+        ]),
+      ),
+      Center(
+        child: Row(children: [
+          Text('Grado a ${(infoEstudiante["Tipo"] == "Repitiente") ? "repetir" : "cursar" }: ',style:TextStyle(fontWeight: FontWeight.bold)),
+          Text('$gradoACursar grado')
+        ]),
+      ),
     ];
 
     if(representanteInscrito){
-      final Representante? representante = await controladorRepresentante.buscarRepresentante(int.parse(infoRepresentante['Cedula']));
+      final Representante? representante = await controladorRepresentante.buscarRepresentante(int.parse(infoRepresentante['Cedula'].text));
       if(representante == null){
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No existe el representante solicitado'));
@@ -391,12 +397,14 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                 child: ListBody(
                   children: [
                     ...parteDelEstudiante,
-                    Text('Representante',style:TextStyle(fontWeight: FontWeight.bold)),
-                    Text('${representante.nombres} ${representante.apellidos}',style:TextStyle(fontWeight: FontWeight.bold)),
-                    Row(children: [
-                      Text('C.I:',style:TextStyle(fontWeight: FontWeight.bold)),
-                      Text(representante.cedula.toString())
-                    ]),
+                    Center(child: Text('Representante',style:TextStyle(fontWeight: FontWeight.bold))),
+                    Center(child: Text('${representante.nombres} ${representante.apellidos}',style:TextStyle(fontWeight: FontWeight.bold))),
+                    Center(
+                      child: Row(children: [
+                        Text('C.I: ',style:TextStyle(fontWeight: FontWeight.bold)),
+                        Text(representante.cedula.toString())
+                      ]),
+                    ),
                   ],
                 ),
               )
@@ -425,10 +433,10 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                 children: [
                   ...parteDelEstudiante,
                   Text('Representante',style:TextStyle(fontWeight: FontWeight.bold)),
-                  Text('${infoRepresentante["Nombres"]} ${infoRepresentante["Apellidos"]}',style:TextStyle(fontWeight: FontWeight.bold)),
+                  Text('${infoRepresentante["Nombres"].text} ${infoRepresentante["Apellidos"].text}',style:TextStyle(fontWeight: FontWeight.bold)),
                   Row(children: [
                     Text('C.I:',style:TextStyle(fontWeight: FontWeight.bold)),
-                    Text(infoRepresentante["Cedula"])
+                    Text(infoRepresentante["Cedula"].text)
                   ]),
                 ],
               ),
@@ -455,32 +463,34 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
     BuildContext context,
     bool representanteInscrito) async {
 
+      final Estudiante estudianteAInscribir = Estudiante.fromForm(formInfoIntoMap(infoEstudiante));
       if(representanteInscrito){
 
-        final Estudiante estudianteAInscribir = Estudiante.fromForm(formInfoIntoMap(infoEstudiante));
         ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
           message:'Registrando estudiante...',
           onVisible: () async {
             try {
-              final result = await controladorEstudiante.registrar(estudianteAInscribir,cedulaRepresentante: infoRepresentante['Cedula'],gradoDeseado:gradoACursar);
+              final result = await controladorEstudiante.registrar(estudianteAInscribir,cedulaRepresentante: int.parse(infoRepresentante['Cedula'].text),gradoDeseado:gradoACursar);
               
-              if(result == -1){
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              
+              if(result == 0){
+                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo crear el estudiante'));
+              }
+              
+              else if(result == -1){
                 ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No existe el representante solicitado'));
               }
 
               else if(result == -2){
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo asignar al estudiante a un grado'));
               }
 
               else if(result == -3){
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No existe el grado solicitado: $gradoACursar'));
               }  
 
               else{
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Estudiante creado con exito!'));
                 resetForm();
               }
@@ -493,34 +503,31 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
         ));
       
       }else{
-        if(await controladorRepresentante.buscarRepresentante(infoRepresentante['Cedula']) == null){
+        if(await controladorRepresentante.buscarRepresentante(int.parse(infoRepresentante['Cedula'].text)) == null){
           final Representante represententanteAInscribir = Representante.fromForm(formInfoIntoMap(infoRepresentante));
-                    
-          final Estudiante estudianteAInscribir = Estudiante.fromForm(formInfoIntoMap(infoEstudiante));
-        
+                 
           ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
           message:'Registrando estudiante y representante...',
           onVisible: () async {
             try {
               final result = await controladorEstudiante.registrar(estudianteAInscribir,representante:represententanteAInscribir,gradoDeseado:gradoACursar);
               
+              
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              
               if(result == -1){
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('El representante ya existe'));
               }
 
               else if(result == -2){
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo asignar al estudiante a un grado'));
               }
 
               else if(result == -3){
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No existe el grado solicitado: $gradoACursar'));
               }
 
               else{
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Estudiante y representante creados con exito!'));
                 resetForm();
               }            
@@ -532,8 +539,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
             }
           }
           ));
-        }
-        else{
+        }else{
           ScaffoldMessenger.of(context).removeCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Ya existe un representante para esa cedula'));
         }

@@ -43,7 +43,7 @@ class Estudiante{
     apellidos = estudiante['Apellidos'],
     cedula = estudiante['Cedula'],
     lugarNacimiento = estudiante['LugarNacimiento'],
-    fechaNacimiento = DateTime(estudiante['FechaNacimiento'].split('/')[2],estudiante['FechaNacimiento'].split('/')[1],estudiante['FechaNacimiento'].split('/')[0]),
+    fechaNacimiento = DateTime(int.parse(estudiante['FechaNacimiento'].split('/')[2]),int.parse(estudiante['FechaNacimiento'].split('/')[1]),int.parse(estudiante['FechaNacimiento'].split('/')[0])),
     genero = estudiante['Genero'];
 
   Estudiante.fromMap(Map<String,dynamic> estudiante):

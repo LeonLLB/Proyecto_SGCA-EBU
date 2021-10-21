@@ -8,22 +8,22 @@ class _MatriculaEstudianteController{
 
   Future<int> registrar(int estudianteId, int gradoDeseado) async {
     //PASO 2: PREPARAR LA CONSULTA PARA ENCONTRAR MATRICULAS CON AMBIENTES
-    String consulta = "WHERE";
+    String consulta = "";
     List<Ambiente>? ambientes = await controladorAmbientes.buscarAmbientesPorGrado(gradoDeseado);
 
     if(ambientes == null) return -3; // NO HAY GRADO DESEADO
 
     for(var ambiente in ambientes){
       if(ambientes[ambientes.length -1] == ambiente){
-        consulta = consulta + " ambienteID = ${ambiente.id};";
+        consulta = consulta + " ambienteID = ?;";
       }else{
-        consulta = consulta + " ambienteID = ${ambiente.id} OR";
+        consulta = consulta + " ambienteID = ? OR";
       }
     }
 
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
-    final resultadosMatriculas = await db.query(MatriculaEstudiante.tableName,where: consulta);
+    final resultadosMatriculas = await db.query(MatriculaEstudiante.tableName,where: consulta,whereArgs: ambientes.map((ambiente)=>ambiente.id).toList());
     // PASO 3: ENCONTRAR UN AMBIENTE DISPOSIBLE
 
     int idMatriculaAsignable = 0;
@@ -43,7 +43,7 @@ class _MatriculaEstudianteController{
     }
     //PASO 4: INSERTAR EL ESTUDIANTE A UN AMBIENTE EN LA MATRICULA
 
-    final yearEscolar = await db.query(Admin.tableName,where:'opcion = AÑO_ESCOLAR');
+    final yearEscolar = await db.query(Admin.tableName,where:'opcion = ?',whereArgs:['AÑO_ESCOLAR']);
 
     final result = await db.insert(MatriculaEstudiante.tableName,{
       'ambienteID':idMatriculaAsignable,

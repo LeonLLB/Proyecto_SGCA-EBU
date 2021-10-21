@@ -19,12 +19,10 @@ Future<int> calcularCedulaEscolar ({int? inscripcionYear ,required int cedulaRep
 
 
   Future<int> registrar(Estudiante estudiante,{int? cedulaRepresentante,Representante? representante,required int gradoDeseado}) async{
-    assert(cedulaRepresentante == null && representante != null,'Haz enviado la cedula y el representante, solo debes mandar unos de ellos');
-    assert(cedulaRepresentante != null && representante == null,'Haz enviado la cedula y el representante, solo debes mandar unos de ellos');
-    
+      
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     if(cedulaRepresentante != null){
-      final representanteCedula = await controladorRepresentante.buscarRepresentante(cedulaRepresentante);
+      final representanteCedula = await controladorRepresentante.buscarRepresentante(cedulaRepresentante,false);
       if(representanteCedula == null) return -1; // NO EXISTE EL REPRESENTANTE
       
       int resultEstudiante = await db.insert(Estudiante.tableName,estudiante.toJson(withId: false));
@@ -33,8 +31,6 @@ Future<int> calcularCedulaEscolar ({int? inscripcionYear ,required int cedulaRep
         await db.insert(EstudianteURepresentante.tableName, {'EstudianteID':resultEstudiante,'RepresentanteID':representanteCedula.id});
         resultEstudiante = await controladorMatriculaEstudiante.registrar(resultEstudiante, gradoDeseado);        
       }
-
-      db.close();
 
       return resultEstudiante;
 

@@ -2,7 +2,7 @@
 
 int calcularEdad(dynamic fechaNacimiento){
   DateTime fechaNacimientoPulida = (fechaNacimiento.runtimeType == String) ?
-    DateTime(fechaNacimiento.split('/')[2],fechaNacimiento.split('/')[1],fechaNacimiento.split('/')[0]):
+    DateTime(int.parse(fechaNacimiento.split('/')[2]),int.parse(fechaNacimiento.split('/')[1]),int.parse(fechaNacimiento.split('/')[0])):
     fechaNacimiento as DateTime
   ;
 
