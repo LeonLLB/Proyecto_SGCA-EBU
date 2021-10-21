@@ -25,7 +25,6 @@ enum procedencia {e,Hogar,Institucion}
 enum representante {existe,noExiste}
 
 class _InscribirEstudianteState extends State<InscribirEstudiante> {
-  //TODO: YA TODO ESTA LISTO, QUEDA PROBAR QUE FUNCIONE Y NO EXPLOTE
 
   genero generoEstudiante = genero.e;
   tipo tipoEstudiante = tipo.e;
