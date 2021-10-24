@@ -132,7 +132,6 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                             final date = await getDate(context,controladoresEstudiante['FechaNacimiento']);
                             if(date != null){
                               final fecha = date.toIso8601String().split('T')[0].split('-');
-                              
                               controladoresEstudiante['FechaNacimiento'] = '${fecha[2]}/${fecha[1]}/${fecha[0]}';
                               setState(() {});
                             }

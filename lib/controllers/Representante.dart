@@ -3,12 +3,12 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class _RepresentanteControllers{
 
-  Future<int> registrar(Representante representante) async{
+  Future<int> registrar(Representante representante,[bool closeDB = true]) async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
     final result = await db.insert(Representante.tableName,representante.toJson(withId: false));
 
-    db.close();
+    if(closeDB){db.close();}
     return result;
   }
 

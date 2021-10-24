@@ -61,14 +61,14 @@ class Estudiante{
     'apellidos':apellidos,
     'cedula':cedula,
     'lugar_nacimiento':lugarNacimiento,
-    'fecha_nacimiento':'${fechaNacimiento.toIso8601String().split('T')[0].split('-')[0]}/${fechaNacimiento.toIso8601String().split('T')[0].split('-')[1]}/${fechaNacimiento.toIso8601String().split('T')[0].split('-')[2]}',
+    'fecha_nacimiento':'${fechaNacimiento.toIso8601String().split('T')[0].split('-')[2]}/${fechaNacimiento.toIso8601String().split('T')[0].split('-')[1]}/${fechaNacimiento.toIso8601String().split('T')[0].split('-')[0]}',
     'genero':genero,
   }:{
     'nombres':nombres,
     'apellidos':apellidos,
     'cedula':cedula,
     'lugar_nacimiento':lugarNacimiento,
-    'fecha_nacimiento':'${fechaNacimiento.toIso8601String().split('T')[0].split('-')[0]}/${fechaNacimiento.toIso8601String().split('T')[0].split('-')[1]}/${fechaNacimiento.toIso8601String().split('T')[0].split('-')[2]}',
+    'fecha_nacimiento':'${fechaNacimiento.toIso8601String().split('T')[0].split('-')[2]}/${fechaNacimiento.toIso8601String().split('T')[0].split('-')[1]}/${fechaNacimiento.toIso8601String().split('T')[0].split('-')[0]}',
     'genero':genero,
   };
 
