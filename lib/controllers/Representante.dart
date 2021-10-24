@@ -21,6 +21,21 @@ class _RepresentanteControllers{
     return (result.isEmpty) ? null : Representante.fromMap(result[0]);
   }
 
+  Future<List<Representante>?> buscarRepresentantes(int? cedula) async {
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final resultados = await db.query(Representante.tableName,where: 'CAST(cedula AS TEXT) LIKE ?',whereArgs: ['%${cedula == null ? "" : cedula}%']);
+    if(resultados.length == 0) return null;
+    List<Representante> result = [];
+
+    for(var representante in resultados){
+      result.add(Representante.fromMap(representante));
+    }
+
+    db.close();
+    return result;
+  }
+
 }
 
 final controladorRepresentante = _RepresentanteControllers();

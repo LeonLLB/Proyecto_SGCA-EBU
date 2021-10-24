@@ -13,6 +13,20 @@ class _UsuariosControllers {
 
   }
 
+  Future<List<Usuarios>?> buscarDocentes(int? cedula) async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final resultados = await db.query(Usuarios.tableName,where: 'rol = ? AND CAST(cedula AS TEXT) LIKE ?',whereArgs: ['D','%${cedula != null ? cedula:""}%']);
+    if(resultados.length == 0) return null;
+    List<Usuarios> results = [];
+    for(var docente in resultados){
+      results.add(Usuarios.fromMap(docente));
+    }
+    db.close();
+    return results;
+
+  }
+
   Future<Map<String,dynamic>> login({required int cedula, required String password}) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
