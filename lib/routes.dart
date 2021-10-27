@@ -19,6 +19,7 @@ final Map<String, Widget> routes = {
   '-estudiantes/asistencia'   :SubirAsistenciaEstudiante(),
   '-estudiantes/rendimiento'  :SubirRendimientoEstudiante(),
   '-estudiantes/matricula'    :MatriculaEstudiante(),
+  '-estudiantes/constancia'   :EstudianteGenerarConstancia(),
 
   '-docentes/inscribir'       :InscribirDocente(),
   '-docentes/actualizar'      :ActualizarDocente(),

@@ -15,6 +15,7 @@ export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/Actualizar.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/SubirAsistencia.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/SubirRendimiento.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/Matricula.dart';
+export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/Constancia.dart';
 
 export 'package:proyecto_sgca_ebu/pages/views/Docentes/Inscribir.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Docentes/Asignar.dart';
