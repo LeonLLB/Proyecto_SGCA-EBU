@@ -43,5 +43,3 @@ Desarrollo de un sistema de gestion y control academico para la administracion d
 |**H7**|3| 0% |
 |**H8**|3| 0% |
 |**H11**|3| 0%|
-
-
