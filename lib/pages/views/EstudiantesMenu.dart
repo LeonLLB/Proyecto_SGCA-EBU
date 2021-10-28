@@ -22,8 +22,10 @@ class EstudiantesMenu extends StatelessWidget {
             SubMenuItem(icon: Icons.show_chart, label: 'Subir rendimiento', route: '-estudiantes/rendimiento')
           ]),
           Row(
+            mainAxisAlignment:MainAxisAlignment.spaceEvenly,
             children: [
             SubMenuItem(icon: Icons.show_chart_sharp, label: 'Generar estadistica', route: '-estudiantes/estadistica'),
+            SubMenuItem(icon: Icons.school, label: 'Constancia de estudio', route: '-estudiantes/constancia'),
           ])
         ]),
       );
