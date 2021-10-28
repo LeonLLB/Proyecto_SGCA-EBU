@@ -13,6 +13,7 @@ import 'package:proyecto_sgca_ebu/models/Estudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Representante.dart';
 
 
+
 class InscribirEstudiante extends StatefulWidget {
 
   @override
@@ -36,6 +37,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
   int gradoACursar = 0;
 
   final _formKey = GlobalKey<FormState>();
+  final ScrollController controller = ScrollController();
 
   Map<String, dynamic> controladoresEstudiante = {
     'Nombres':TextEditingController(),
@@ -198,7 +200,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                 ]),
                 Padding(padding:EdgeInsets.symmetric(vertical:5)),
                 // REPRESENTANTE
-
+    
                 Center(child:Text('Su representante ya esta inscrito?',style:TextStyle(fontSize:18))),
                   RadioInputRowList<representante>(
                     groupValue: existeRepresentante,
@@ -211,7 +213,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                     }
                   ),
                   
-
+    
                 (existeRepresentante == representante.noExiste) ? _ContenedorForm([
                   Center(child:Text('Representante del estudiante:',
                     style:TextStyle(fontSize:20,fontWeight:FontWeight.bold))
@@ -260,9 +262,9 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                     validators: TextFormFieldValidators(required:true,isNumeric:true,charLength:9),
                     icon: Icon(Icons.assignment_ind)
                   )])]),
-
+    
                 Padding(padding:EdgeInsets.symmetric(vertical:5)),
-
+    
                 _ContenedorForm([Row(children:[SimplifiedTextFormField(
                   controlador: inscripcionYear,
                   labelText: 'Año de inscripción',
@@ -270,7 +272,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                 )])]),
                 
                 Padding(padding:EdgeInsets.symmetric(vertical:5)),
-
+    
                 TextButton(onPressed: ()async{
                   if(
                     _formKey.currentState!.validate() &&
@@ -287,13 +289,13 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                       gradoACursar = await getGradoACursar(context);
                     }
                     if(gradoACursar > 0){
-
+    
                       final inscripcionConfirmada = await confirmarInscripcion(
                         controladoresEstudiante,
                         controladoresRepresentante,
                         context,(existeRepresentante == representante.existe)
                       );
-
+    
                       if(inscripcionConfirmada != null && inscripcionConfirmada){
                         crearEstudiante(
                           controladoresEstudiante,
@@ -310,7 +312,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                 },
                 child: Text('Inscribir estudiante y representante',
                 style:TextStyle(fontSize: 20,fontWeight:FontWeight.w600))),
-
+    
                 Padding(padding:EdgeInsets.symmetric(vertical:5)),
               ],
             )

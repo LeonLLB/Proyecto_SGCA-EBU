@@ -45,7 +45,18 @@ class _EstudianteControllers{
     }
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     final results = await db.rawQuery(consulta);
+    db.close();
     return results;
+  }
+
+  Future<Map<String,Object?>?> buscarEstudiante (int? cedulaEscolar) async{
+    
+    String consulta = EstudianteURepresentante.consultarUnionEuRuMEuAM(cedulaEscolar, null, 'E');
+
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    final result = await db.rawQuery(consulta);
+    db.close();
+    return (result.length == 0 ) ? null : result[0];
   }
 
   Future<int> registrar(Estudiante estudiante,{int? cedulaRepresentante,Representante? representante,required int gradoDeseado}) async{

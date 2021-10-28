@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -8,6 +10,14 @@ import 'package:window_size/window_size.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:proyecto_sgca_ebu/models/index.dart';
 import 'package:provider/provider.dart';
+
+class _ScrollBehavior extends MaterialScrollBehavior {
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => { 
+    PointerDeviceKind.mouse,
+  };
+}
 
 void initTable(String tableInitializer,String testInitializer,db) async{
   try {
@@ -58,6 +68,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scrollBehavior:_ScrollBehavior(),
       debugShowCheckedModeBanner: false,
       title: 'SGCA - EBU',
       localizationsDelegates: [

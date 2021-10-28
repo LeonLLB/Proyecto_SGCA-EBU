@@ -23,7 +23,7 @@ class SubMenuItem extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width:100,
+            width:120,
             height:100,
             child: TextButton(
               onPressed:(){

@@ -12,6 +12,7 @@ import 'package:proyecto_sgca_ebu/routes.dart';
 
 class HomeMenu extends StatelessWidget {
 
+  final ScrollController controller = ScrollController();
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -26,7 +27,7 @@ class HomeMenu extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border(right: BorderSide(color:Colors.grey,width:2)),/* (color: Color(0xff7C83FD), width: 4) */
               ),
-              child:ListView(children: [
+              child:ListView(controller:controller,children: [
                 CustomSideBarItem(icon: Icons.home, label: 'Principal', route: '/home'),
                 CustomSideBarItem(icon: Icons.face, label: 'Estudiantes', route: '-estudiantes'),
                 CustomSideBarItem(icon: Icons.assignment_ind, label: 'Docentes', route: '-docentes'),
