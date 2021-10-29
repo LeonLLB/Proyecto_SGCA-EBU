@@ -9,7 +9,15 @@ RunLoop::RunLoop() {}
 RunLoop::~RunLoop() {}
 
 void RunLoop::Run() {
-  bool keep_running = true;
+  MSG msg;
+  while(GetMessage(&msg,nullptr,0,0)){
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+  }
+}
+
+  //OJO, CAMBIAR SI PRESENTA ERRORES
+  /* bool keep_running = true;
   TimePoint next_flutter_event_time = TimePoint::clock::now();
   while (keep_running) {
     std::chrono::nanoseconds wait_duration =
@@ -40,8 +48,8 @@ void RunLoop::Run() {
       next_flutter_event_time =
           std::min(next_flutter_event_time, ProcessFlutterMessages());
     }
-  }
-}
+  } 
+}*/
 
 void RunLoop::RegisterFlutterInstance(
     flutter::FlutterEngine* flutter_instance) {
