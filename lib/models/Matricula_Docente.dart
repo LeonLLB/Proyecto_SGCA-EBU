@@ -1,6 +1,41 @@
 
 class MatriculaDocente{
 
+  static final String buscarExistenciaMatricula = '''
+    SELECT 
+      a.valor AS 'añoEscolar',
+      COUNT(CASE WHEN am.grado = ? AND am.seccion = ? THEN 1 ELSE NULL END) Num 
+    FROM Matricula_Docentes md
+    LEFT OUTER JOIN Ambientes am
+      ON am.id = md.ambienteID
+    LEFT OUTER JOIN Admin_Options a
+      ON a.opcion = 'AÑO_ESCOLAR'
+    WHERE 'añoEscolar' = ?
+    ;
+  ''';
+
+  static final String fullSearch = '''
+  
+    SELECT      
+      am.grado,
+      am.seccion,
+      md."añoEscolar",
+      COUNT(CASE WHEN me.ambienteID = md.ambienteID THEN 1 ELSE NULL END) NumeroEstudiantes,
+      d.nombres,
+      d.apellidos,
+      d.cedula,
+      d.numero,
+      d.correo,
+      d.direccion,
+    FROM Matricula_Docentes md
+    LEFT OUTER JOIN Usuarios d
+      ON d.cedula = ?
+    LEFT OUTER JOIN Matricula_Estudiantes me
+      ON me.ambienteID = md.ambienteID
+    LEFT OUTER JOIN Ambientes am
+      ON md.ambienteID = am.id;
+  ''';
+
   static final String tableName = "Matricula_Docentes";
 
   static final String testInitializer = "SELECT id FROM $tableName";

@@ -13,6 +13,17 @@ class _AmbientesController{
 
   }
 
+  Future<Ambiente?> obtenerAmbiente(int grado, String seccion, [bool closeDB = true]) async {
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final result = await db.query(Ambiente.tableName,where:'grado = ? AND seccion = ?',whereArgs:[grado,seccion]);
+
+    if(closeDB){db.close();}
+
+    return (result.length == 0) ? null : Ambiente.fromMap(result[0]);
+
+  }
+
   Future<List<Ambiente>?> buscarAmbientesPorGrado(int grado) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 

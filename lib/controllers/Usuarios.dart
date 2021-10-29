@@ -67,6 +67,13 @@ class _UsuariosControllers {
     
   }
 
+  Future<Usuarios?> buscarDocente(int cedulaDocente,[bool closeDB = true])async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    final result = await db.query(Usuarios.tableName,where:'rol = ? AND cedula = ?',whereArgs:['D',cedulaDocente]);
+    if(closeDB){db.close();}
+    return (result.length == 0) ? null : Usuarios.fromMap(result[0]);  
+  }
+
 }
 
 final controladorUsuario = _UsuariosControllers();
