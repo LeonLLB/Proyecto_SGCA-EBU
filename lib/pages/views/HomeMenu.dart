@@ -1,36 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
+import 'package:proyecto_sgca_ebu/helpers/getMonth.dart';
 
-String _monthNumIntoString (int mes){
-  switch(mes){
-    case 1:
-      return 'Enero';
-    case 2:
-      return 'Febrero';
-    case 3:
-      return 'Marzo';
-    case 4:
-      return 'Abril';
-    case 5:
-      return 'Mayo';
-    case 6:
-      return 'Junio';
-    case 7:
-      return 'Julio';
-    case 8:
-      return 'Agosto';
-    case 9:
-      return 'Septiembre';
-    case 10:
-      return 'Octubre';
-    case 11:
-      return 'Noviembre';
-    case 12:
-      return 'Diciembre';
-    default:
-      return '';
-  }
-}
 
 class HomeMenuPage extends StatelessWidget {
 
@@ -67,7 +38,7 @@ class HomeMenuPage extends StatelessWidget {
                 Text('${fecha["dia"]}/${fecha["mes"]}/${fecha["año"]}',style:simpleTextStyle),
                 Row(children:[
                   Text('Mes: ',style:simpleTextStyle),
-                  Text(_monthNumIntoString(fecha['mes']! as int),style:detailTextStyle)
+                  Text(monthNumIntoString(fecha['mes']! as int),style:detailTextStyle)
                 ]),
                 Center(child:Text('Año escolar:',style:simpleTextStyle)),
                 Center(child:Text('${fecha["año"]} - ${DateTime.now().year + 1}',style:detailTextStyle))

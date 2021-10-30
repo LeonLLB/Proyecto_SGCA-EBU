@@ -18,9 +18,13 @@ class AdminVerGrado extends StatelessWidget {
       future: controladorAmbientes.obtenerGrados(),
       initialData: [],
       builder: (BuildContext context, AsyncSnapshot data) {
-        if(data.data.length == 0){
+        if(data.connectionState == ConnectionState.waiting){
           return Center(child: CircularProgressIndicator());
-        }else{
+        }
+        else if(data.data == null){
+          return Center(child:Text('No hay ambientes disponibles'));
+        }
+        else{
           return Expanded(
             child: ListView.separated(
               itemCount:data.data.length,

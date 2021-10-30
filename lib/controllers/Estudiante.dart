@@ -8,8 +8,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 class _EstudianteControllers{
 
   
-  Future<int> calcularCedulaEscolar ({int? inscripcionYear ,required int cedulaRepresentante})async{
-    int anoInscripcion = (inscripcionYear == null) ? (DateTime.now().year - 2000) : inscripcionYear - 2000;
+  Future<int> calcularCedulaEscolar ({int? nacimientoYear ,required int cedulaRepresentante})async{
+    int anoInscripcion = (nacimientoYear == null) ? (DateTime.now().year - 2000) : nacimientoYear - 2000;
 
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     final result = await db.query(Estudiante.tableName,where: 'CAST(cedula AS TEXT) LIKE ?',whereArgs: ['%$anoInscripcion$cedulaRepresentante']);

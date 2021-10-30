@@ -30,8 +30,6 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
   genero generoEstudiante = genero.e;
   tipo tipoEstudiante = tipo.e;
   procedencia procedenciaEstudiante = procedencia.e;
- 
-  TextEditingController inscripcionYear = TextEditingController(text:DateTime.now().year.toString());
 
   representante existeRepresentante = representante.noExiste;
   int gradoACursar = 0;
@@ -43,6 +41,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
     'Nombres':TextEditingController(),
     'Apellidos':TextEditingController(),
     'LugarNacimiento':TextEditingController(),
+    'EstadoNacimiento':TextEditingController(),
     'FechaNacimiento':'',
     'Genero':'',
     'Tipo':'',
@@ -69,6 +68,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
       'Nombres':TextEditingController(),
       'Apellidos':TextEditingController(),
       'LugarNacimiento':TextEditingController(),
+      'EstadoNacimiento':TextEditingController(),
       'FechaNacimiento':'',
       'Genero':'',
       'Tipo':'',
@@ -78,8 +78,6 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
     generoEstudiante = genero.e;
     tipoEstudiante = tipo.e;
     procedenciaEstudiante = procedencia.e;
-
-    inscripcionYear = TextEditingController(text:DateTime.now().year.toString());
 
     existeRepresentante = representante.noExiste;
     setState((){});
@@ -120,14 +118,21 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                       TextFormFieldValidators(required:true,isNotNumeric:true)
                     ]
                   ),
+                  DoubleTextFormFields(
+                    controladores: [
+                      controladoresEstudiante['LugarNacimiento'],
+                      controladoresEstudiante['EstadoNacimiento']
+                    ],
+                    iconos: [Icon(Icons.location_on)],
+                    labelTexts: ['Lugar de nacimiento','Estado de nacimiento'],
+                    validators: [
+                      TextFormFieldValidators(required:true),
+                      TextFormFieldValidators(required:true,isNotNumeric:true)
+                    ]
+                  ),
+                  Padding(padding:EdgeInsets.symmetric(vertical:5)),
                   Row(
                     children: [
-                      SimplifiedTextFormField(
-                        controlador: controladoresEstudiante['LugarNacimiento'],
-                        labelText: 'Lugar de nacimiento',
-                        validators: TextFormFieldValidators(required:true),
-                        icon: Icon(Icons.location_on),
-                      ),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: ()async{
@@ -263,13 +268,8 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                     icon: Icon(Icons.assignment_ind)
                   )])]),
     
-                Padding(padding:EdgeInsets.symmetric(vertical:5)),
-    
-                _ContenedorForm([Row(children:[SimplifiedTextFormField(
-                  controlador: inscripcionYear,
-                  labelText: 'Año de inscripción',
-                  validators: TextFormFieldValidators(required:true,isNumeric:true)
-                )])]),
+                Padding(padding:EdgeInsets.symmetric(vertical:5)),   
+          
                 
                 Padding(padding:EdgeInsets.symmetric(vertical:5)),
     
@@ -283,7 +283,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                   ){
                     controladoresEstudiante['Cedula'] = await controladorEstudiante.calcularCedulaEscolar(
                       cedulaRepresentante: int.parse(controladoresRepresentante['Cedula'].text),
-                      inscripcionYear: int.parse(inscripcionYear.text)
+                      nacimientoYear: int.parse(controladoresEstudiante['FechaNacimiento'].split('/')[2])
                     );
                     if(controladoresEstudiante['Procedencia'] != 'Hogar'){
                       gradoACursar = await getGradoACursar(context);
@@ -462,8 +462,9 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
     Map<String, dynamic> infoRepresentante,
     BuildContext context,
     bool representanteInscrito) async {
-
+      
       final Estudiante estudianteAInscribir = Estudiante.fromForm(formInfoIntoMap(infoEstudiante));
+      
       if(representanteInscrito){
 
         ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(

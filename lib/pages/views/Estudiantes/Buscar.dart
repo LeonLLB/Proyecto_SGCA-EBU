@@ -99,7 +99,7 @@ class _BuscarEstudianteState extends State<BuscarEstudiante> {
                         ],mainAxisAlignment:MainAxisAlignment.spaceBetween),
                         Row(children: [
                           Text(snapshot.data[i]['añoEscolar']),
-                          Text(snapshot.data[i]['grado'].toString() + '"${snapshot.data[i]['seccion']}"')
+                          Text(snapshot.data[i]['grado'].toString() + '° "${snapshot.data[i]['seccion']}"')
                         ],mainAxisAlignment:MainAxisAlignment.spaceBetween),
                         Text('${snapshot.data[i]["representante.nombres"]} ${snapshot.data[i]["representante.apellidos"]}',
                           style:TextStyle(fontWeight:FontWeight.bold)),

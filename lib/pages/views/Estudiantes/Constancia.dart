@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_sgca_ebu/components/FailedSnackbar.dart';
+import 'package:proyecto_sgca_ebu/components/RadioInputsRowList.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
 import 'package:proyecto_sgca_ebu/components/SuccesSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/loadingSnackbar.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estudiante.dart';
+import 'package:proyecto_sgca_ebu/controllers/Usuarios.dart';
 import 'package:proyecto_sgca_ebu/helpers/calcularEdad.dart';
 import 'package:proyecto_sgca_ebu/services/PDF.dart';
+
+enum _genero {F, M}
 
 class EstudianteGenerarConstancia extends StatefulWidget {
 
@@ -16,9 +20,12 @@ class EstudianteGenerarConstancia extends StatefulWidget {
 
 class _EstudianteGenerarConstanciaState extends State<EstudianteGenerarConstancia> {
 
+  _genero generoDirector = _genero.F;
+
   final _formKey = GlobalKey<FormState>();
 
   TextEditingController controlador = TextEditingController();  
+  TextEditingController controladorDirector = TextEditingController();  
 
   Future<Map<String,Object?>?> estudianteSolicitado = controladorEstudiante.buscarEstudiante(null);
 
@@ -37,12 +44,13 @@ class _EstudianteGenerarConstanciaState extends State<EstudianteGenerarConstanci
         child: Center(
           child: SimplifiedContainer(            
             width: width,
-            child:Row(children: [
-              SimplifiedTextFormField(
-                controlador: controlador,
-                labelText: 'Cedula escolar',
-                validators: TextFormFieldValidators(required:true,isNumeric:true),  
-              ),
+            child:Row(
+              children: [
+                SimplifiedTextFormField(
+                  controlador: controlador,
+                  labelText: 'Cedula escolar',
+                  validators: TextFormFieldValidators(required:true,isNumeric:true),  
+                ),
               VerticalDivider(),
               TextButton.icon(
                 onPressed: (){
@@ -118,21 +126,60 @@ class _EstudianteGenerarConstanciaState extends State<EstudianteGenerarConstanci
       ),
       Padding(padding:EdgeInsets.symmetric(vertical:5)),
       (hayEstudiante) 
-      ? Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          ElevatedButton.icon(onPressed: (){generarConstancia(context);}, icon: Icon(Icons.save), label: Text('Guardar constancia')),
-          ElevatedButton.icon(onPressed: (){imprimirConstancia(context);}, icon: Icon(Icons.print), label: Text('Imprimir constancia'))
-        ]
+      ? Center(
+        child: Column(        
+          children: [
+            SimplifiedContainer(
+              width: width,
+              child: Row(
+                children: [
+                  SimplifiedTextFormField(
+                    controlador: controladorDirector,
+                    labelText: 'Cedula director',
+                    validators: TextFormFieldValidators(required:true,isNumeric:true), 
+                  ),
+                ],
+              ),
+            ),
+            RadioInputRowList<_genero>(
+              groupValue: generoDirector,
+              values: [_genero.F,_genero.M],
+              labels: ['Directora','Director'],
+              onChanged: (val){
+                setState(() {
+                  generoDirector = val!;
+                });
+              }
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(onPressed: (){generarConstancia(context);}, icon: Icon(Icons.save), label: Text('Guardar constancia')),
+                ElevatedButton.icon(onPressed: (){imprimirConstancia(context);}, icon: Icon(Icons.print), label: Text('Imprimir constancia'))
+              ]
+            ),
+            
+          ]
+        ),
       ) : SizedBox()
     ]);
   }
 
   void generarConstancia(BuildContext context) {
+    if(controladorDirector.text == ''){
+      ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Es necesario la cedula del director'));
+      return;
+    }
     ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
       message:'Generando constancia...',
       onVisible: () async {
-        final bool seGenero = await generarConstanciaEstudianteCompleta(estudiante!);
+        final director = await controladorUsuario.buscarAdmin(int.parse(controladorDirector.text));
+        if(director == null){
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Es necesario la cedula del director'));
+          return;
+        }
+        final bool seGenero = await generarConstanciaEstudianteCompleta(estudiante!,director,generoDirector.toString().split('.')[1]);
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
         if(seGenero){
           ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Se ha generado correctamente la constancia de estudio, revise el directorio de descargas'));
@@ -144,11 +191,21 @@ class _EstudianteGenerarConstanciaState extends State<EstudianteGenerarConstanci
     );
   }
 
-  void imprimirConstancia(BuildContext context) async {
+  void imprimirConstancia(BuildContext context) {
+    if(controladorDirector.text == ''){
+      ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Es necesario la cedula del director'));
+      return;
+    }
     ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
       message:'Imprimiendo constancia...',
       onVisible: () async {
-        final bool seGenero = await imprimirConstanciaEstudianteCompleta(estudiante!);
+        final director = await controladorUsuario.buscarAdmin(int.parse(controladorDirector.text));
+        if(director == null){
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Es necesario la cedula del director'));
+          return;
+        }
+        final bool seGenero = await imprimirConstanciaEstudianteCompleta(estudiante!,director,generoDirector.toString().split('.')[1]);
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
         if(seGenero){
           ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Constancia impresa con exito'));
