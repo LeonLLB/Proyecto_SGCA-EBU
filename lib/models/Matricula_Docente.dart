@@ -2,21 +2,17 @@
 class MatriculaDocente{
 
   static final String buscarExistenciaMatricula = '''
-    SELECT 
-      a.valor AS 'añoEscolar',
-      COUNT(CASE WHEN am.grado = ? AND am.seccion = ? THEN 1 ELSE NULL END) Num 
+    SELECT
+      md.id
     FROM Matricula_Docentes md
-    LEFT OUTER JOIN Ambientes am
-      ON am.id = md.ambienteID
-    LEFT OUTER JOIN Admin_Options a
-      ON a.opcion = 'AÑO_ESCOLAR'
-    WHERE 'añoEscolar' = ?
-    ;
+    WHERE añoEscolar = ? AND md.ambienteID = ?
+        ;
   ''';
 
   static final String fullSearch = '''
   
-    SELECT      
+    SELECT
+      md.id,      
       am.grado,
       am.seccion,
       md."añoEscolar",
@@ -26,14 +22,41 @@ class MatriculaDocente{
       d.cedula,
       d.numero,
       d.correo,
-      d.direccion,
+      d.direccion
     FROM Matricula_Docentes md
     LEFT OUTER JOIN Usuarios d
-      ON d.cedula = ?
+      ON d.id = md.docenteID
     LEFT OUTER JOIN Matricula_Estudiantes me
       ON me.ambienteID = md.ambienteID
     LEFT OUTER JOIN Ambientes am
-      ON md.ambienteID = am.id;
+      ON md.ambienteID = am.id
+    WHERE d.cedula = ?;
+  ''';
+
+   static final String fullSearchPorGrado = '''
+  
+    SELECT
+      md.id,      
+      am.grado,
+      am.seccion,
+      md."añoEscolar",
+      COUNT(CASE WHEN me.ambienteID = md.ambienteID THEN 1 ELSE NULL END) NumeroEstudiantes,
+      d.nombres,
+      d.apellidos,
+      d.cedula,
+      d.numero,
+      d.correo,
+      d.direccion
+    FROM Matricula_Docentes md
+    LEFT OUTER JOIN Usuarios d
+      ON d.id = md.docenteID
+    LEFT OUTER JOIN Matricula_Estudiantes me
+      ON me.ambienteID = md.ambienteID
+    LEFT OUTER JOIN Ambientes am
+      ON md.ambienteID = am.id
+    WHERE am.grado = ? AND am.seccion = ?
+    ;
+    
   ''';
 
   static final String tableName = "Matricula_Docentes";

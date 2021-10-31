@@ -67,7 +67,10 @@ class _UsuariosControllers {
     
   }
 
-  Future<Usuarios?> buscarDocente(int cedulaDocente,[bool closeDB = true])async{
+  Future<Usuarios?> buscarDocente(int? cedulaDocente,[bool closeDB = true])async{
+
+    if(cedulaDocente == null) return null;
+
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     final result = await db.query(Usuarios.tableName,where:'rol = ? AND cedula = ?',whereArgs:['D',cedulaDocente]);
     if(closeDB){db.close();}

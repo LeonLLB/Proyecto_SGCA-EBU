@@ -39,12 +39,12 @@ class _AdminController{
     return (results.length == 0 ) ? null : results;
   }
 
-  Future<Admin?> obtenerOpcion(String opcion)async{
+  Future<Admin?> obtenerOpcion(String opcion,[bool closeDB = true])async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     
     final opcionSolicitada = await db.query(Admin.tableName,where: 'opcion = ?',whereArgs:[opcion]);
 
-    db.close();
+    if(closeDB){db.close();}
 
     return (opcionSolicitada.length == 0) ? null : Admin.fromMap(opcionSolicitada[0]);
   }
