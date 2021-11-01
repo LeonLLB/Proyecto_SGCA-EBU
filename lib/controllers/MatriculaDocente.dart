@@ -6,6 +6,28 @@ import 'package:proyecto_sgca_ebu/models/Matricula_Docente.dart';
 
 class _MatriculaDocenteController{
 
+  Future<List<Map<String,Object?>>> obtenerMatriculaCompleta()async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final resultConsulta = await db.rawQuery(MatriculaDocente.matriculaCompletaSegunAmbientes);
+    List<Map<String,Object?>> result = [];
+
+    for (var index = 0; index < resultConsulta.length; index++) {    
+      if(resultConsulta[index]['id'] != null){
+        final cantidadEstudiantes = await db.rawQuery(MatriculaDocente.cantidadDeEstudiantes,[resultConsulta[index]['id']]);
+        result.add({
+          ...resultConsulta[index],
+          'CantidadEstudiantes': cantidadEstudiantes[0]['cantidadEstudiantes']
+        });
+      }else{
+        result.add(resultConsulta[index]);
+      }
+    }
+
+    db.close();
+    return result;
+  }
+
   Future<int> casoModificacionMatricula(int cedulaDocente, Ambiente ambiente,[bool closeDB = true]) async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     

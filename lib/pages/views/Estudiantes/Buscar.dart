@@ -93,7 +93,7 @@ class _BuscarEstudianteState extends State<BuscarEstudiante> {
                         Row(children: [
                           Row(children: [
                             Text('C.E: ',style:TextStyle(fontWeight:FontWeight.bold)),
-                            Text(snapshot.data[i]['estudiante.cedula'].toString()),
+                            SelectableText(snapshot.data[i]['estudiante.cedula'].toString()),
                           ]),
                           Text(calcularEdad(snapshot.data[i]["estudiante.fecha_nacimiento"]).toString() + ' años')
                         ],mainAxisAlignment:MainAxisAlignment.spaceBetween),
@@ -105,7 +105,7 @@ class _BuscarEstudianteState extends State<BuscarEstudiante> {
                           style:TextStyle(fontWeight:FontWeight.bold)),
                         Row(children: [
                           Text('C.I: ',style:TextStyle(fontWeight:FontWeight.bold)),
-                          Text(snapshot.data[i]['representante.cedula'].toString()),
+                          SelectableText(snapshot.data[i]['representante.cedula'].toString()),
                         ]),
                       ])
                     );

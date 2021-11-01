@@ -78,7 +78,7 @@ class _BuscarDocenteState extends State<BuscarDocente> {
                         Row(children: [
                           Row(children: [
                             Text('C.I: ',style:TextStyle(fontWeight:FontWeight.bold)),
-                            Text(snapshot.data[i].cedula.toString()),
+                            SelectableText(snapshot.data[i].cedula.toString()),
                           ]),
                           Text((snapshot.data[i].numero != '') ? snapshot.data[i].numero : 'Sin teléfono')
                         ],mainAxisAlignment:MainAxisAlignment.spaceBetween),

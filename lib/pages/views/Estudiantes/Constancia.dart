@@ -100,7 +100,7 @@ class _EstudianteGenerarConstanciaState extends State<EstudianteGenerarConstanci
                 Row(children: [
                   Row(children: [
                     Text('C.E: ',style:TextStyle(fontWeight:FontWeight.bold)),
-                    Text(snapshot.data['estudiante.cedula'].toString()),
+                    SelectableText(snapshot.data['estudiante.cedula'].toString()),
                   ]),
                   Text(calcularEdad(snapshot.data["estudiante.fecha_nacimiento"]).toString() + ' años')
                 ],mainAxisAlignment:MainAxisAlignment.spaceBetween),
@@ -112,7 +112,7 @@ class _EstudianteGenerarConstanciaState extends State<EstudianteGenerarConstanci
                   style:TextStyle(fontWeight:FontWeight.bold)),
                 Row(children: [
                   Text('C.I: ',style:TextStyle(fontWeight:FontWeight.bold)),
-                  Text(snapshot.data['representante.cedula'].toString()),
+                  SelectableText(snapshot.data['representante.cedula'].toString()),
                 ]),
               ]);
             }

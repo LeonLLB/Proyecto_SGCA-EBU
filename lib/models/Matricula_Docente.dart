@@ -1,6 +1,42 @@
 
 class MatriculaDocente{
 
+  static final String matriculaCompletaSegunAmbientes = '''
+  
+  SELECT
+	  md.id,     
+    am.grado,
+    am.seccion,
+    am.turno,
+    md."añoEscolar",      
+    d.nombres,
+    d.apellidos,
+    d.cedula,
+    d.numero,
+    d.correo,      
+    d.direccion
+  FROM Ambientes am
+  LEFT OUTER JOIN Matricula_Docentes md
+    ON am.id = md.ambienteID
+  LEFT OUTER JOIN Usuarios d
+    ON d.id = md.docenteID
+  LEFT OUTER JOIN Matricula_Estudiantes me
+    ON me.ambienteID = md.ambienteID;
+  
+  ''';
+
+  static final String cantidadDeEstudiantes = '''
+  
+    SELECT 
+      md.id,
+      COUNT(me.ambienteID = md.ambienteID) cantidadEstudiantes
+    FROM Matricula_Docentes md
+    LEFT OUTER JOIN Matricula_Estudiantes me
+      ON me.ambienteID = md.ambienteID
+    WHERE md.id = ?;
+
+  ''';
+
   static final String buscarExistenciaMatricula = '''
     SELECT
       md.id
