@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_sgca_ebu/components/AmbientePicker.dart';
 import 'package:proyecto_sgca_ebu/components/FailedSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
@@ -29,22 +30,6 @@ class _AsignarDocenteState extends State<AsignarDocente> {
 
   Ambiente? ambiente;
   Usuarios? docente;
-
-  Future<Ambiente?> getAmbiente (BuildContext context) async{
-
-    final listaDeAmbientes = await listaAmbientesDisponibles;
-    if(listaDeAmbientes == null) return null;
-
-    return await showDialog<Ambiente>(context: context, builder: (_)  =>  SimpleDialog(
-      title:Text('Seleccionar el grado y sección'),
-      children:listaDeAmbientes.map((ambiente) => 
-        SimpleDialogOption(
-          onPressed: (){Navigator.pop(_,ambiente);},
-          child: Text('${ambiente.grado}° \"${ambiente.seccion}\"')
-        )
-      ).toList()
-    ));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,21 +71,11 @@ class _AsignarDocenteState extends State<AsignarDocente> {
         )
       ),
       Padding(padding:EdgeInsets.symmetric(vertical:5)),
-      ElevatedButton(onPressed: ()async{
-        
-        if(await listaAmbientesDisponibles == null){
-          ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No hay ambientes inscritos en la base de datos, intentelo más tarde'));
-        }
-        else{
-          final ambienteSeleccionado = await getAmbiente(context);
-          if(ambienteSeleccionado != null){
-            ambiente = ambienteSeleccionado;
-            matriculaSegunAmbiente = controladorMatriculaDocente.buscarPorGrado(ambiente!);
-            setState((){});
-          }
-        }
-
-      }, child: Text((ambiente == null) ? 'Seleccionar ambiente' : 'Ambiente seleccionado: ${ambiente!.grado}° \"${ambiente!.seccion}\"')),
+      AmbientePicker(onChange: (ambienteSeleccionado){
+        ambiente = ambienteSeleccionado;
+        matriculaSegunAmbiente = controladorMatriculaDocente.buscarPorGrado(ambienteSeleccionado!);
+        setState((){});
+      }),
       Padding(padding:EdgeInsets.symmetric(vertical:5)),
       Row(children: [
         SimplifiedContainer(child: FutureBuilder(

@@ -1,6 +1,34 @@
 
 class MatriculaEstudiante{
 
+  static final String obtenerMatriculaCompleta = '''
+  
+  SELECT
+    me.id,
+    md.id AS 'matriculaDocente.id',
+    me."añoEscolar",
+    e.nombres AS 'estudiante.nombres',
+    e.apellidos AS 'estudiante.apellidos',
+    e.cedula,
+    e.fecha_nacimiento,
+    d.nombres AS 'docente.nombres',
+    d.apellidos AS 'docente.apellidos',
+    am.grado,
+    am.seccion,
+    am.turno
+  FROM Matricula_Estudiantes me
+  LEFT OUTER JOIN Informacion_estudiantes e
+    ON me.estudianteID = e.id
+  LEFT OUTER JOIN Matricula_Docentes md
+    ON md.ambienteID = me.ambienteID
+  LEFT OUTER JOIN Usuarios d
+    ON md.docenteID = d.id
+  LEFT OUTER JOIN Ambientes am
+    ON am.id = me.ambienteID
+  WHERE am.id = ?;
+
+  ''';
+
   static final String tableName = "Matricula_Estudiantes";
 
   static final String testInitializer = "SELECT id FROM $tableName";
