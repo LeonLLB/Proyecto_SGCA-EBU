@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_sgca_ebu/components/AmbientePicker.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
+import 'package:proyecto_sgca_ebu/helpers/calcularEdad.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 
 class MatriculaEstudiante extends StatefulWidget {
@@ -24,7 +25,7 @@ class _MatriculaEstudianteState extends State<MatriculaEstudiante> {
           AmbientePicker(onChange: (ambienteSeleccionado){
             ambiente = ambienteSeleccionado;
             matriculaSeleccionada = controladorMatriculaEstudiante.getMatricula(ambiente!.id);
-            print('i changed');
+            
             setState((){});
           }),
           Padding(padding:EdgeInsets.symmetric(vertical: 5)),
@@ -58,8 +59,81 @@ class _MatriculaEstudianteState extends State<MatriculaEstudiante> {
                       Text(data.data[0]['grado'].toString()+'° ' + '\"'+data.data[0]['seccion']+'\"',style:TextStyle(fontWeight: FontWeight.bold)),
                     ])
                   ])),
-                  Padding(padding:EdgeInsets.symmetric(vertical: 5)),
-
+                  Padding(padding:EdgeInsets.symmetric(vertical: 5)),                  
+                  Table(
+                    //border: TableBorder.all(),
+                    border: TableBorder(horizontalInside: BorderSide(color:Colors.blue[200]!)),
+                    children:[
+                      TableRow(
+                        children:[
+                          TableCell(
+                            child:  Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(child: Text('Nombres')),
+                            )
+                          ),
+                          TableCell(
+                            child:  Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(child: Text('Apellidos')),
+                            )
+                          ),
+                          TableCell(
+                            child:  Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(child: Text('Cedula escolar')),
+                            )
+                          ),
+                          TableCell(
+                            child:  Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(child: Text('Fecha Nacimiento')),
+                            )
+                          ),
+                          TableCell(
+                            child:  Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(child: Text('Edad')),
+                            )
+                          )
+                        ]
+                      ),
+                      ...data.data.map((estudiante)=>TableRow(
+                        children:[
+                          TableCell(
+                            child:  Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(child: Text(estudiante['estudiante.nombres'])),
+                            )
+                          ),
+                          TableCell(
+                            child:  Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(child: Text(estudiante['estudiante.apellidos'])),
+                            )
+                          ),
+                          TableCell(
+                            child:  Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(child: Text(estudiante['cedula'].toString())),
+                            )
+                          ),
+                          TableCell(
+                            child:  Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(child: Text(estudiante['fecha_nacimiento'])),
+                            )
+                          ),
+                          TableCell(
+                            child:  Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Center(child: Text(calcularEdad(estudiante['fecha_nacimiento']).toString()  + ' años')),
+                            )
+                          )
+                        ]
+                      )).toList()
+                    ]
+                  )
                 ]);
               }
             },
