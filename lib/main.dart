@@ -44,6 +44,7 @@ void initDB() async {
   initTable(MatriculaEstudiante.tableInitializer,MatriculaEstudiante.testInitializer,db);
   initTable(MatriculaDocente.tableInitializer,MatriculaDocente.testInitializer,db);
   initTable(Admin.tableInitializer,Admin.testInitializer,db);
+  initTable(Asistencia.tableInitializer,Asistencia.testInitializer,db);
 
 }
 void main() {
