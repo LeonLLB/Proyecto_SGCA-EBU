@@ -81,8 +81,10 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
                     ),
                     Text('Total de estudiantes: ${data.data[0]['CantidadEstudiantes']}'),
                     Text('Turno: ${(data.data[0]['turno'] == 'M') ? 'Mañana' : 'Tarde'}'),
-                    MesPicker(onChange: (mes){
-
+                    MesPicker(onChange: (mesSeleccionado){
+                      mes = mesSeleccionado!;
+                      //TODO: BUSCAR ASISTENCIAS DEL MES Y DEL MISMO AÑO ESCOLAR
+                      setState((){});
                     })
                   ])),
                   Padding(padding:EdgeInsets.symmetric(vertical: 5)),                  
@@ -107,12 +109,12 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
                           TableCell(
                             child:  Padding(
                               padding: EdgeInsets.all(5),
-                              child: Center(child: Text('Primera semana')),
+                              child: Center(child:Text('Primera semana')),
                             )
                           ),
                           TableCell(
                             child:  Padding(
-                              padding: EdgeInsets.all(5),
+                              padding: EdgeInsets.all(4),
                               child: Center(child: Text('Segunda semana')),
                             )
                           ),
@@ -130,90 +132,63 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
                           )
                         ]
                       ),
-                      ...data.data.map((estudiante)=>TableRow(
+                      ...data.data.asMap().entries.map((estudiante)=>TableRow(
                         children:[
                           TableCell(
                             child:  Padding(
                               padding: EdgeInsets.all(5),
-                              child: Center(child: Text(estudiante['estudiante.nombres'])),
+                              child: Center(child: Text(estudiante.value['estudiante.nombres'])),
                             )
                           ),
                           TableCell(
                             child:  Padding(
                               padding: EdgeInsets.all(5),
-                              child: Center(child: Text(estudiante['estudiante.apellidos'])),
+                              child: Center(child: Text(estudiante.value['estudiante.apellidos'])),
                             )
                           ),
                           TableCell(
                             child:  Padding(
                               padding: EdgeInsets.all(5),
-                              child: Column(children: [
+                              child: Column(crossAxisAlignment:CrossAxisAlignment.start,children: [
                                 //PRIMERA SEMANA
-                                Checkbox(
-                                  value:listaAsistenciasSeccion[i][0].lunes,
+                                CheckboxListTile(
+                                  title:Text('L'),
+                                  value:listaAsistenciasSeccion[estudiante.key][0].lunes,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][0].lunes = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('M'),
+                                  value:listaAsistenciasSeccion[estudiante.key][0].martes,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][0].martes = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('M'),
+                                  value:listaAsistenciasSeccion[estudiante.key][0].miercoles,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][0].miercoles = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('J'),
+                                  value:listaAsistenciasSeccion[estudiante.key][0].jueves,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][0].jueves = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('V'),
+                                  value:listaAsistenciasSeccion[estudiante.key][0].viernes,
                                   onChanged:(val){
-
-                                  }  
-                                ),
-                              ],)
-                            )
-                          ),
-                          TableCell(
-                            child:  Padding(
-                              padding: EdgeInsets.all(5),
-                              child: Column(children: [
-                                Checkbox(
-                                  value:,
-                                  onChanged:(val){
-
-                                  }  
-                                ),
-                                Checkbox(
-                                  value:,
-                                  onChanged:(val){
-
-                                  }  
-                                ),
-                                Checkbox(
-                                  value:,
-                                  onChanged:(val){
-
-                                  }  
-                                ),
-                                Checkbox(
-                                  value:,
-                                  onChanged:(val){
-
-                                  }  
-                                ),
-                                Checkbox(
-                                  value:,
-                                  onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][0].viernes = val!;
+                                    setState((){});
                                   }  
                                 ),
                               ],)
@@ -222,35 +197,46 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
                           TableCell(
                             child:  Padding(
                               padding: EdgeInsets.all(5),
-                              child: Column(children: [
-                                Checkbox(
-                                  value:,
+                              child: Column(crossAxisAlignment:CrossAxisAlignment.start,children: [
+                                //SEGUNDA SEMANDA
+                                CheckboxListTile(
+                                  title:Text('L'),
+                                  value:listaAsistenciasSeccion[estudiante.key][1].lunes,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][1].lunes = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('M'),
+                                  value:listaAsistenciasSeccion[estudiante.key][1].martes,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][1].martes = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('M'),
+                                  value:listaAsistenciasSeccion[estudiante.key][1].miercoles,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][1].miercoles = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('J'),
+                                  value:listaAsistenciasSeccion[estudiante.key][1].jueves,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][1].jueves = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('V'),
+                                  value:listaAsistenciasSeccion[estudiante.key][1].viernes,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][1].viernes = val!;
+                                    setState((){});
                                   }  
                                 ),
                               ],)
@@ -259,35 +245,94 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
                           TableCell(
                             child:  Padding(
                               padding: EdgeInsets.all(5),
-                              child: Column(children: [
-                                Checkbox(
-                                  value:,
+                              child: Column(crossAxisAlignment:CrossAxisAlignment.start,children: [
+                                //TERCERA SEMANA
+                                CheckboxListTile(
+                                  title:Text('L'),
+                                  value:listaAsistenciasSeccion[estudiante.key][2].lunes,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][2].lunes = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('M'),
+                                  value:listaAsistenciasSeccion[estudiante.key][2].martes,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][2].martes = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('M'),
+                                  value:listaAsistenciasSeccion[estudiante.key][2].miercoles,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][2].miercoles = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('J'),
+                                  value:listaAsistenciasSeccion[estudiante.key][2].jueves,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][2].jueves = val!;
+                                    setState((){});
                                   }  
                                 ),
-                                Checkbox(
-                                  value:,
+                                CheckboxListTile(
+                                  title:Text('V'),
+                                  value:listaAsistenciasSeccion[estudiante.key][2].viernes,
                                   onChanged:(val){
-
+                                    listaAsistenciasSeccion[estudiante.key][2].viernes = val!;
+                                    setState((){});
+                                  }  
+                                ),
+                              ],)
+                            )
+                          ),
+                          TableCell(
+                            child:  Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Column(crossAxisAlignment:CrossAxisAlignment.start,children: [
+                                //CUARTA SEMANA                                
+                                CheckboxListTile(
+                                  title:Text('L'),
+                                  value:listaAsistenciasSeccion[estudiante.key][3].lunes,
+                                  onChanged:(val){
+                                    listaAsistenciasSeccion[estudiante.key][3].lunes = val!;
+                                    setState((){});
+                                  }  
+                                ),
+                                CheckboxListTile(
+                                  title:Text('M'),
+                                  value:listaAsistenciasSeccion[estudiante.key][3].martes,
+                                  onChanged:(val){
+                                    listaAsistenciasSeccion[estudiante.key][3].martes = val!;
+                                    setState((){});
+                                  }  
+                                ),
+                                CheckboxListTile(
+                                  title:Text('M'),
+                                  value:listaAsistenciasSeccion[estudiante.key][3].miercoles,
+                                  onChanged:(val){
+                                    listaAsistenciasSeccion[estudiante.key][3].miercoles = val!;
+                                    setState((){});
+                                  }  
+                                ),
+                                CheckboxListTile(
+                                  title:Text('J'),
+                                  value:listaAsistenciasSeccion[estudiante.key][3].jueves,
+                                  onChanged:(val){
+                                    listaAsistenciasSeccion[estudiante.key][3].jueves = val!;
+                                    setState((){});
+                                  }  
+                                ),
+                                CheckboxListTile(
+                                  title:Text('V'),
+                                  value:listaAsistenciasSeccion[estudiante.key][3].viernes,
+                                  onChanged:(val){
+                                    listaAsistenciasSeccion[estudiante.key][3].viernes = val!;
+                                    setState((){});
                                   }  
                                 ),
                               ],)
@@ -296,6 +341,11 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
                         ]
                       )).toList()
                     ]
+                  ),
+                  Padding(padding:EdgeInsets.symmetric(vertical: 5)), 
+                  ElevatedButton(
+                    onPressed: (){},
+                    child: Text('Subir asistencia')
                   )
                 ]);
               }
