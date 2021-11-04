@@ -7,6 +7,7 @@ class MatriculaEstudiante{
     me.id,
     md.id AS 'matriculaDocente.id',
     me."añoEscolar",
+    e.id AS 'estudiante.id',
     e.nombres AS 'estudiante.nombres',
     e.apellidos AS 'estudiante.apellidos',
     e.cedula,

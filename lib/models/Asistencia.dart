@@ -16,13 +16,15 @@ class Asistencia{
       miercoles BOOL NOT NULL,
       jueves BOOL NOT NULL,
       viernes BOOL NOT NULL,
-      inicio_semana VARCHAR(10) NOT NULL,
-      fin_semana VARCHAR(10) NOT NULL,
+      numero_semana INTEGER NOT NULL,
       mes INTEGER NOT NULL,
+      añoEscolar VARCHAR(9),
 
       FOREIGN KEY (estudianteID) REFERENCES Estudiante (id)
       	ON UPDATE CASCADE
       	ON DELETE CASCADE
+
+      UNIQUE(mes,numero_semana,estudianteID)
     );
   
   ''';
@@ -34,9 +36,8 @@ class Asistencia{
   bool miercoles;
   bool jueves;
   bool viernes;
-  DateTime inicioSemana;
-  DateTime finSemana; 
   int mes;
+  int numeroSemana;
 
   Asistencia({
     this.id,
@@ -46,8 +47,7 @@ class Asistencia{
     required this.miercoles,
     required this.jueves,
     required this.viernes,
-    required this.inicioSemana,
-    required this.finSemana, 
+    required this.numeroSemana,
     required this.mes,
   });
 
@@ -58,8 +58,7 @@ class Asistencia{
     miercoles = asistencia['Miercoles'],
     jueves = asistencia['Jueves'],
     viernes = asistencia['Viernes'],
-    inicioSemana = asistencia['InicioSemana'],
-    finSemana = asistencia['FinSemana'], 
+    numeroSemana = asistencia['NumeroSemana'],
     mes = asistencia['Mes'];
   
   Asistencia.fromMap(Map<String,dynamic> asistencia) :
@@ -69,8 +68,7 @@ class Asistencia{
     miercoles = asistencia['miercoles'] == 1 ,
     jueves = asistencia['jueves'] == 1 ,
     viernes = asistencia['viernes'] == 1 ,
-    inicioSemana = DateTime(asistencia['inicioSemana'].split('/')[2],asistencia['inicioSemana'].split('/')[1],asistencia['inicioSemana'].split('/')[0]),
-    finSemana = DateTime(asistencia['finSemana'].split('/')[2],asistencia['finSemana'].split('/')[1],asistencia['finSemana'].split('/')[0]), 
+    numeroSemana = asistencia['numero_semana'],
     mes = asistencia['mes'];
 
   Map<String,dynamic> toJson({bool withId = true})=>(withId)?{
@@ -81,8 +79,7 @@ class Asistencia{
     'miercoles' : miercoles,
     'jueves' : jueves,
     'viernes' : viernes,
-    'inicioSemana' : DateFormat.yMd().format(inicioSemana),
-    'finSemana' :  DateFormat.yMd().format(finSemana),
+    'numero_semana' : numeroSemana,
     'mes' : mes
   }:{
     'estudianteID' : estudianteID,
@@ -91,31 +88,8 @@ class Asistencia{
     'miercoles' : miercoles,
     'jueves' : jueves,
     'viernes' : viernes,
-    'inicioSemana' : DateFormat.yMd().format(inicioSemana),
-    'finSemana' :  DateFormat.yMd().format(finSemana),
+    'numero_semana' : numeroSemana,
     'mes' : mes
   };
-
-}
-
-class AsistenciaTemporal {
-
-  int estudianteID;
-  bool lunes; 
-  bool martes;
-  bool miercoles;
-  bool jueves;
-  bool viernes;
-  int numeroSemana;
-
-  AsistenciaTemporal({
-    required this.estudianteID,
-    required this.lunes,
-    required this.martes,
-    required this.miercoles,
-    required this.jueves,
-    required this.viernes,
-    required this.numeroSemana
-  });
 
 }

@@ -1,5 +1,4 @@
 import 'package:proyecto_sgca_ebu/models/Admin.dart';
-import 'package:proyecto_sgca_ebu/models/Matricula_Docente.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/controllers/Grado_Seccion.dart';

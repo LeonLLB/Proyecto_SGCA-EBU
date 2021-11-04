@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MesPicker extends StatefulWidget {
 
-  final void Function(int? mesSeleccionado) onChange;
+  final void Function(int? mes) onChange;
 
   MesPicker({required this.onChange});
 
@@ -12,7 +12,7 @@ class MesPicker extends StatefulWidget {
 
 class _MesPickerState extends State<MesPicker> {
 
-  final void Function(int? mesSeleccionado) onChange;
+  final void Function(int? mes) onChange;
 
   _MesPickerState({required this.onChange});
   int? mes;
