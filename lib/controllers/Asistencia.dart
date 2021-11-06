@@ -1,13 +1,14 @@
+
 import 'package:proyecto_sgca_ebu/controllers/Admin.dart';
 import 'package:proyecto_sgca_ebu/models/Asistencia.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class _AsistenciaController {
 
-  Future<bool> existeAsistencia(int mes, int estudiante, int nSemana, [bool closeDB = true]) async {
+  Future<bool> existeAsistencia(int mes, int estudiante, int dia, [bool closeDB = true]) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
-    final result = await db.query(Asistencia.tableName,where:'estudianteID = ? AND mes = ? AND numero_semana = ?',whereArgs:[estudiante,mes,nSemana]);
+    final result = await db.query(Asistencia.tableName,where:'estudianteID = ? AND mes = ? AND dia = ?',whereArgs:[estudiante,mes,dia]);
 
     if(closeDB) db.close();
 
@@ -26,9 +27,10 @@ class _AsistenciaController {
     return result;
   }
 
-  Future<Asistencia?> buscarAsistencia(int mes,int estudiante, int nSemana) async {
+  Future<Asistencia?> buscarAsistencia(int mes,int estudiante, int dia) async {
+    
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
-    final resultados = await db.query(Asistencia.tableName,where:'estudianteID = ? AND mes = ? AND numero_semana = ?',whereArgs:[estudiante,mes,nSemana]);
+    final resultados = await db.query(Asistencia.tableName,where:'estudianteID = ? AND mes = ? AND dia = ?',whereArgs:[estudiante,mes,dia]);
     if(resultados.length == 0) {
       db.close();
       return null;
@@ -40,14 +42,14 @@ class _AsistenciaController {
 
   
 
-  Future<int> registrarSemana(Asistencia asistencia, [bool closeDB = true]) async{
+  Future<int> registrarDia(Asistencia asistencia, [bool closeDB = true]) async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
     int result;
 
     final yearEscolar = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
 
-    if(await existeAsistencia(asistencia.mes,asistencia.estudianteID, asistencia.numeroSemana,false)){
+    if(await existeAsistencia(asistencia.mes,asistencia.estudianteID, asistencia.dia,false)){
       //SI EXISTE LA ASISTENCIA, SOLO SE ACTUALIZARA
       result = await db.update(Asistencia.tableName,{...asistencia.toJson(),'añoEscolar':yearEscolar!.valor},where: 'id = ?',whereArgs:[asistencia.id!]);
     }else{
@@ -65,7 +67,7 @@ class _AsistenciaController {
     List<Future<int>> consultas = [];
     
     for(var asistencia in asistencias){
-      consultas.add(registrarSemana(asistencia));
+      consultas.add(registrarDia(asistencia));
     }
 
     if(db.isOpen) db.close();
