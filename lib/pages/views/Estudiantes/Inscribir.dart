@@ -6,10 +6,12 @@ import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
 import 'package:proyecto_sgca_ebu/components/SuccesSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/loadingSnackbar.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estudiante.dart';
+import 'package:proyecto_sgca_ebu/controllers/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/controllers/Representante.dart';
 import 'package:proyecto_sgca_ebu/helpers/calcularEdad.dart';
 import 'package:proyecto_sgca_ebu/helpers/formInfoIntoMap.dart';
 import 'package:proyecto_sgca_ebu/models/Estudiante.dart';
+import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/models/Representante.dart';
 
 
@@ -32,7 +34,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
   procedencia procedenciaEstudiante = procedencia.e;
 
   representante existeRepresentante = representante.noExiste;
-  int gradoACursar = 0;
+  Ambiente? gradoACursar;
 
   final _formKey = GlobalKey<FormState>();
   final ScrollController controller = ScrollController();
@@ -196,9 +198,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                       setState(() {
                         controladoresEstudiante['Procedencia'] = val.toString().split('.')[1];
                         procedenciaEstudiante = val!;
-                        if(val == procedencia.Hogar){
-                          gradoACursar = 1;
-                        }
+                        
                       });
                     }
                   ),
@@ -286,9 +286,11 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                       nacimientoYear: int.parse(controladoresEstudiante['FechaNacimiento'].split('/')[2])
                     );
                     if(controladoresEstudiante['Procedencia'] != 'Hogar'){
-                      gradoACursar = await getGradoACursar(context);
+                      gradoACursar = await getGradoACursar(context,true);
+                    }else{
+                      gradoACursar = await getGradoACursar(context,false);
                     }
-                    if(gradoACursar > 0){
+                    if(gradoACursar != null){
     
                       final inscripcionConfirmada = await confirmarInscripcion(
                         controladoresEstudiante,
@@ -322,32 +324,19 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
     );
   }
 
-  Future<int> getGradoACursar (BuildContext context)async{
-    List<String> grados = ['1er','2do','3er','4to','5to','6to'];
-    switch(await showDialog<String>(context: context, builder: (_)=>SimpleDialog(
+  Future<Ambiente?> getGradoACursar (BuildContext context,bool todosLosAmbientes)async{
+
+    final List<Map<String,Object?>>? grados = await controladorAmbientes.obtenerAmbientesConEstudiantes((todosLosAmbientes) ? null : 1);
+
+    if(grados == null) return null;
+
+    return await showDialog<Ambiente>(context: context, builder: (_)=>SimpleDialog(
       title: Text('Grado a cursar'),
       children: grados.map((grado) => SimpleDialogOption(
-        onPressed: (){Navigator.pop(_,grado);},
-        child: Text('$grado grado')
+        onPressed: (){Navigator.pop(_,Ambiente.fromMap(grado));},
+        child: Text('${grado['grado']}° grado \"${grado['seccion']}\" Turno: ${(grado['turno'] == 'M') ? 'Mañana':'Tarde'} Estudiantes: ${grado['cantidadEstudiantes']}')
       )).toList()
-    ))){
-      case '1er':
-        return 1;
-      case '2do':
-        return 2;
-      case '3er':
-        return 3;
-      case '4to':
-        return 4;
-      case '5to':
-        return 5;
-      case '6to':
-        return 6;
-      case null:
-        return gradoACursar;
-      default:
-        return 0;
-    }
+    ));
   }
 
   Future<bool?> confirmarInscripcion(
@@ -375,7 +364,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
       Center(
         child: Row(children: [
           Text('Grado a ${(infoEstudiante["Tipo"] == "Repitiente") ? "repetir" : "cursar" }: ',style:TextStyle(fontWeight: FontWeight.bold)),
-          Text('$gradoACursar grado')
+          Text('${gradoACursar!.grado}° \"${gradoACursar!.seccion}\"')
         ]),
       ),
     ];
@@ -471,7 +460,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
           message:'Registrando estudiante...',
           onVisible: () async {
             try {
-              final result = await controladorEstudiante.registrar(estudianteAInscribir,cedulaRepresentante: int.parse(infoRepresentante['Cedula'].text),gradoDeseado:gradoACursar);
+              final result = await controladorEstudiante.registrar(estudianteAInscribir,cedulaRepresentante: int.parse(infoRepresentante['Cedula'].text),ambienteSeleccionado:gradoACursar!);
               
               ScaffoldMessenger.of(context).removeCurrentSnackBar();
               
@@ -511,7 +500,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
           message:'Registrando estudiante y representante...',
           onVisible: () async {
             try {
-              final result = await controladorEstudiante.registrar(estudianteAInscribir,representante:represententanteAInscribir,gradoDeseado:gradoACursar);
+              final result = await controladorEstudiante.registrar(estudianteAInscribir,representante:represententanteAInscribir,ambienteSeleccionado:gradoACursar!);
               
               
               ScaffoldMessenger.of(context).removeCurrentSnackBar();

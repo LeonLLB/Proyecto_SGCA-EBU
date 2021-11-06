@@ -4,7 +4,7 @@ class MatriculaDocente{
   static final String matriculaCompletaSegunAmbientes = '''
   
   SELECT
-	  md.id,     
+	  DISTINCT md.id,     
     am.grado,
     am.seccion,
     am.turno,

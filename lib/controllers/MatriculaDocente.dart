@@ -11,8 +11,10 @@ class _MatriculaDocenteController{
 
     final resultConsulta = await db.rawQuery(MatriculaDocente.matriculaCompletaSegunAmbientes);
     List<Map<String,Object?>> result = [];
+    print(resultConsulta.where((e)=>e['id'] != null));
 
-    for (var index = 0; index < resultConsulta.length; index++) {    
+    for (var index = 0; index < resultConsulta.length; index++) {  
+        
       if(resultConsulta[index]['id'] != null){
         final cantidadEstudiantes = await db.rawQuery(MatriculaDocente.cantidadDeEstudiantes,[resultConsulta[index]['id']]);
         result.add({

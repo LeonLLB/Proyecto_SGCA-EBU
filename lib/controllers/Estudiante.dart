@@ -2,6 +2,7 @@ import 'package:proyecto_sgca_ebu/controllers/Representante.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Estudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Estudiante_U_Representante.dart';
+import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/models/Representante.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -59,7 +60,7 @@ class _EstudianteControllers{
     return (result.length == 0 ) ? null : result[0];
   }
 
-  Future<int> registrar(Estudiante estudiante,{int? cedulaRepresentante,Representante? representante,required int gradoDeseado}) async{
+  Future<int> registrar(Estudiante estudiante,{int? cedulaRepresentante,Representante? representante,required Ambiente ambienteSeleccionado}) async{
       
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     if(cedulaRepresentante != null){
@@ -70,7 +71,7 @@ class _EstudianteControllers{
       
       if(resultEstudiante != 0){
         await db.insert(EstudianteURepresentante.tableName, {'EstudianteID':resultEstudiante,'RepresentanteID':representanteCedula.id});
-        resultEstudiante = await controladorMatriculaEstudiante.registrar(resultEstudiante, gradoDeseado);        
+        resultEstudiante = await controladorMatriculaEstudiante.registrar(resultEstudiante, ambienteSeleccionado);        
       }
 
       return resultEstudiante;
@@ -84,7 +85,7 @@ class _EstudianteControllers{
       
       if(resultEstudiante != 0){
         await db.insert(EstudianteURepresentante.tableName, {'EstudianteID':resultEstudiante,'RepresentanteID':representanteInsertado});
-        resultEstudiante = await controladorMatriculaEstudiante.registrar(resultEstudiante, gradoDeseado);
+        resultEstudiante = await controladorMatriculaEstudiante.registrar(resultEstudiante, ambienteSeleccionado);
       }
       if(db.isOpen){db.close();}
       return resultEstudiante;

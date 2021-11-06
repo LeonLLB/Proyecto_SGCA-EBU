@@ -1,3 +1,4 @@
+import 'package:proyecto_sgca_ebu/models/Matricula_Estudiante.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 
@@ -13,6 +14,41 @@ class _AmbientesController{
 
   }
 
+  Future<List<Map<String,Object?>>?> obtenerAmbientesConEstudiantes(int? grado) async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    List<Map<String,Object?>>? results;
+
+    if(grado != null){
+      results = await db.query(Ambiente.tableName,where:'grado = ?',whereArgs:[grado]);
+      if(results.length == 0) return null;
+    }else{
+      results = await db.query(Ambiente.tableName);
+      if(results.length == 0) return null;
+    }
+    
+
+    final cantidadEstudiantesAmbienteFutures = results.map((result)async{
+      final cantidad = await db.rawQuery(MatriculaEstudiante.cantidadDeEstudiantes,[result['id']]);
+      return cantidad[0]['cantidadEstudiantes'] as int;
+    }).toList();
+
+    List<int> cantidadEstudiantesAmbiente = await Future.wait(cantidadEstudiantesAmbienteFutures);
+
+    db.close();
+
+    List<Map<String,Object?>> resultadoNuevo = [];
+
+    for (var i = 0; i < results.length; i++) {
+      resultadoNuevo.add({
+        ...results[i],
+        'cantidadEstudiantes': cantidadEstudiantesAmbiente[i]
+      });
+    }
+
+    return resultadoNuevo;
+  }
+
   Future<Ambiente?> obtenerAmbiente(int grado, String seccion, [bool closeDB = true]) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
@@ -23,6 +59,8 @@ class _AmbientesController{
     return (result.length == 0) ? null : Ambiente.fromMap(result[0]);
 
   }
+
+  
 
   Future<List<Ambiente>?> buscarAmbientesPorGrado(int grado) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
