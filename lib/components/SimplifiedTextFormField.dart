@@ -30,6 +30,7 @@ class SimplifiedTextFormField extends StatelessWidget {
   final Icon? icon;
   final TextFormFieldValidators validators;
   final bool? obscureText;
+  final String? helperText;
 
   SimplifiedTextFormField({
     required this.controlador,
@@ -37,6 +38,7 @@ class SimplifiedTextFormField extends StatelessWidget {
     this.icon,
     required this.validators,
     this.obscureText,
+    this.helperText
   });
 
   @override
@@ -48,7 +50,8 @@ class SimplifiedTextFormField extends StatelessWidget {
       onChanged: validators.onChange,
       decoration: InputDecoration(
         icon: icon,
-        labelText: labelText,                        
+        labelText: labelText,
+        helperText:  helperText                       
       ),
       validator: (val){
         if (

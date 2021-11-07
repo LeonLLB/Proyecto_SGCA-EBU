@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:proyecto_sgca_ebu/components/AmbientePicker.dart';
+import 'package:proyecto_sgca_ebu/components/FailedSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/MesPicker.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
+import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
+import 'package:proyecto_sgca_ebu/components/SuccesSnackbar.dart';
+import 'package:proyecto_sgca_ebu/components/loadingSnackbar.dart';
 import 'package:proyecto_sgca_ebu/controllers/Asistencia.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
@@ -23,20 +27,26 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
   
   List<Map<String,Object?>>? matriculaSeleccionada;
 
-  List<List<Asistencia>> listaAsistenciasSeccion = [];
-  List<int> diasDelMes = [];
+  List<List<Asistencia?>> listaAsistenciasSeccion = []; 
+
+  List<int> diasDelMesNoHabiles = [];
+  TextEditingController controllerDiasNoHabiles = TextEditingController();
 
   Future<List<Map<String,Object?>>?> dualChange () async {
+    diasDelMesNoHabiles = [];    
+    if(controllerDiasNoHabiles.text != ''){
+      diasDelMesNoHabiles = controllerDiasNoHabiles.text.split(',').map((diaNoHabil)=>int.parse(diaNoHabil)).toList();
+    }
+
 
     if(matriculaSeleccionada != null && mes != null){
-      listaAsistenciasSeccion = [];      
-      diasDelMes = [];
+      listaAsistenciasSeccion = [];   
 
       for(var i = 0; i < matriculaSeleccionada!.length;i++){
         final estudiante = matriculaSeleccionada![i];
-        List<Asistencia> tmp = [];
+        List<Asistencia?> tmp = [];
         for (var j = 1; j <= 31; j++) {
-          
+          int skipBegginingDays = 0;
           final fechaActual = DateTime((mes! >= 6) ? (DateTime.now().year) : (DateTime(DateTime.now().year+1).year),mes!,j);
           
           if(fechaActual.month != mes){
@@ -48,57 +58,59 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
           if(diaSemana == 'sáb.' || diaSemana == 'dom.'){
             continue;
           }
-          else{
-            if(i == 0){
-              switch(diaSemana){
-                case 'lun.':
-                  diasDelMes.add(j);
-                  break;
-                case 'mar.':
-                  if(diasDelMes.length == 0){
-                    diasDelMes.addAll([0,j]);
-                  }else{
-                    diasDelMes.add(j);
-                  }
-                  break;
-                case 'mié.':
-                  if(diasDelMes.length == 0){
-                    diasDelMes.addAll([0,0,j]);
-                  }else{
-                    diasDelMes.add(j);
-                  }
-                  break;
-                case 'jue.':
-                  if(diasDelMes.length == 0){
-                    diasDelMes.addAll([0,0,0,j]);
-                  }else{
-                    diasDelMes.add(j);
-                  }
-                  break;
-                case 'vie.':
-                  if(diasDelMes.length == 0){
-                    diasDelMes.addAll([0,0,0,0,j]);
-                  }else{
-                    diasDelMes.add(j);
-                  }
-                  break;
-              }
-            }            
+          if(j == 1){
+            switch(diaSemana){
+              case 'mar.':
+                skipBegginingDays = 1;
+                break;
+              case 'mié.':
+                skipBegginingDays = 2;
+                break;
+              case 'jue.':
+                skipBegginingDays = 3;
+                break;
+              case 'vie.':
+                skipBegginingDays = 4;
+                break;
+              default:
+                skipBegginingDays = 0;
+                break;
+            }
           }
+
 
           final condition = await controladorAsistencia.existeAsistencia(mes!, estudiante['estudiante.id']! as int, j);
           if(condition){
             //SE BUSCA LA QUE EXISTE
             final asistenciaVieja = await controladorAsistencia.buscarAsistencia(mes!, estudiante['estudiante.id']! as int, j);
-            tmp.add(asistenciaVieja!);
+            if(asistenciaVieja != null ){tmp.add(asistenciaVieja);}
+            else{tmp.add(null);}
           }else{
             //SE INSERTA UNA VACIA
-            tmp.add(Asistencia(
-              estudianteID: estudiante['estudiante.id'] as int,
-              asistio: false,
-              dia: j,
-              mes: mes!
-            ));
+            if(diasDelMesNoHabiles.contains(j)){
+              if(j == 1) tmp.addAll([null,null]);
+              else tmp.add(null);
+            }
+            else if(skipBegginingDays > 0){
+              List skip = List.filled(skipBegginingDays+1, null);
+              tmp.addAll([
+                ...skip,
+                Asistencia(
+                  estudianteID: estudiante['estudiante.id'] as int,
+                  asistio: false,
+                  dia: j,
+                  mes: mes!
+                )
+              ]);
+            }
+            else{
+              tmp.add(Asistencia(
+                estudianteID: estudiante['estudiante.id'] as int,
+                asistio: false,
+                dia: j,
+                mes: mes!
+              ));
+            }
           }
         }
         listaAsistenciasSeccion.add(tmp);
@@ -110,6 +122,28 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
     return null;
   }
 
+  void subirAsistencia(BuildContext context){
+    List<int> resultados = [];
+    ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+      message: 'Subiendo asistencias',
+      onVisible:()async{
+        for (var asistencias in listaAsistenciasSeccion){
+          try {
+            final results = await controladorAsistencia.registrarMes(asistencias.where((asistencia) => asistencia != null).toList() as List<Asistencia>);
+            resultados.addAll(results);
+          } catch (e) {
+            print(e);
+            ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Hubo un error al subir una asistencia'));  
+          }
+        }
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        if(resultados.length > 0){
+          ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Se han subido o actualizado varias asistencias'));  
+        }
+      }
+      )
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +167,24 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
               })
             ],
           ),
+          Padding(padding:EdgeInsets.symmetric(vertical: 5)),
+          Row(
+            children: [
+              SimplifiedTextFormField(
+                controlador: controllerDiasNoHabiles,
+                labelText: 'Dias no habiles',
+                validators: TextFormFieldValidators(),
+                helperText:'Los dias deben de ser separados por comas (,) sin espacios (1,5,6,7,8,24,25,23)'
+              )
+            ],
+          ),
+          Padding(padding:EdgeInsets.symmetric(vertical: 5)),
+          ElevatedButton.icon(
+            onPressed: (){setState((){});},
+            icon:Icon(Icons.refresh),
+            label:Text('Actualizar')
+          ),
+          //BOTON PARA ACTUALIZAR
           Padding(padding:EdgeInsets.symmetric(vertical: 5)),
           FutureBuilder(
             future: dualChange(),
@@ -234,14 +286,11 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
                   Padding(padding:EdgeInsets.symmetric(vertical: 5)), 
                   ElevatedButton(
                     onPressed: (){
-                      for(var asistencias in listaAsistenciasSeccion){
-                        for(var asistencia in asistencias){
-                          print(asistencia.toJson());
-                        }
-                      }
+                      subirAsistencia(context);
                     },
                     child: Text('Subir asistencia')
-                  )
+                  ),
+                  Padding(padding:EdgeInsets.symmetric(vertical: 5))
                 ]);
               }
             },
@@ -256,20 +305,20 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
 class _MesCheckboxList extends StatefulWidget {
 
 
-  final void Function(List<Asistencia>) onChange;
-  final List<Asistencia> asistencia;
+  final void Function(List<Asistencia?>) onChange;
+  final List<Asistencia?> asistencia;
 
   _MesCheckboxList({required this.onChange,required this.asistencia});
 
   @override
-  __MesCheckboxListState createState() => __MesCheckboxListState(onChange:onChange,asistencia:asistencia);
+  __MesCheckboxListState createState() => __MesCheckboxListState(onChange:onChange,asistencias:asistencia);
 }
 
 class __MesCheckboxListState extends State<_MesCheckboxList> {
 
-  final void Function(List<Asistencia>) onChange;
+  final void Function(List<Asistencia?>) onChange;
 
-  List<Asistencia> asistencias;
+  List<Asistencia?> asistencias;
 
   __MesCheckboxListState({
     required this.onChange,
@@ -277,34 +326,28 @@ class __MesCheckboxListState extends State<_MesCheckboxList> {
   });
 
   @override
-  Widget build(BuildContext context) {
-    List<Row> checkBoxRows = [];
-    List<List<CheckboxListTile>> checkBoxTiles = [];
+  Widget build(BuildContext context) { 
+    
 
-    for(var asistencia in asistencias){
-
-      for (var i = 0; i < 5; i++) {
-        if()
-          checkBoxTiles[i].add(
-            CheckboxListTile(
-              value: asistencias[asistencias.indexWhere((element) => element == asistencia)].asistio,
-              title:Text(asistencia.dia.toString()),
-              onChanged: (val){
-                asistencias[asistencias.indexWhere((element) => element == asistencia)].asistio = val!;
-                setState((){
-                  onChange(asistencias);
-                });
-              }
-            )
-          );
+    return Wrap(
+      children:asistencias.map((asistencia){
+        if(asistencia == null){
+          return SizedBox(width:30,height:25);
         }
-
-    }
-
-    for(var i = 0; i < 5; i++){
-
-    }
-
-    return Text('hi');
+        return Row(
+          mainAxisSize:MainAxisSize.min,
+          children: [
+            Text(asistencia.dia.toString(),style:TextStyle(fontSize:(asistencia.dia >= 10) ? 10: 12)),
+            Checkbox(
+              value: asistencia.asistio, onChanged: (asistio){
+                asistencias[asistencias.indexOf(asistencia)]!.asistio=asistio!;
+                onChange(asistencias);
+                setState((){});
+              }
+            ),
+          ],
+        );
+      }).toList()
+    );
   }
 }

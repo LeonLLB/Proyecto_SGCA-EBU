@@ -53,12 +53,12 @@ class Asistencia{
   Map<String,dynamic> toJson({bool withId = true})=>(withId)?{
     'id':id,
     'estudianteID' : estudianteID,
-    'asistio' :  asistio,
+    'asistio' :  (asistio) ? 1 : 0,
     'dia' : dia,
     'mes' : mes
   }:{
     'estudianteID' : estudianteID,
-    'asistio' :  asistio,
+    'asistio' :  (asistio) ? 1 : 0,
     'dia' : dia,
     'mes' : mes
   };

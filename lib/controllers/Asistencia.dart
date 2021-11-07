@@ -47,7 +47,7 @@ class _AsistenciaController {
 
     int result;
 
-    final yearEscolar = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
+    final yearEscolar = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR',false);
 
     if(await existeAsistencia(asistencia.mes,asistencia.estudianteID, asistencia.dia,false)){
       //SI EXISTE LA ASISTENCIA, SOLO SE ACTUALIZARA
@@ -67,7 +67,7 @@ class _AsistenciaController {
     List<Future<int>> consultas = [];
     
     for(var asistencia in asistencias){
-      consultas.add(registrarDia(asistencia));
+      consultas.add(registrarDia(asistencia,false));
     }
 
     if(db.isOpen) db.close();
