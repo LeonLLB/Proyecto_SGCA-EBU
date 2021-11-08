@@ -8,6 +8,7 @@ import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
 import 'package:proyecto_sgca_ebu/components/SuccesSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/loadingSnackbar.dart';
+import 'package:proyecto_sgca_ebu/controllers/Admin.dart';
 import 'package:proyecto_sgca_ebu/controllers/Asistencia.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
@@ -38,8 +39,10 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
       diasDelMesNoHabiles = controllerDiasNoHabiles.text.split(',').map((diaNoHabil)=>int.parse(diaNoHabil)).toList();
     }
 
-
     if(matriculaSeleccionada != null && mes != null){
+      if(diasDelMesNoHabiles.length > 0){
+        controladorAsistencia.eliminarAsistenciasSA(mes!, diasDelMesNoHabiles);
+      }
       listaAsistenciasSeccion = [];   
 
       for(var i = 0; i < matriculaSeleccionada!.length;i++){
@@ -47,7 +50,10 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
         List<Asistencia?> tmp = [];
         for (var j = 1; j <= 31; j++) {
           int skipBegginingDays = 0;
-          final fechaActual = DateTime((mes! >= 6) ? (DateTime.now().year) : (DateTime(DateTime.now().year+1).year),mes!,j);
+
+          final yearEscolar = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
+
+          final fechaActual = DateTime((mes! >= 6) ? (int.parse(yearEscolar!.valor.split('-')[0])) : (int.parse(yearEscolar!.valor.split('-')[1])),mes!,j);
           
           if(fechaActual.month != mes){
             break;
@@ -77,50 +83,52 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
                 break;
             }
           }
-
-
-          final condition = await controladorAsistencia.existeAsistencia(mes!, estudiante['estudiante.id']! as int, j);
-          if(condition){
-            //SE BUSCA LA QUE EXISTE
-            final asistenciaVieja = await controladorAsistencia.buscarAsistencia(mes!, estudiante['estudiante.id']! as int, j);
-            if(asistenciaVieja != null ){tmp.add(asistenciaVieja);}
-            else{tmp.add(null);}
-          }else{
-            //SE INSERTA UNA VACIA
-            if(diasDelMesNoHabiles.contains(j)){
-              if(j == 1) tmp.addAll([null,null]);
-              else tmp.add(null);
-            }
-            else if(skipBegginingDays > 0){
-              List skip = List.filled(skipBegginingDays+1, null);
-              tmp.addAll([
-                ...skip,
-                Asistencia(
-                  estudianteID: estudiante['estudiante.id'] as int,
-                  asistio: false,
-                  dia: j,
-                  mes: mes!
-                )
-              ]);
-            }
-            else{
-              tmp.add(Asistencia(
-                estudianteID: estudiante['estudiante.id'] as int,
-                asistio: false,
-                dia: j,
-                mes: mes!
-              ));
-            }
+            controladorAsistencia.buscarAsistencia(mes!, estudiante['estudiante.id']! as int, j)
+            .then((asistenciaVieja){
+              if(asistenciaVieja != null){
+                if (diasDelMesNoHabiles.contains(j)) {
+                  if(j == 1) tmp.addAll([null,null]);
+                  else tmp.add(null);
+                }else{
+                  tmp.add(asistenciaVieja);
+                }
+              }
+              else{
+                //SE INSERTA UNA VACIA
+                if(diasDelMesNoHabiles.contains(j)){
+                  if(j == 1) tmp.addAll([null,null]);
+                  else tmp.add(null);
+                }
+                else if(skipBegginingDays > 0){
+                  List skip = List.filled(skipBegginingDays+1, null);
+                  tmp.addAll([
+                    ...skip,
+                    Asistencia(
+                      estudianteID: estudiante['estudiante.id'] as int,
+                      asistio: false,
+                      dia: j,
+                      mes: mes!
+                    )
+                  ]);
+                }
+                else{
+                  tmp.add(Asistencia(
+                    estudianteID: estudiante['estudiante.id'] as int,
+                    asistio: false,
+                    dia: j,
+                    mes: mes!
+                  ));
+                }
+              }
+            });
           }
-        }
-        listaAsistenciasSeccion.add(tmp);
-        tmp=[];
-        
+          listaAsistenciasSeccion.add(tmp);
+          tmp=[];
+        }        
+        return matriculaSeleccionada;
       }
-      return matriculaSeleccionada;
+      return null;
     }
-    return null;
-  }
 
   void subirAsistencia(BuildContext context){
     List<int> resultados = [];

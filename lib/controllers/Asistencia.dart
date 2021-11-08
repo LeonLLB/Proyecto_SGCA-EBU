@@ -5,6 +5,13 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class _AsistenciaController {
 
+  Future<void> eliminarAsistenciasSA(int mes, List<int> diasNoHabiles)async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    for(var diaNoHabil in diasNoHabiles){
+      db.delete(Asistencia.tableName,where:'mes = ? AND dia = ?',whereArgs: [mes,diaNoHabil]);
+    }
+  }
+
   Future<bool> existeAsistencia(int mes, int estudiante, int dia, [bool closeDB = true]) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
