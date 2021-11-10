@@ -159,11 +159,11 @@ class EstudianteURepresentante{
       estudianteID INTEGER NOT NULL,
       representanteID INTEGER NOT NULL,
       
-      FOREIGN KEY (estudianteID) REFERENCES Estudiante (id)
+      FOREIGN KEY (estudianteID) REFERENCES Informacion_estudiantes (id)
       	ON UPDATE CASCADE
       	ON DELETE CASCADE
       
-      FOREIGN KEY (representanteID) REFERENCES Representante (id)
+      FOREIGN KEY (representanteID) REFERENCES Representantes (id)
       	ON UPDATE CASCADE
       	ON DELETE CASCADE
     );

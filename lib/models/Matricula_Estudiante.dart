@@ -58,7 +58,7 @@ class MatriculaEstudiante{
       	ON UPDATE CASCADE
       	ON DELETE CASCADE
       
-      FOREIGN KEY (estudianteID) REFERENCES Estudiantes (id)
+      FOREIGN KEY (estudianteID) REFERENCES Informacion_estudiantes  (id)
       	ON UPDATE CASCADE
       	ON DELETE CASCADE
 

@@ -14,7 +14,7 @@ class Asistencia{
       mes INTEGER NOT NULL,
       añoEscolar VARCHAR(9),
 
-      FOREIGN KEY (estudianteID) REFERENCES Estudiante (id)
+      FOREIGN KEY (estudianteID) REFERENCES Informacion_estudiantes  (id)
       	ON UPDATE CASCADE
       	ON DELETE CASCADE
 

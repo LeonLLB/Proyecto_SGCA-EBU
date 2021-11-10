@@ -10,3 +10,5 @@ export 'package:proyecto_sgca_ebu/models/Matricula_Docente.dart';
 export 'package:proyecto_sgca_ebu/models/Matricula_Estudiante.dart';
 export 'package:proyecto_sgca_ebu/models/Admin.dart';
 export 'package:proyecto_sgca_ebu/models/Asistencia.dart';
+export 'package:proyecto_sgca_ebu/models/Rendimiento.dart';
+export 'package:proyecto_sgca_ebu/models/Record.dart';
