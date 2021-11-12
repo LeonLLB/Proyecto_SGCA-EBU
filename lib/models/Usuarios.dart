@@ -19,6 +19,16 @@ class Usuarios {
     SELECT id FROM Usuarios;
   ''';
 
+  static final String contarDocentes = '''
+  
+    SELECT
+      COUNT(*) cantidadDocentes
+    FROM Usuarios u
+    WHERE u.rol = 'D'
+    ;
+  
+  ''';
+
   static final String tableInitializer = '''
   
     CREATE TABLE Usuarios(

@@ -13,6 +13,18 @@ class MatriculaEstudiante{
   
   ''';
 
+  static final String cantidadDeEstudiantesPorGrado = '''
+  
+    SELECT 
+      am.id,
+      COUNT(me.ambienteID = am.id) cantidadEstudiantes
+    FROM Ambientes am
+    LEFT OUTER JOIN Matricula_Estudiantes me
+      ON me.ambienteID = am.id
+    WHERE am.grado = ?;
+  
+  ''';
+
   static final String obtenerMatriculaCompleta = '''
   
   SELECT

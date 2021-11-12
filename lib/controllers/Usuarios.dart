@@ -67,6 +67,14 @@ class _UsuariosControllers {
     
   }
 
+  Future<int> contarDocentes()async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final result = (await db.rawQuery(Usuarios.contarDocentes))[0];
+
+    return result['cantidadDocentes'] as int;
+  }
+
   Future<Usuarios?> buscarDocente(int? cedulaDocente,[bool closeDB = true])async{
 
     if(cedulaDocente == null) return null;

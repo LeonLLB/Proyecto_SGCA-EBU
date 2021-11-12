@@ -1,10 +1,40 @@
 import 'package:proyecto_sgca_ebu/models/Admin.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
-import 'package:proyecto_sgca_ebu/controllers/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/models/Matricula_Estudiante.dart';
 
 class _MatriculaEstudianteController{
+
+  Future<Map<String,int>> contarEstudiantesEnGrados()async{
+    Map<String,int> estudiantesPorGrado = {
+      '1':0,
+      '2':0,
+      '3':0,
+      '4':0,
+      '5':0,
+      '6':0,
+      'TOTAL':0
+    };
+
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    
+    final result = await db.rawQuery('SELECT am.grado FROM Ambientes am ORDER BY am.grado DESC LIMIT 1');
+
+    final gradoMaximo = result[0]['grado'] as int;
+
+    int sumaTotal = 0;
+    
+    for(var i = 1; i <= gradoMaximo; i++){
+      estudiantesPorGrado[i.toString()] = (await db.rawQuery(MatriculaEstudiante.cantidadDeEstudiantesPorGrado,[i]))[0]['cantidadEstudiantes'] as int;
+      sumaTotal += estudiantesPorGrado[i.toString()]!;
+    }
+
+    estudiantesPorGrado['TOTAL'] = sumaTotal;
+    db.close();
+
+    return estudiantesPorGrado;
+
+  }
 
   Future<List<Map<String,Object?>>?> getMatricula(int? ambienteId)async{
     if(ambienteId == null) return null;
