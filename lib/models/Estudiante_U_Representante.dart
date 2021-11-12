@@ -158,6 +158,7 @@ class EstudianteURepresentante{
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       estudianteID INTEGER NOT NULL,
       representanteID INTEGER NOT NULL,
+      parentesco VARCHAR(5),
       
       FOREIGN KEY (estudianteID) REFERENCES Informacion_estudiantes (id)
       	ON UPDATE CASCADE

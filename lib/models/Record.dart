@@ -2,7 +2,7 @@
 
 class Record {
 
-  static final String tableName = "Record_Estudiantil";
+  static final String tableName = "Record_Boletin_Estudiantil";
 
   static final String testInitializer = "SELECT id FROM $tableName";
 
@@ -11,9 +11,10 @@ class Record {
     CREATE TABLE $tableName (
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       estudianteID INTEGER NOT NULL,
-      aprobado BOOL NOT NULL DEFAULT false,
+      aprobado BOOL,
       gradoCursado VARCHAR(6) NOT NULL,
       añoEscolar VARCHAR(9) NOT NULL,
+      fechaInscripcion,
 
       FOREIGN KEY (estudianteID) REFERENCES Informacion_estudiantes (id)
       	ON UPDATE CASCADE

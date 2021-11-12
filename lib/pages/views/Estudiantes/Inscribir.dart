@@ -32,6 +32,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
   genero generoEstudiante = genero.e;
   tipo tipoEstudiante = tipo.e;
   procedencia procedenciaEstudiante = procedencia.e;
+  DateTime fechaInscripcion = DateTime.now();
 
   representante existeRepresentante = representante.noExiste;
   Ambiente? gradoACursar;
@@ -83,16 +84,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
 
     existeRepresentante = representante.noExiste;
     setState((){});
-  }
-
-  Future<DateTime?> getDate (BuildContext context,String? date)=>showDatePicker(
-    context: context,
-    initialDate: (date != null && date != '') ? 
-    DateTime(int.parse(date.split('/')[2]),int.parse(date.split('/')[1]),int.parse(date.split('/')[0])) :
-    DateTime(DateTime.now().year - 6),
-    firstDate: DateTime(2000),
-    lastDate: DateTime(DateTime.now().year - 6,12,31)
-    );
+  }  
 
   @override
   Widget build(BuildContext context) {
@@ -133,32 +125,15 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                     ]
                   ),
                   Padding(padding:EdgeInsets.symmetric(vertical:5)),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: ()async{
-                            final date = await getDate(context,controladoresEstudiante['FechaNacimiento']);
-                            if(date != null){
-                              final fecha = date.toIso8601String().split('T')[0].split('-');
-                              controladoresEstudiante['FechaNacimiento'] = '${fecha[2]}/${fecha[1]}/${fecha[0]}';
-                              setState(() {});
-                            }
-                          },
-                          child: Row(
-                            mainAxisAlignment:MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Icon(Icons.calendar_today),
-                              Text(
-                                (controladoresEstudiante['FechaNacimiento'] == '')?
-                                'Fecha de nacimiento':
-                                '${controladoresEstudiante['FechaNacimiento']}',
-                                style:TextStyle(fontSize:16)),
-                            ],
-                          )
-                        )
-                      )
-                  ]),
+                  _DateTimePicker(onChange: (fecha){
+                      final newDate = fecha!.toIso8601String().split('T')[0].split('-');
+                      controladoresEstudiante['FechaNacimiento'] = '${newDate[2]}/${newDate[1]}/${newDate[0]}';
+                      setState((){});
+                    },
+                    defaultText: 'Fecha de Nacimiento',
+                    maxDate:DateTime(DateTime.now().year - 6,12,31),
+                    defaultDate:DateTime(DateTime.now().year - 6)
+                  ),
                   Padding(padding:EdgeInsets.symmetric(vertical:5)),
                   Center(child:Text('Genero',style:TextStyle(fontSize:18))),
                   RadioInputRowList<genero>(
@@ -270,6 +245,14 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
     
                 Padding(padding:EdgeInsets.symmetric(vertical:5)),   
           
+                _DateTimePicker(onChange: (fecha){
+                    fechaInscripcion = fecha!;
+                    setState((){});
+                  },
+                  defaultText: 'Fecha de inscripcion',
+                  maxDate:DateTime.now(),
+                  defaultDate:DateTime(DateTime.now().year,1,1)
+                ),
                 
                 Padding(padding:EdgeInsets.symmetric(vertical:5)),
     
@@ -460,8 +443,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
           message:'Registrando estudiante...',
           onVisible: () async {
             try {
-              final result = await controladorEstudiante.registrar(estudianteAInscribir,cedulaRepresentante: int.parse(infoRepresentante['Cedula'].text),ambienteSeleccionado:gradoACursar!);
-              
+              final result = await controladorEstudiante.registrar(estudianteAInscribir,cedulaRepresentante: int.parse(infoRepresentante['Cedula'].text),ambienteSeleccionado:gradoACursar!,procedencia:infoEstudiante['Procedencia'],tipo:infoEstudiante['Tipo'],fechaInscripcion:fechaInscripcion);
               ScaffoldMessenger.of(context).removeCurrentSnackBar();
               
               if(result == 0){
@@ -500,7 +482,7 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
           message:'Registrando estudiante y representante...',
           onVisible: () async {
             try {
-              final result = await controladorEstudiante.registrar(estudianteAInscribir,representante:represententanteAInscribir,ambienteSeleccionado:gradoACursar!);
+              final result = await controladorEstudiante.registrar(estudianteAInscribir,representante:represententanteAInscribir,ambienteSeleccionado:gradoACursar!,procedencia:infoEstudiante['Procedencia'],tipo:infoEstudiante['Tipo'],fechaInscripcion:fechaInscripcion);
               
               
               ScaffoldMessenger.of(context).removeCurrentSnackBar();
@@ -537,6 +519,69 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
 
     }    
   
+}
+
+class _DateTimePicker extends StatefulWidget {
+
+  final void Function(DateTime?) onChange;
+  final String defaultText;
+  final DateTime maxDate;
+  final DateTime defaultDate;
+
+  _DateTimePicker({
+    required this.onChange,
+    required this.defaultText,
+    required this.maxDate,
+    required this.defaultDate
+  });
+
+  @override
+  __DateTimePickerState createState() => __DateTimePickerState();
+}
+
+class __DateTimePickerState extends State<_DateTimePicker> {
+
+  String? lastDate;
+
+  Future<DateTime?> getDate (BuildContext context,String? date)=>showDatePicker(
+    context: context,
+    initialDate: (date != null && date != '') ? 
+    DateTime(int.parse(date.split('/')[2]),int.parse(date.split('/')[1]),int.parse(date.split('/')[0])) :
+    widget.defaultDate,
+    firstDate: DateTime(2000),
+    lastDate: widget.maxDate
+    );
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: ()async{
+              final date = await getDate(context,lastDate);
+              if(date != null){
+                final fecha = date.toIso8601String().split('T')[0].split('-');
+                lastDate = '${fecha[2]}/${fecha[1]}/${fecha[0]}';
+                widget.onChange(date);
+                setState(() {});
+              }
+            },
+            child: Row(
+              mainAxisAlignment:MainAxisAlignment.spaceEvenly,
+              children: [
+                Icon(Icons.calendar_today),
+                Text(
+                  (lastDate == '')?
+                  widget.defaultText:
+                  '$lastDate',
+                  style:TextStyle(fontSize:16)),
+              ],
+            )
+          )
+        )
+    ]);
+  }
 }
 
 class _ContenedorForm extends StatelessWidget {

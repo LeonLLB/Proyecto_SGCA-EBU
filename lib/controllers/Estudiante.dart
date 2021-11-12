@@ -1,7 +1,9 @@
+import 'package:proyecto_sgca_ebu/controllers/FichaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/controllers/Representante.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Estudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Estudiante_U_Representante.dart';
+import 'package:proyecto_sgca_ebu/models/Ficha_Estudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/models/Representante.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -60,7 +62,7 @@ class _EstudianteControllers{
     return (result.length == 0 ) ? null : result[0];
   }
 
-  Future<int> registrar(Estudiante estudiante,{int? cedulaRepresentante,Representante? representante,required Ambiente ambienteSeleccionado}) async{
+  Future<int> registrar(Estudiante estudiante,{int? cedulaRepresentante,Representante? representante,required Ambiente ambienteSeleccionado,required String procedencia, required String tipo,required DateTime fechaInscripcion}) async{
       
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     if(cedulaRepresentante != null){
@@ -70,8 +72,10 @@ class _EstudianteControllers{
       int resultEstudiante = await db.insert(Estudiante.tableName,estudiante.toJson(withId: false));
       
       if(resultEstudiante != 0){
+        await controladorFichaEstudiante.creacionFichaInicial(resultEstudiante, tipo,fechaInscripcion, procedencia,estudiante.fechaNacimiento,false);
         await db.insert(EstudianteURepresentante.tableName, {'EstudianteID':resultEstudiante,'RepresentanteID':representanteCedula.id});
         resultEstudiante = await controladorMatriculaEstudiante.registrar(resultEstudiante, ambienteSeleccionado);        
+        
       }
 
       return resultEstudiante;
@@ -84,14 +88,51 @@ class _EstudianteControllers{
       int resultEstudiante = await db.insert(Estudiante.tableName,estudiante.toJson(withId: false));
       
       if(resultEstudiante != 0){
+        await controladorFichaEstudiante.creacionFichaInicial(resultEstudiante, tipo,fechaInscripcion, procedencia,estudiante.fechaNacimiento,false);
         await db.insert(EstudianteURepresentante.tableName, {'EstudianteID':resultEstudiante,'RepresentanteID':representanteInsertado});
         resultEstudiante = await controladorMatriculaEstudiante.registrar(resultEstudiante, ambienteSeleccionado);
+        
       }
       if(db.isOpen){db.close();}
       return resultEstudiante;
     }
     return 0;
     
+  }
+
+  Future<int> eliminarEstudiante(int estudianteID)async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final result = await db.delete(Estudiante.tableName,where:'id = ?',whereArgs: [estudianteID]);
+
+    db.close();
+
+    return result;
+  }
+
+  Future<int> modificarEstudiante(Estudiante nuevoEstudiante, FichaEstudiante nuevaFicha)async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final resultE = await db.update(Estudiante.tableName,nuevoEstudiante.toJson(),where:'id = ?',whereArgs:[nuevoEstudiante.id]);
+    final resultF = await controladorFichaEstudiante.actualizarFicha(nuevaFicha,nuevoEstudiante.fechaNacimiento);
+
+    return resultE+resultF;
+
+  }
+
+  Future<int> cambiarRepresentante(int estudianteID,String? parentesco, int cedulaRepresentante) async {
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    //PASO 1: ENCONTRAR A UN REPRESENTANTE PARA ESA CEDULA
+    final representante = await controladorRepresentante.buscarRepresentante(cedulaRepresentante,false);
+    if(representante == null) return -1; //NO EXISTE EL REPRESENTANTE
+    
+    //PASE 2: EJECUTAR LA ACTUALIZACION
+
+    final result = await db.rawUpdate('UPDATE ${EstudianteURepresentante.tableName} SET representanteID = ?, parentesco = ? WHERE estudianteID = ?',[representante.id,parentesco,estudianteID]);
+    
+    db.close();
+
+    return result;
   }
 
 }
