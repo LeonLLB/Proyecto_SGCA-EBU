@@ -5,39 +5,56 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class _AsistenciaController {
 
-  Future<void> eliminarAsistenciasSA(int mes, List<int> diasNoHabiles)async{
+  Future<void> eliminarAsistencias(int mes, int ambienteID, List<int> diasNoHabiles)async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
-    for(var diaNoHabil in diasNoHabiles){
-      db.delete(Asistencia.tableName,where:'mes = ? AND dia = ?',whereArgs: [mes,diaNoHabil]);
+    final results = await db.rawQuery(Asistencia.getAsistenciasPorAmbiente,[ambienteID,mes]);
+    
+    if(results.length == 0) return;
+    
+    for(var result in results){
+
+      final asistenciaAModificar = Asistencia.fromMap(result);
+
+      for(var diaNoHabil in diasNoHabiles){
+        if(asistenciaAModificar.asistencias.contains(diaNoHabil) ){
+          asistenciaAModificar.asistencias.remove(diaNoHabil);
+        }
+      }
+
+      db.update(Asistencia.tableName,asistenciaAModificar.toJson(),where: 'id = ?',whereArgs:[asistenciaAModificar.id]);    
     }
+
   }
 
-  Future<bool> existeAsistencia(int mes, int estudiante, int dia, [bool closeDB = true]) async {
+  Future<bool> existeAsistencia(int mes, int estudiante, [bool closeDB = true]) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
-    final result = await db.query(Asistencia.tableName,where:'estudianteID = ? AND mes = ? AND dia = ?',whereArgs:[estudiante,mes,dia]);
+    final result = await db.query(Asistencia.tableName,where:'estudianteID = ? AND mes = ?',whereArgs:[estudiante,mes]);
 
     if(closeDB) db.close();
 
     return result.length != 0;
   }
 
-  Future<List<Asistencia>?> buscarAsistencias(int mes) async {
-    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
-    final resultados = await db.query(Asistencia.tableName);
-    if(resultados.length == 0) return null;
-    List<Asistencia> result = [];
-    for(var resultado in resultados){
-      result.add(Asistencia.fromMap(resultado));
-    }
-    db.close();
-    return result;
-  }
 
-  Future<Asistencia?> buscarAsistencia(int mes,int estudiante, int dia) async {
+
+  //POSIBLE UTILIZACION FUTURA
+  Future<List<Map<String,Object?>>?> buscarAsistencias(int mes,int ambienteID,[bool enBaseAMatricula = false]) async {
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    final resultados = await db.rawQuery((enBaseAMatricula) ? Asistencia.getAsistenciasPorAmbienteEnBaseAMatricula: Asistencia.getAsistenciasPorAmbiente, (enBaseAMatricula) ? [mes,ambienteID] : [ambienteID,mes]);
+    
+    if(resultados.length == 0) return null;
+
+    db.close();
+
+    return resultados;
+  }
+  
+  Future<Asistencia?> buscarAsistencia(int mes,int estudiante) async {
     
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
-    final resultados = await db.query(Asistencia.tableName,where:'estudianteID = ? AND mes = ? AND dia = ?',whereArgs:[estudiante,mes,dia]);
+    final resultados = await db.query(Asistencia.tableName,where:'estudianteID = ? AND mes = ?',whereArgs:[estudiante,mes]);
+    
     if(resultados.length == 0) {
       db.close();
       return null;
@@ -49,14 +66,14 @@ class _AsistenciaController {
 
   
 
-  Future<int> registrarDia(Asistencia asistencia, [bool closeDB = true]) async{
+  Future<int> registrarAsistencia(Asistencia asistencia, [bool closeDB = true]) async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
     int result;
 
     final yearEscolar = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR',false);
 
-    if(await existeAsistencia(asistencia.mes,asistencia.estudianteID, asistencia.dia,false)){
+    if(await existeAsistencia(asistencia.mes,asistencia.estudianteID,false)){
       //SI EXISTE LA ASISTENCIA, SOLO SE ACTUALIZARA
       result = await db.update(Asistencia.tableName,{...asistencia.toJson(),'añoEscolar':yearEscolar!.valor},where: 'id = ?',whereArgs:[asistencia.id!]);
     }else{
@@ -74,7 +91,7 @@ class _AsistenciaController {
     List<Future<int>> consultas = [];
     
     for(var asistencia in asistencias){
-      consultas.add(registrarDia(asistencia,false));
+      consultas.add(registrarAsistencia(asistencia,false));
     }
 
     if(db.isOpen) db.close();

@@ -1,6 +1,6 @@
 class Asistencia{
 
-  static final String tableName='Asistencia_diaria';
+  static final String tableName='Asistencia_mensual';
 
   static final String testInitializer='SELECT id FROM $tableName';
 
@@ -9,8 +9,7 @@ class Asistencia{
     CREATE TABLE $tableName (
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       estudianteID INTEGER NOT NULL,
-      asistio BOOL NOT NULL,
-      dia INTEGER NOT NULL,
+      asistencias VARCHAR(92) NOT NULL,
       mes INTEGER NOT NULL,
       añoEscolar VARCHAR(9),
 
@@ -18,48 +17,81 @@ class Asistencia{
       	ON UPDATE CASCADE
       	ON DELETE CASCADE
 
-      UNIQUE(dia,mes,añoEscolar,estudianteID)
+      UNIQUE(mes,añoEscolar,estudianteID)
     );
+  
+  ''';
+
+  static final String getAsistenciasPorAmbiente = '''
+  
+    SELECT
+      asis.id,
+      asis.mes,
+      asis.asistencias,
+      asis.estudianteID
+    FROM Asistencia_mensual asis
+    LEFT OUTER JOIN Matricula_Estudiantes me
+      ON asis.estudianteID = me.estudianteID
+    LEFT OUTER JOIN Ambientes am
+      ON me.ambienteID = am.id
+    WHERE am.id = ? AND asis.mes = ?;
+
+  ''';
+
+  static final String getAsistenciasPorAmbienteEnBaseAMatricula = '''
+  
+    SELECT
+      asis.id,
+      asis.mes,
+      asis.asistencias,
+      me.estudianteID
+    FROM Matricula_Estudiantes me 
+    LEFT OUTER JOIN Asistencia_mensual asis
+      ON asis.estudianteID = me.estudianteID
+      AND asis.mes = ?
+    LEFT OUTER JOIN Ambientes am
+      ON me.ambienteID = am.id
+    WHERE am.id = ?;
   
   ''';
 
   int? id;
   int estudianteID;
-  bool asistio; 
-  int dia;
+  List<int> asistencias;
   int mes;
+
+  static List<int> _turnAsistenciasIntoList(String asistencias){
+    final List<String> asistenciasSeparadas = asistencias.split(',');
+    final List<int> listaDiasAsistencias = asistenciasSeparadas.map((asistencia)=>int.parse(asistencia)).toList();
+    return listaDiasAsistencias;
+  }
 
   Asistencia({
     this.id,
     required this.estudianteID,
-    required this.asistio, 
-    required this.dia,
+    required this.asistencias,
     required this.mes
   });
 
   Asistencia.fromForm(Map<String,dynamic> asistencia) :
     estudianteID = asistencia['EstudianteID'],
-    asistio = asistencia['Asistio'],
-    dia = asistencia['Dia'],
+    asistencias = asistencia['Asistencias'],
     mes = asistencia['Mes'];
   
   Asistencia.fromMap(Map<String,dynamic> asistencia) :
     id = asistencia['id'],
     estudianteID = asistencia['estudianteID'],
-    asistio = asistencia['asistio'] == 1 , 
-    dia = asistencia['dia'],
+    asistencias = _turnAsistenciasIntoList(asistencia['asistencias']),
     mes = asistencia['mes'];
 
-  Map<String,dynamic> toJson({bool withId = true})=>(withId)?{
+  Map<String,dynamic> toJson({bool withId = true,bool simplified = true})=>(withId)?{
     'id':id,
     'estudianteID' : estudianteID,
-    'asistio' :  (asistio) ? 1 : 0,
-    'dia' : dia,
+    'asistencias' : (simplified) ? asistencias.join(',') : asistencias,
     'mes' : mes
   }:{
     'estudianteID' : estudianteID,
-    'asistio' :  (asistio) ? 1 : 0,
-    'dia' : dia,
+    'asistencias' : (simplified) ? asistencias.join(',') : asistencias,
     'mes' : mes
   };
 

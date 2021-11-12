@@ -28,121 +28,110 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
   
   List<Map<String,Object?>>? matriculaSeleccionada;
 
-  List<List<Asistencia?>> listaAsistenciasSeccion = []; 
+  List<Asistencia> listaAsistenciasSeccion = []; 
 
   List<int> diasDelMesNoHabiles = [];
+  List<int> mementoDiasDelMesNoHabiles = [];
+  List<int?> diasDelMesHabiles = [];
+
   TextEditingController controllerDiasNoHabiles = TextEditingController();
 
+
   Future<List<Map<String,Object?>>?> dualChange () async {
-    diasDelMesNoHabiles = [];    
-    if(controllerDiasNoHabiles.text != ''){
-      diasDelMesNoHabiles = controllerDiasNoHabiles.text.split(',').map((diaNoHabil)=>int.parse(diaNoHabil)).toList();
-    }
+    diasDelMesNoHabiles = [];
+    diasDelMesHabiles = [];   
 
     if(matriculaSeleccionada != null && mes != null){
-      if(diasDelMesNoHabiles.length > 0){
-        controladorAsistencia.eliminarAsistenciasSA(mes!, diasDelMesNoHabiles);
+
+        //PASO 1: SACAR LOS DIAS NO HABILES
+      if(controllerDiasNoHabiles.text != ''){
+        diasDelMesNoHabiles = controllerDiasNoHabiles.text.split(',').map((diaNoHabil)=>int.parse(diaNoHabil)).toList();
       }
-      listaAsistenciasSeccion = [];   
 
-      for(var i = 0; i < matriculaSeleccionada!.length;i++){
-        final estudiante = matriculaSeleccionada![i];
-        List<Asistencia?> tmp = [];
-        for (var j = 1; j <= 31; j++) {
-          int skipBegginingDays = 0;
+      //PASO 2: SACAR LOS DIAS HABILES
+      for(var i = 1; i <= 31; i++){
+        final yearEscolar = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
 
-          final yearEscolar = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
-
-          final fechaActual = DateTime((mes! >= 6) ? (int.parse(yearEscolar!.valor.split('-')[0])) : (int.parse(yearEscolar!.valor.split('-')[1])),mes!,j);
-          
-          if(fechaActual.month != mes){
-            break;
+        final fechaActual = DateTime((mes! >= 6) ? (int.parse(yearEscolar!.valor.split('-')[0])) : (int.parse(yearEscolar!.valor.split('-')[1])),mes!,i);
+        
+        if(fechaActual.month != mes!){
+          break;
+        }
+        
+        final diaSemana = DateFormat.E('es_ES').format(fechaActual);
+        
+        if(diasDelMesNoHabiles.contains(i) || (diaSemana == 'sáb.' || diaSemana == 'dom.')){
+          if(diasDelMesNoHabiles.contains(i) && (diaSemana != 'sáb.' || diaSemana != 'dom.')){
+            diasDelMesHabiles.add(null);
           }
-
-          final diaSemana = DateFormat.E('es_ES').format(fechaActual);
-
-          if(diaSemana == 'sáb.' || diaSemana == 'dom.'){
-            continue;
-          }
-          if(j == 1){
+          continue;
+        }
+        else{
+          if(i == 1){
             switch(diaSemana){
               case 'mar.':
-                skipBegginingDays = 1;
+                diasDelMesHabiles.addAll([null,null,i]);
                 break;
               case 'mié.':
-                skipBegginingDays = 2;
+                diasDelMesHabiles.addAll([null,null,null,i]);
                 break;
               case 'jue.':
-                skipBegginingDays = 3;
+                diasDelMesHabiles.addAll([null,null,null,null,i]);
                 break;
               case 'vie.':
-                skipBegginingDays = 4;
+                diasDelMesHabiles.addAll([null,null,null,null,null,i]);
                 break;
               default:
-                skipBegginingDays = 0;
+                diasDelMesHabiles.add(i);
                 break;
             }
+          }else{
+            diasDelMesHabiles.add(i);
           }
-            controladorAsistencia.buscarAsistencia(mes!, estudiante['estudiante.id']! as int, j)
-            .then((asistenciaVieja){
-              if(asistenciaVieja != null){
-                if (diasDelMesNoHabiles.contains(j)) {
-                  if(j == 1) tmp.addAll([null,null]);
-                  else tmp.add(null);
-                }else{
-                  tmp.add(asistenciaVieja);
-                }
-              }
-              else{
-                //SE INSERTA UNA VACIA
-                if(diasDelMesNoHabiles.contains(j)){
-                  if(j == 1) tmp.addAll([null,null]);
-                  else tmp.add(null);
-                }
-                else if(skipBegginingDays > 0){
-                  List skip = List.filled(skipBegginingDays+1, null);
-                  tmp.addAll([
-                    ...skip,
-                    Asistencia(
-                      estudianteID: estudiante['estudiante.id'] as int,
-                      asistio: false,
-                      dia: j,
-                      mes: mes!
-                    )
-                  ]);
-                }
-                else{
-                  tmp.add(Asistencia(
-                    estudianteID: estudiante['estudiante.id'] as int,
-                    asistio: false,
-                    dia: j,
-                    mes: mes!
-                  ));
-                }
-              }
-            });
-          }
-          listaAsistenciasSeccion.add(tmp);
-          tmp=[];
-        }        
-        return matriculaSeleccionada;
+        }
       }
-      return null;
+    
+      listaAsistenciasSeccion = [];   
+      //PASO 3: POR CADA ESTUDIANTE, DEBE TENER SU ASISTENCIA MENSUAL
+
+      if(diasDelMesNoHabiles.length > 0 && diasDelMesNoHabiles != mementoDiasDelMesNoHabiles){
+        controladorAsistencia.eliminarAsistencias(mes!,ambiente!.id!,diasDelMesNoHabiles);
+        mementoDiasDelMesNoHabiles = diasDelMesNoHabiles;
+      }
+
+      final asistenciasViejas = await controladorAsistencia.buscarAsistencias(mes!,ambiente!.id!,true);
+
+      if (asistenciasViejas != null) {
+        for(var asistenciaVieja in asistenciasViejas){
+          if(asistenciaVieja['id'] != null){
+            //SE INSERTA UNA HECHA
+            listaAsistenciasSeccion.add(Asistencia.fromMap(asistenciaVieja));
+          }else{
+            //SE INSERTA UNA VACIA
+            listaAsistenciasSeccion.add(Asistencia(
+              estudianteID: asistenciaVieja['estudianteID'] as int,
+              asistencias:[],
+              mes: mes!
+            ));
+          }
+        }
+      }
+      return matriculaSeleccionada;
     }
+    return null;
+  }
 
   void subirAsistencia(BuildContext context){
     List<int> resultados = [];
     ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
-      message: 'Subiendo asistencias',
+      message: 'Subiendo asistencias...',
       onVisible:()async{
-        for (var asistencias in listaAsistenciasSeccion){
-          try {
-            final results = await controladorAsistencia.registrarMes(asistencias.where((asistencia) => asistencia != null).toList() as List<Asistencia>);
-            resultados.addAll(results);
-          } catch (e) {
-            print(e);
-            ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Hubo un error al subir una asistencia'));  
-          }
+        try {
+          final results = await controladorAsistencia.registrarMes(listaAsistenciasSeccion);
+          resultados.addAll(results);
+        } catch (e) {
+          print(e);
+          ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Hubo un error al subir una asistencia'));  
         }
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
         if(resultados.length > 0){
@@ -280,6 +269,7 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
                               padding: EdgeInsets.all(5),
                               //PRIMERA SEMANA
                               child: _MesCheckboxList(
+                                diasHabiles:diasDelMesHabiles,
                                 onChange: (val){
                                   listaAsistenciasSeccion[estudiante.key] = val;                                  
                                 },
@@ -313,42 +303,49 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
 class _MesCheckboxList extends StatefulWidget {
 
 
-  final void Function(List<Asistencia?>) onChange;
-  final List<Asistencia?> asistencia;
+  final void Function(Asistencia) onChange;
+  final Asistencia asistencia;
+  final List<int?> diasHabiles;
 
-  _MesCheckboxList({required this.onChange,required this.asistencia});
+  _MesCheckboxList({required this.diasHabiles,required this.onChange,required this.asistencia});
 
   @override
-  __MesCheckboxListState createState() => __MesCheckboxListState(onChange:onChange,asistencias:asistencia);
+  __MesCheckboxListState createState() => __MesCheckboxListState(diasHabiles:diasHabiles,onChange:onChange,asistencias:asistencia);
 }
 
 class __MesCheckboxListState extends State<_MesCheckboxList> {
 
-  final void Function(List<Asistencia?>) onChange;
-
-  List<Asistencia?> asistencias;
+  final void Function(Asistencia) onChange;
+  Asistencia asistencias;
+  final List<int?> diasHabiles;
 
   __MesCheckboxListState({
     required this.onChange,
+    required this.diasHabiles,
     required this.asistencias
   });
 
   @override
-  Widget build(BuildContext context) { 
-    
+  Widget build(BuildContext context) {     
 
     return Wrap(
-      children:asistencias.map((asistencia){
-        if(asistencia == null){
-          return SizedBox(width:30,height:25);
+      children:diasHabiles.map((diaHabil){
+        if(diaHabil == null){
+          return SizedBox(width:35,height:25);
         }
         return Row(
           mainAxisSize:MainAxisSize.min,
           children: [
-            Text(asistencia.dia.toString(),style:TextStyle(fontSize:(asistencia.dia >= 10) ? 10: 12)),
+            Text(diaHabil.toString(),style:TextStyle(fontSize:(diaHabil >= 10) ? 10: 12)),
             Checkbox(
-              value: asistencia.asistio, onChanged: (asistio){
-                asistencias[asistencias.indexOf(asistencia)]!.asistio=asistio!;
+              value: asistencias.asistencias.contains(diaHabil),
+              onChanged: (asistio){
+                if(asistio!){
+                  asistencias.asistencias.add(diaHabil);
+                }else{
+                  asistencias.asistencias.remove(diaHabil);
+                }
+                asistencias.asistencias.sort();
                 onChange(asistencias);
                 setState((){});
               }
