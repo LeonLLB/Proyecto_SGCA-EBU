@@ -2,6 +2,51 @@
 
 class FichaEstudiante{
 
+  static final String getFichaCompleta = '''
+  
+    SELECT
+      fe.id,
+      e.nombres,e.apellidos,
+      e.id AS 'e.id',
+      e.cedula,
+      e.lugar_nacimiento,e.estado_nacimiento,e.fecha_nacimiento,
+      e.genero,
+      fe.tipo_estudiante,
+      fe.fecha_inscripcion,
+      fe.procedencia,
+      fe.talla,fe.peso,
+      fe.alergia,fe.asma,fe.cardiaco,fe.tipaje,fe.respiratorio,fe.detalles,
+      r.nombres AS 'r.nombres',
+      r.apellidos AS 'r.apellidos',
+      r.cedula AS 'r.cedula',
+      r.numero AS 'r.numero',
+      r.ubicacion AS 'r.ubicacion',
+      eur.parentesco AS 'r.parentesco',	
+      me."añoEscolar",
+      am.grado,
+      am.seccion,am.turno,
+      d.nombres AS 'd.nombres',
+      d.apellidos AS 'd.apellidos',
+      d.cedula AS 'd.cedula'
+    FROM Estudiante_U_Representante eur
+    LEFT OUTER JOIN Representantes r
+      ON r.id = eur.representanteID
+    LEFT OUTER JOIN Ficha_Estudiante fe
+      ON fe.estudianteID = eur.estudianteID
+    LEFT OUTER JOIN Informacion_estudiantes e
+      ON fe.estudianteID = e.id
+    LEFT OUTER JOIN Matricula_Estudiantes me
+      ON me.estudianteID = e.id
+    LEFT OUTER JOIN Matricula_Docentes md
+      ON md.ambienteID = me.ambienteID
+    LEFT OUTER JOIN Usuarios d
+      ON d.id = md.docenteID
+    LEFT OUTER JOIN Ambientes am
+      ON am.id = me.ambienteID
+    WHERE e.cedula = ?
+
+  ''';
+
   static final String tableName = 'Ficha_Estudiante';
 
   static final String testInitializer = 'SELECT id FROM $tableName';

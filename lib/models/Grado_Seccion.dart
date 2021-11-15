@@ -19,6 +19,15 @@ class Ambiente {
   
   ''';
 
+  static final String getAmbientesPorAmbiente = '''
+  
+    SELECT
+      *
+    FROM Ambientes
+    WHERE grado = (SELECT grado FROM Ambientes WHERE id = ?)
+  
+  ''';
+
   int? id;
   int grado;
   String seccion;

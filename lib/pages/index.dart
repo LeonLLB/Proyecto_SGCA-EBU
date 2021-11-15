@@ -11,7 +11,7 @@ export 'package:proyecto_sgca_ebu/pages/views/RepresentantesMenu.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/Inscribir.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/Buscar.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/Estadistica.dart';
-export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/Actualizar.dart';
+export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/Ficha.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/SubirAsistencia.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/SubirRendimiento.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Estudiantes/Matricula.dart';

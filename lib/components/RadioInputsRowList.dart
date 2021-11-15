@@ -8,13 +8,15 @@ class RadioInputRowList<T> extends StatelessWidget {
   final List<String> labels;
   final void Function(T? val) onChanged;
   final bool? ignoreFirst; 
+  final bool? enabled;
 
   RadioInputRowList({
     required this.groupValue,
     required this.values,
     required this.labels,
     required this.onChanged,
-    this.ignoreFirst : false
+    this.ignoreFirst : false,
+    this.enabled : true
   }){
     assert(values.length == labels.length, "Por cada valor debe haber un descriptor, valores = ${values.length} , descriptores = ${labels.length}");
   }
@@ -31,6 +33,7 @@ class RadioInputRowList<T> extends StatelessWidget {
         list.add(RadioInput<T>(
         groupValue: groupValue,
         value: value.value,
+        enabled:enabled,
         label: labels[value.key],
         onChanged: onChanged
         ));

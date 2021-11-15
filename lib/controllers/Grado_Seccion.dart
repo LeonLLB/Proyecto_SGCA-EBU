@@ -4,6 +4,17 @@ import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 
 class _AmbientesController{
 
+  Future<List<Ambiente>> obtenerListadoDeAmbientesSegunAmbiente(int ambienteID,[bool closeDB = true])async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final results = await db.rawQuery(Ambiente.getAmbientesPorAmbiente,[ambienteID]);
+
+    if(closeDB){db.close();}
+
+    return results.map((result)=>Ambiente.fromMap(result)).toList();
+
+  }
+
   Future<int> registrarAmbiente(Ambiente ambiente) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 

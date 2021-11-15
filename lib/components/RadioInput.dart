@@ -8,12 +8,14 @@ class RadioInput<T> extends StatelessWidget {
   final T value;
   final String label;
   final void Function(T? val) onChanged;
+  final bool? enabled;
 
   RadioInput({
     required this.groupValue,
     required this.value,
     required this.label,
-    required this.onChanged
+    required this.onChanged,
+    this.enabled : true
   });
 
   @override
@@ -23,7 +25,9 @@ class RadioInput<T> extends StatelessWidget {
         Radio<T>(
           value: value,
           groupValue: groupValue,
-          onChanged: onChanged
+          onChanged: (val){
+            if(enabled!){onChanged(val);}
+          }
         ),
         Padding(padding: EdgeInsets.symmetric(horizontal: 5)),
         Text(label)

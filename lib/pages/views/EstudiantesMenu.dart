@@ -11,7 +11,7 @@ class EstudiantesMenu extends StatelessWidget {
             mainAxisAlignment:MainAxisAlignment.spaceEvenly,
             children: [
             SubMenuItem(icon: Icons.person_add, label: 'Inscribir estudiante', route: '-estudiantes/inscribir'),
-            SubMenuItem(icon: Icons.edit, label: 'Actualizar estudiante', route: '-estudiantes/actualizar'),
+            SubMenuItem(icon: Icons.edit, label: 'Ficha de inscripcion', route: '-estudiantes/fichaestudiante'),
             SubMenuItem(icon: Icons.face, label: 'Matricula de estudiantes', route: '-estudiantes/matricula')
           ]),
           Row(

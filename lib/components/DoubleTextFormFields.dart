@@ -8,13 +8,15 @@ class DoubleTextFormFields extends StatelessWidget {
   final List<String> labelTexts;
   final List<TextFormFieldValidators> validators;
   final List<bool>? obscureTexts;
+  final bool? enabled;
 
   DoubleTextFormFields({
     required this.controladores,
     required this.iconos,
     required this.labelTexts,
     required this.validators,
-    this.obscureTexts : const [false,false]
+    this.obscureTexts : const [false,false],
+    this.enabled
   }){
     assert(this.controladores.length == 2, "Debe haber 2 controladores solamente, hubieron ${this.controladores.length} controladores");
     assert(this.iconos.length > 0 && this.iconos.length < 3, "Debe haber por lo menos un icono, y un máximo de 2 iconos, hubieron ${this.iconos.length} iconos");
@@ -32,6 +34,7 @@ class DoubleTextFormFields extends StatelessWidget {
           icon: iconos[0],
           validators: validators[0],
           obscureText: obscureTexts?[0],
+          enabled: enabled,
         ),
         (iconos.length == 1 ) ? Padding(padding:EdgeInsets.symmetric(horizontal: 5)) : Padding(padding:EdgeInsets.symmetric(horizontal: 0)),
         SimplifiedTextFormField(
@@ -40,6 +43,7 @@ class DoubleTextFormFields extends StatelessWidget {
           icon: iconos.length == 1 ? null : iconos[1],
           validators: validators[1],
           obscureText: obscureTexts?[1],
+          enabled: enabled,
         ), 
       ]
     );

@@ -5,6 +5,18 @@ import 'package:proyecto_sgca_ebu/models/Ficha_Estudiante.dart';
 
 class _FichaEstudianteController{
 
+  Future<Map<String,Object?>?> getFichaCompleta(int? cedulaEscolar)async{
+    if(cedulaEscolar == null) return null;
+    
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    
+    final result = await db.rawQuery(FichaEstudiante.getFichaCompleta,[cedulaEscolar]);
+    
+    db.close(); 
+    if(result.length == 0) return null;
+    return result[0];   
+  }
+
   Future<int> creacionFichaInicial(int estudianteID, String tipoEstudiante, DateTime fechaDeInscripcion,String procedencia,DateTime fechaNacimiento,[bool closeDB = true])async{
     
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');

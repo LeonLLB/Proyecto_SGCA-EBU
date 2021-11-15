@@ -1,7 +1,7 @@
 
 
 class RecordFicha{
-  static final String tableName = 'Ficha_Estudiante';
+  static final String tableName = 'Record_Ficha';
 
   static final String testInitializer = 'SELECT id FROM $tableName';
 
@@ -52,11 +52,13 @@ class RecordFicha{
     'estudianteID': estudianteID,
     'talla': talla,
     'peso': peso,
+    'edad':edad,
     'añoEscolar': yearEscolar
   } : {
     'estudianteID': estudianteID,
     'talla': talla,
     'peso': peso,
+    'edad':edad,
     'añoEscolar': yearEscolar
   };
 }

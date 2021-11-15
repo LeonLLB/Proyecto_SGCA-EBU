@@ -125,10 +125,16 @@ class _EstudianteControllers{
     //PASO 1: ENCONTRAR A UN REPRESENTANTE PARA ESA CEDULA
     final representante = await controladorRepresentante.buscarRepresentante(cedulaRepresentante,false);
     if(representante == null) return -1; //NO EXISTE EL REPRESENTANTE
+    //PASO 2: ENCONTRAR LA UNION
+    final viejaUnion = (await db.query(EstudianteURepresentante.tableName,where: 'estudianteID = ?',whereArgs:[estudianteID]))[0];
     
-    //PASE 2: EJECUTAR LA ACTUALIZACION
-
-    final result = await db.rawUpdate('UPDATE ${EstudianteURepresentante.tableName} SET representanteID = ?, parentesco = ? WHERE estudianteID = ?',[representante.id,parentesco,estudianteID]);
+    //PASO 3: MODIFICAR LOS LA UNION
+    final result = await db.update(EstudianteURepresentante.tableName,{
+      'id':viejaUnion['id'],
+      'estudianteID':estudianteID,
+      'representanteID':representante.id,
+      'parentesco':parentesco,
+    },where: 'id = ?', whereArgs: [viejaUnion['id']]);
     
     db.close();
 

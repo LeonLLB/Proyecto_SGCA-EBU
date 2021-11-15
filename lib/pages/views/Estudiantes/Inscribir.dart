@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_sgca_ebu/components/DateTimePicker.dart';
 import 'package:proyecto_sgca_ebu/components/DoubleTextFormFields.dart';
 import 'package:proyecto_sgca_ebu/components/FailedSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/RadioInputsRowList.dart';
@@ -125,14 +126,15 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
                     ]
                   ),
                   Padding(padding:EdgeInsets.symmetric(vertical:5)),
-                  _DateTimePicker(onChange: (fecha){
+                  DateTimePicker(onChange: (fecha){
                       final newDate = fecha!.toIso8601String().split('T')[0].split('-');
                       controladoresEstudiante['FechaNacimiento'] = '${newDate[2]}/${newDate[1]}/${newDate[0]}';
                       setState((){});
                     },
                     defaultText: 'Fecha de Nacimiento',
                     maxDate:DateTime(DateTime.now().year - 6,12,31),
-                    defaultDate:DateTime(DateTime.now().year - 6)
+                    defaultDate:DateTime(DateTime.now().year - 6),
+                    lastDate:controladoresEstudiante['FechaNacimiento'],
                   ),
                   Padding(padding:EdgeInsets.symmetric(vertical:5)),
                   Center(child:Text('Genero',style:TextStyle(fontSize:18))),
@@ -245,12 +247,13 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
     
                 Padding(padding:EdgeInsets.symmetric(vertical:5)),   
           
-                _DateTimePicker(onChange: (fecha){
+                DateTimePicker(onChange: (fecha){
                     fechaInscripcion = fecha!;
                     setState((){});
                   },
                   defaultText: 'Fecha de inscripcion',
                   maxDate:DateTime.now(),
+                  lastDate:'${fechaInscripcion.toIso8601String().split('T')[0].split('-')[2]}/${fechaInscripcion.toIso8601String().split('T')[0].split('-')[1]}/${fechaInscripcion.toIso8601String().split('T')[0].split('-')[0]}',
                   defaultDate:DateTime(DateTime.now().year,1,1)
                 ),
                 
@@ -519,69 +522,6 @@ class _InscribirEstudianteState extends State<InscribirEstudiante> {
 
     }    
   
-}
-
-class _DateTimePicker extends StatefulWidget {
-
-  final void Function(DateTime?) onChange;
-  final String defaultText;
-  final DateTime maxDate;
-  final DateTime defaultDate;
-
-  _DateTimePicker({
-    required this.onChange,
-    required this.defaultText,
-    required this.maxDate,
-    required this.defaultDate
-  });
-
-  @override
-  __DateTimePickerState createState() => __DateTimePickerState();
-}
-
-class __DateTimePickerState extends State<_DateTimePicker> {
-
-  String? lastDate;
-
-  Future<DateTime?> getDate (BuildContext context,String? date)=>showDatePicker(
-    context: context,
-    initialDate: (date != null && date != '') ? 
-    DateTime(int.parse(date.split('/')[2]),int.parse(date.split('/')[1]),int.parse(date.split('/')[0])) :
-    widget.defaultDate,
-    firstDate: DateTime(2000),
-    lastDate: widget.maxDate
-    );
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton(
-            onPressed: ()async{
-              final date = await getDate(context,lastDate);
-              if(date != null){
-                final fecha = date.toIso8601String().split('T')[0].split('-');
-                lastDate = '${fecha[2]}/${fecha[1]}/${fecha[0]}';
-                widget.onChange(date);
-                setState(() {});
-              }
-            },
-            child: Row(
-              mainAxisAlignment:MainAxisAlignment.spaceEvenly,
-              children: [
-                Icon(Icons.calendar_today),
-                Text(
-                  (lastDate == '')?
-                  widget.defaultText:
-                  '$lastDate',
-                  style:TextStyle(fontSize:16)),
-              ],
-            )
-          )
-        )
-    ]);
-  }
 }
 
 class _ContenedorForm extends StatelessWidget {

@@ -12,7 +12,8 @@ class Record {
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       estudianteID INTEGER NOT NULL,
       aprobado BOOL,
-      gradoCursado VARCHAR(6) NOT NULL,
+      gradoCursado INTEGER NOT NULL,
+      seccionCursada VARCHAR(1) NOT NULL,
       añoEscolar VARCHAR(9) NOT NULL,
       fechaInscripcion,
 
@@ -28,7 +29,8 @@ class Record {
   int? id;
   int estudianteID;
   bool aprobado;
-  String gradoCursado;
+  int gradoCursado;
+  String seccionCursada;
   String yearEscolar;
 
   Record({
@@ -36,6 +38,7 @@ class Record {
     required this.estudianteID,
     required this.aprobado,
     required this.gradoCursado,
+    required this.seccionCursada,
     required this.yearEscolar
   });
 
@@ -48,6 +51,7 @@ class Record {
     estudianteID = record['estudianteID'],
     aprobado = record['aprobado'],
     gradoCursado = record['gradoCursado'],
+    seccionCursada = record['seccionCursada'],
     yearEscolar = record['añoEscolar']
   ;
 
@@ -56,11 +60,13 @@ class Record {
     'estudianteID' : estudianteID,
     'aprobado' : aprobado,
     'gradoCursado' : gradoCursado,
+    'seccionCursada' : seccionCursada,
     'añoEscolar' : yearEscolar
   } : {
     'estudianteID' : estudianteID,
     'aprobado' : aprobado,
     'gradoCursado' : gradoCursado,
+    'seccionCursada' : seccionCursada,
     'añoEscolar' : yearEscolar
   };
 

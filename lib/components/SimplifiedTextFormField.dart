@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class TextFormFieldValidators {
   bool required;
   bool isNumeric;
+  bool isDouble;
   bool isNotNumeric;
   int? charLength;
   bool isEmail;
@@ -16,7 +17,8 @@ class TextFormFieldValidators {
     this.charLength,
     this.isEmail : false,
     this.extraValidator,
-    this.onChange
+    this.onChange,
+    this.isDouble: false
   }){
     assert(!(this.isNumeric && this.isNotNumeric));
   }
@@ -31,6 +33,7 @@ class SimplifiedTextFormField extends StatelessWidget {
   final TextFormFieldValidators validators;
   final bool? obscureText;
   final String? helperText;
+  final bool? enabled;
 
   SimplifiedTextFormField({
     required this.controlador,
@@ -38,7 +41,8 @@ class SimplifiedTextFormField extends StatelessWidget {
     this.icon,
     required this.validators,
     this.obscureText,
-    this.helperText
+    this.helperText,
+    this.enabled
   });
 
   @override
@@ -48,6 +52,7 @@ class SimplifiedTextFormField extends StatelessWidget {
       maxLength: validators.charLength,
       obscureText: obscureText ?? false,
       onChanged: validators.onChange,
+      enabled:enabled,
       decoration: InputDecoration(
         icon: icon,
         labelText: labelText,
@@ -70,7 +75,10 @@ class SimplifiedTextFormField extends StatelessWidget {
           validators.isEmail && 
           (val!.isNotEmpty && (!val.contains('@') && !val.endsWith('.com')))
         ) return 'El campo "$labelText" no es un correo valido';   
-        
+        else if(
+          validators.isDouble &&
+          (val!.isNotEmpty && double.tryParse(val) == null)
+        )return 'El campo "$labelText" no es un numero valido';
         if(validators.extraValidator != null){
           return validators.extraValidator!(val ?? '');
         }

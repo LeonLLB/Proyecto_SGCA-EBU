@@ -1,3 +1,6 @@
+import 'package:proyecto_sgca_ebu/controllers/Admin.dart';
+import 'package:proyecto_sgca_ebu/controllers/Grado_Seccion.dart';
+import 'package:proyecto_sgca_ebu/controllers/Record.dart';
 import 'package:proyecto_sgca_ebu/models/Admin.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
@@ -19,7 +22,11 @@ class _MatriculaEstudianteController{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     
     final result = await db.rawQuery('SELECT am.grado FROM Ambientes am ORDER BY am.grado DESC LIMIT 1');
-
+    if(result.length == 0 ){
+      db.close();
+      return estudiantesPorGrado;
+    }
+    
     final gradoMaximo = result[0]['grado'] as int;
 
     int sumaTotal = 0;
@@ -34,6 +41,56 @@ class _MatriculaEstudianteController{
 
     return estudiantesPorGrado;
 
+  }
+
+  Future<Map<String,dynamic>> casoDeCambioDeMatricula(int estudianteID)async{
+    //PREPARATIVOS: OBTENER EL AÑO ESCOLAR PARA EL PRIMER CASO Y EL MAPA DE RETORNO
+    //ADEMAS DE CONSULTAR EL ULTIMO RECORD DEL ESTUDIANTE PARA EL CASO  2 Y 3
+    Map<String,dynamic> retornable = {
+      'caso':0,
+      'listado':<Ambiente>[]
+    };
+
+    final resultadoCaso2Y3 = await controladorRecord.obtenerUltimoRecord(estudianteID,false);
+
+    final yearEscolar = (await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR',false))!.valor;
+    
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    //CASO 1: SI EXISTE UNA MATRICULA DEL ESTUDIANTE PARA EL AÑO ACTUAL,
+    //SE ACTUALIZARA LA MATRICULA, ENTONCES SE RETORNA 
+    //EL LISTADO DE AMBIENTES DE ESE MISMO GRADO
+    final resultadoCaso1 = await db.query(MatriculaEstudiante.tableName,where:'estudianteID = ? AND añoEscolar = ?',whereArgs: [estudianteID,yearEscolar]);
+    if(resultadoCaso1.length > 0){
+      retornable['caso'] = 1;
+      retornable['listado'] = await controladorAmbientes.obtenerListadoDeAmbientesSegunAmbiente(resultadoCaso1[0]['id'] as int);
+    }
+
+    //CASO 2: SI NO EXISTE UNA MATRICULA PARA EL AÑO ACTUAL, Y EL ESTUDIANTE
+    //APROBO EL AÑO PASADO, ENTONCES SE RETORNA 
+    //EL LISTADO DE AMBIENTES DEL PROXIMO GRADO
+    else if(resultadoCaso2Y3 != null && resultadoCaso2Y3.aprobado){
+      retornable['caso'] = 2;
+      retornable['listado'] = await controladorAmbientes.buscarAmbientesPorGrado(resultadoCaso2Y3.gradoCursado+1);
+    }
+
+    //CASO 3: SI NO EXISTE UNA MATRICULA PARA EL AÑO ACTUAL, Y EL ESTUDIANTE
+    //REPROBO EL AÑO PASADO, ENTONCES SE RETORNA
+    //EL LISTADO DE AMBIENTES DEL MISMO GRADO
+    else if(resultadoCaso2Y3 != null && resultadoCaso2Y3.aprobado == false){
+      retornable['caso'] = 3;
+      retornable['listado'] = await controladorAmbientes.buscarAmbientesPorGrado(resultadoCaso2Y3.gradoCursado);
+    }
+
+    db.close();
+    return retornable;
+  }
+
+  Future<int> cambiarMatricula(MatriculaEstudiante nuevaMatricula)async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    final result = await db.update(MatriculaEstudiante.tableName, nuevaMatricula.toJson(withId:true),where: 'id = ?',whereArgs: [nuevaMatricula.id]);
+    db.close();
+    return result;
   }
 
   Future<List<Map<String,Object?>>?> getMatricula(int? ambienteId)async{
@@ -67,12 +124,10 @@ class _MatriculaEstudianteController{
 
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
-    final int idMatriculaAsignable = ambiente.id!;
-
     final yearEscolar = await db.query(Admin.tableName,where:'opcion = ?',whereArgs:['AÑO_ESCOLAR']);
 
     final result = await db.insert(MatriculaEstudiante.tableName,{
-      'ambienteID':idMatriculaAsignable,
+      'ambienteID':ambiente.id,
       'estudianteID':estudianteId,
       'añoEscolar':yearEscolar[0]['valor']!
     });

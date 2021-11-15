@@ -35,7 +35,7 @@ class _MatriculaEstudianteState extends State<MatriculaEstudiante> {
               if(data.connectionState == ConnectionState.waiting){
                 return Center(child: CircularProgressIndicator());
               }
-              else if(data.data == null){
+              else if(data.data == null || data.data[0]['docente.nombres'] == null){
                 return Center(child:Text('No hubo resultados, esto puede deberse a que no haya ambientes inscritos, no haya una matricula de docentes para ese ambiente, o no haya estudiantes en el aula solicitada'));
               }
               else{
