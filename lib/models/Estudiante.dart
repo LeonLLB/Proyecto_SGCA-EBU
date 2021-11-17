@@ -42,9 +42,10 @@ class Estudiante{
   });
 
   Estudiante.fromForm(Map<String,dynamic> estudiante) :
+    id = estudiante['id'] == null ? null : estudiante['id'],
     nombres = estudiante['Nombres'],
     apellidos = estudiante['Apellidos'],
-    cedula = estudiante['Cedula'],
+    cedula = (estudiante['Cedula'].runtimeType == int) ? estudiante['Cedula'] : int.parse(estudiante['Cedula']) ,
     lugarNacimiento = estudiante['LugarNacimiento'],
     estadoNacimiento = estudiante['EstadoNacimiento'],
     fechaNacimiento = DateTime(int.parse(estudiante['FechaNacimiento'].split('/')[2]),int.parse(estudiante['FechaNacimiento'].split('/')[1]),int.parse(estudiante['FechaNacimiento'].split('/')[0])),

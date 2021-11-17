@@ -26,7 +26,7 @@ class RadioInput<T> extends StatelessWidget {
           value: value,
           groupValue: groupValue,
           onChanged: (val){
-            if(enabled!){onChanged(val);}
+            onChanged(val);
           }
         ),
         Padding(padding: EdgeInsets.symmetric(horizontal: 5)),

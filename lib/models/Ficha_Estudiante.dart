@@ -106,12 +106,13 @@ class FichaEstudiante{
   });
 
   FichaEstudiante.fromForm(Map<String,dynamic> fichaEstudiante) :
+    id = (fichaEstudiante['id'] == null) ? null : fichaEstudiante['id'],
     estudianteID = fichaEstudiante['EstudianteID'],
-    tipoEstudiante = fichaEstudiante['TipoEstudiante'],
+    tipoEstudiante = fichaEstudiante['Tipo'],
     fechaInscripcion = fichaEstudiante['FechaInscripcion'],
     procedencia = fichaEstudiante['Procedencia'],
-    talla = fichaEstudiante['Talla'],
-    peso = fichaEstudiante['Peso'],
+    talla = double.parse(fichaEstudiante['Talla']),
+    peso = double.parse(fichaEstudiante['Peso']),
     alergia = fichaEstudiante['Alergia'],
     asma = fichaEstudiante['Asma'],
     cardiaco = fichaEstudiante['Cardiaco'],

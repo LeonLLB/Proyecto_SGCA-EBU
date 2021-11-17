@@ -13,7 +13,7 @@ final Map<String, Widget> routes = {
   '-admin'                    :AdminMenu(),
 
   '-estudiantes/inscribir'      :InscribirEstudiante(),
-  '-estudiantes/fichaestudiante':FichaEstudiante(),
+  '-estudiantes/fichaestudiante':FichaEstudiantePage(),
   '-estudiantes/buscar'         :BuscarEstudiante(),
   '-estudiantes/estadistica'    :EstadisticaEstudiante(),
   '-estudiantes/asistencia'     :SubirAsistenciaEstudiante(),
