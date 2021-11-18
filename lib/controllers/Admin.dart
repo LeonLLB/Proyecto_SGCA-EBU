@@ -1,4 +1,9 @@
+import 'package:proyecto_sgca_ebu/controllers/Record.dart';
 import 'package:proyecto_sgca_ebu/models/Admin.dart';
+import 'package:proyecto_sgca_ebu/models/Matricula_Estudiante.dart';
+import 'package:proyecto_sgca_ebu/models/Matricula_Docente.dart';
+import 'package:proyecto_sgca_ebu/models/Rendimiento.dart';
+import 'package:proyecto_sgca_ebu/models/Asistencia.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class _AdminController{
@@ -15,9 +20,21 @@ class _AdminController{
 
   Future<int> actualizarOpcion(String opcionACambiar,Admin opcionActualizada)async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
-    
-    final result = await db.update(Admin.tableName, opcionActualizada.toJson(withId:true),where: 'opcion = ?',whereArgs:[opcionACambiar] ); //(Admin.tableName,opcion.toJson(withId:false));
+    if(opcionACambiar == 'AÑO_ESCOLAR'){
+      //PASO 1 Y 2: REGISTRAR BOLETINES
+      await controladorRecord.registrarRecords(false);
+    }
 
+    final result = await db.update(Admin.tableName, opcionActualizada.toJson(withId:true),where: 'opcion = ?',whereArgs:[opcionACambiar] ); //(Admin.tableName,opcion.toJson(withId:false));
+    
+    if(opcionACambiar == 'AÑO_ESCOLAR'){
+      //PASO 3: ELIMINAR TODA LA INFORMACIÓN DE LAS MATRICULAS, RENDIMIENTO Y ASISTENCIA
+      await db.delete(MatriculaEstudiante.tableName);
+      await db.delete(MatriculaDocente.tableName);
+      await db.delete(Rendimiento.tableName);
+      await db.delete(Asistencia.tableName);
+    }
+    
     db.close();
 
     return result;

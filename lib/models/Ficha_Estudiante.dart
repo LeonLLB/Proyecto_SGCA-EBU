@@ -23,6 +23,7 @@ class FichaEstudiante{
       r.ubicacion AS 'r.ubicacion',
       eur.parentesco AS 'r.parentesco',	
       me."añoEscolar",
+      me.id AS 'me.id',
       am.grado,
       am.seccion,am.turno,
       d.nombres AS 'd.nombres',

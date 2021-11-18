@@ -8,6 +8,20 @@ import 'package:proyecto_sgca_ebu/models/Matricula_Estudiante.dart';
 
 class _MatriculaEstudianteController{
 
+  Future<Map<String,int>> contarEstudiantes(List<Ambiente> listadoAmbientes)async{
+    Map<String,int> retornable = {};
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    for(var ambiente in listadoAmbientes){
+      retornable['${ambiente.grado}${ambiente.seccion}'] = (await db.rawQuery(MatriculaEstudiante.cantidadDeEstudiantesPorAmbiente,[ambiente.id]))[0]['cantidadEstudiantes'] as int;
+    }
+
+    await db.close();
+
+    return retornable;
+
+  }
+
   Future<Map<String,int>> contarEstudiantesEnGrados()async{
     Map<String,int> estudiantesPorGrado = {
       '1':0,
@@ -63,7 +77,7 @@ class _MatriculaEstudianteController{
     final resultadoCaso1 = await db.query(MatriculaEstudiante.tableName,where:'estudianteID = ? AND añoEscolar = ?',whereArgs: [estudianteID,yearEscolar]);
     if(resultadoCaso1.length > 0){
       retornable['caso'] = 1;
-      retornable['listado'] = await controladorAmbientes.obtenerListadoDeAmbientesSegunAmbiente(resultadoCaso1[0]['id'] as int);
+      retornable['listado'] = await controladorAmbientes.obtenerListadoDeAmbientesSegunAmbiente(resultadoCaso1[0]['ambienteID'] as int);
     }
 
     //CASO 2: SI NO EXISTE UNA MATRICULA PARA EL AÑO ACTUAL, Y EL ESTUDIANTE
@@ -119,8 +133,7 @@ class _MatriculaEstudianteController{
     return resultadoNuevo;
   }
 
-  Future<int> registrar(int estudianteId, Ambiente ambiente) async {
-    
+  Future<int> registrar(int estudianteId, Ambiente ambiente) async {    
 
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 

@@ -46,6 +46,22 @@ class _RecordFichaController{
     return result;
   }
 
+  Future<List<RecordFicha>?> obtenerRecords(int estudianteID) async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    
+    final results = await db.query(RecordFicha.tableName,where:'estudianteID = ?',whereArgs: [estudianteID]);
+
+    if(results.length == 0) return null;
+    List<RecordFicha> retornable = [];
+    for(var result in results){
+      retornable.add(RecordFicha.fromMap(result));
+    }
+
+    db.close();
+
+    return retornable;
+  }
+
 }
 
 final controladorRecordFicha = _RecordFichaController();

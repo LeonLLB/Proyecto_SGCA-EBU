@@ -7,11 +7,16 @@ import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estudiante.dart';
 import 'package:proyecto_sgca_ebu/controllers/FichaEstudiante.dart';
+import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
+import 'package:proyecto_sgca_ebu/controllers/Record.dart';
+import 'package:proyecto_sgca_ebu/controllers/RecordFicha.dart';
 import 'package:proyecto_sgca_ebu/controllers/Representante.dart';
 import 'package:proyecto_sgca_ebu/helpers/formInfoIntoMap.dart';
 import 'package:proyecto_sgca_ebu/models/Estudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Ficha_Estudiante.dart';
+import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/models/Representante.dart';
+import 'package:proyecto_sgca_ebu/models/Matricula_Estudiante.dart';
 
 class FichaEstudiantePage extends StatefulWidget {
   @override
@@ -448,12 +453,19 @@ class _FichaEstudiantePageState extends State<FichaEstudiantePage> {
                           )),
                           Text(data.data['añoEscolar'] == null ? 'No esta inscrito al año actual!' : 'Año escolar: ${data.data['añoEscolar']}'),                  
                           Text(data.data['añoEscolar'] == null ? '' : 'Aula: ${data.data['grado']}° \"${data.data['seccion']}\"'),   
-                          Text(data.data['añoEscolar'] == null ? '' : 'Turno: ${data.data['turno']}'),   
+                          Text(data.data['añoEscolar'] == null ? '' : 'Turno: ${(data.data['turno'] == 'M') ? 'Mañana' : 'Tarde' }'),   
                           Text((data.data['añoEscolar'] != null && data.data['d.nombres'] != null) ? 'Docente: ${data.data['d.nombres']} ${data.data['d.apellidos']}' : ''),   
                           Text((data.data['añoEscolar'] != null && data.data['d.nombres'] != null) ? 'C.I: ${data.data['d.cedula']}' : ''),   
 
                           Padding(padding:EdgeInsets.symmetric(vertical:5)),
-                          ElevatedButton(onPressed: (){}, child: Text('Cambiar o asignar matricula'))
+                          ElevatedButton(onPressed: ()async{
+                            final resultCaso = await controladorMatriculaEstudiante.casoDeCambioDeMatricula(controladoresEstudiante['id']);
+                            
+                            final gradoSeleccionado = await seleccionarAmbienteAlCambiar(resultCaso['listado'], context);
+                            if(gradoSeleccionado != null){
+                              cambiarMatricula(context,data.data['me.id'],resultCaso['caso'],controladoresEstudiante['id'],gradoSeleccionado,data.data['añoEscolar']);
+                            }
+                          }, child: Text('Cambiar o asignar matricula'))
                         ]))
                       ),
                     ])
@@ -466,7 +478,8 @@ class _FichaEstudiantePageState extends State<FichaEstudiantePage> {
                         casoTablaVisualizar = val!;
                         setState((){});
                       }
-                    )
+                    ),
+                    (casoTablaVisualizar != _casoTabla.invisible) ? _Tablas(caso:casoTablaVisualizar,estudianteID:controladoresEstudiante['id']) : SizedBox()
                   ]),
                 );
               }
@@ -532,8 +545,25 @@ class _FichaEstudiantePageState extends State<FichaEstudiantePage> {
         );
       }
     }
+
+  Future<Ambiente?> seleccionarAmbienteAlCambiar(
+    List<Ambiente> ambientesDisponibles,
+    BuildContext context
+  ) async{
+    final estudiantesPorGrado = await controladorMatriculaEstudiante.contarEstudiantes(ambientesDisponibles);
+    return showDialog<Ambiente>(
+      context:context,
+      builder:(BuildContext context) => SimpleDialog(
+        title: Text('Grado a cursar'),
+        children: ambientesDisponibles.map((ambiente) => SimpleDialogOption(
+          onPressed: (){Navigator.pop(context,ambiente);},
+          child: Text('${ambiente.grado}° grado \"${ambiente.seccion}\" Estudiante: ${estudiantesPorGrado['${ambiente.grado}${ambiente.seccion}']}')
+        )).toList()
+      )
+    );
+  }
   
-   Future<bool?> confirmarEliminacion(
+  Future<bool?> confirmarEliminacion(
     BuildContext context
   )async{
     return showDialog<bool>(
@@ -568,6 +598,49 @@ class _FichaEstudiantePageState extends State<FichaEstudiantePage> {
         ],
       ),
     );
+  }
+
+  void cambiarMatricula(BuildContext context,int matriculaID,int caso, int estudianteID, Ambiente ambienteSeleccionado, String yearEscolar) {
+    if(caso == 1){
+      ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+        message:'Cambiando matrícula...',
+        onVisible:()async{
+          try {
+            await controladorMatriculaEstudiante.cambiarMatricula(MatriculaEstudiante(
+              id:matriculaID,
+              ambienteID: ambienteSeleccionado.id!,
+              estudianteID: estudianteID,
+              yearEscolar: yearEscolar
+            ));
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Se ha cambiado el grado del estudiante!'));
+            fichaEstudiante = controladorFichaEstudiante.getFichaCompleta(int.parse(controladorConsulta.text));
+            setState((){});
+          } catch (e) {
+            print(e);
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Hubo un error al cambiar el grado del estudiante'));
+          }
+        }
+      ));
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+        message:'Subiendo matrícula...',
+        onVisible:()async{
+          try {
+            await controladorMatriculaEstudiante.registrar(estudianteID, ambienteSeleccionado);
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(successSnackbar('El estudiante esta inscrito a ${ambienteSeleccionado.grado}° ${ambienteSeleccionado.seccion}'));
+            fichaEstudiante = controladorFichaEstudiante.getFichaCompleta(int.parse(controladorConsulta.text));
+            setState((){});
+          } catch (e) {
+            print(e);
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Hubo un error al inscribir al estudiante al grado ${ambienteSeleccionado.grado}° ${ambienteSeleccionado.seccion}'));
+          }
+        }
+      ));
+    }
   }
 }
 
@@ -787,5 +860,182 @@ class __CamposStatefulParteDetallesState extends State<_CamposStatefulParteDetal
         widget.onCaseChange(5,val);
       }),
     ]);
+  }
+}
+
+class _Tablas extends StatelessWidget {
+  
+  final _casoTabla caso;
+  final int estudianteID;
+
+  _Tablas({required this.caso, required this.estudianteID});
+
+  @override
+  Widget build(BuildContext context) {
+    return (caso == _casoTabla.recordFicha) ? _TablaRecordFicha(estudianteID:estudianteID) : _TablaRecordBoletin(estudianteID:estudianteID);
+  }
+}
+
+class _TablaRecordFicha extends StatelessWidget {
+
+  final int estudianteID;
+
+  _TablaRecordFicha({required this.estudianteID});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: controladorRecordFicha.obtenerRecords(estudianteID),
+      builder: (BuildContext context, AsyncSnapshot data) {
+        if(data.connectionState == ConnectionState.waiting){
+          return Center(child: CircularProgressIndicator());
+        }
+        else if(data.data == null){
+          return Center(child:Text('No hubo resultados, esto puede deberse a que no haya ningún record para el estudiante'));
+        }else{
+          return Table(
+            border: TableBorder(horizontalInside: BorderSide(color:Colors.blue[200]!)),
+            children: [
+              TableRow(
+                children:[
+                  TableCell(
+                    child:  Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Center(child: Text('Talla')),
+                    )
+                  ),
+                  TableCell(
+                    child:  Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Center(child: Text('Peso')),
+                    )
+                  ),
+                  TableCell(
+                    child:  Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Center(child: Text('Edad')),
+                    )
+                  ),
+                  TableCell(
+                    child:  Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Center(child: Text('Año escolar')),
+                    )
+                  )
+                ]
+              ),
+              ...data.data.map((record)=>TableRow(children:[
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(record.talla.toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(record.peso.toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(record.edad.toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(record.yearEscolar)),
+                  )
+                )
+              ])).toList()
+            ],
+          );
+        }
+      },
+    );
+  }
+}
+
+class _TablaRecordBoletin extends StatelessWidget {
+
+  final int estudianteID;
+
+  _TablaRecordBoletin({required this.estudianteID});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: controladorRecord.obtenerRecordsDeEstudiante(estudianteID),
+      builder: (BuildContext context, AsyncSnapshot data) {
+        if(data.connectionState == ConnectionState.waiting){
+          return Center(child: CircularProgressIndicator());
+        }
+        else if(data.data == null){
+          return Center(child:Text('No hubo resultados, esto puede deberse a que no haya ningún record para el estudiante, o que el estudiante todavia no haya progresado a otro año escolar'));
+        }else{
+          return Table(
+            border: TableBorder(horizontalInside: BorderSide(color:Colors.blue[200]!)),
+            children: [
+              TableRow(
+                children:[
+                  TableCell(
+                    child:  Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Center(child: Text('Rendimiento')),
+                    )
+                  ),
+                  TableCell(
+                    child:  Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Center(child: Text('Grado y sección')),
+                    )
+                  ),
+                  TableCell(
+                    child:  Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Center(child: Text('Año escolar')),
+                    )
+                  ),
+                  TableCell(
+                    child:  Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Center(child: Text('Fecha inscripcion')),
+                    )
+                  )
+                ]
+              ),
+              ...data.data.map((record)=>TableRow(children:[
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text((record.aprobado)?'Aprobado':'Reprobado')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('${record.gradoCursado}° \"${record.seccionCursada}\"')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(record.yearEscolar)),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(record.fechaInscripcion)),
+                  )
+                )
+              ])).toList()
+            ],
+          );
+        }
+      },
+    );
   }
 }

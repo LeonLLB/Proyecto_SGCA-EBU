@@ -84,65 +84,144 @@ class _AdminCambiarYearEscolarState extends State<AdminCambiarYearEscolar> {
               style:TextStyle(fontSize:20,fontWeight:FontWeight.bold)
             )),
             Padding(padding:EdgeInsets.symmetric(vertical:5)),
-            TextButton(onPressed: ()async {
-              if(_formKey.currentState!.validate()){
-                final confirmacionCambio = await confirmarCambio(context,controlador.text);
-                if(confirmacionCambio != null && confirmacionCambio){
-                  cambiarYearEscolar(context,controlador.text);
-                }
-              }
-            }, child: Text('Asignar año escolar',style:TextStyle(fontSize: 20,fontWeight:FontWeight.w600)))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(onPressed: ()async {
+                  if(_formKey.currentState!.validate()){
+                    final confirmacionCambio = await confirmarCambio(context,controlador.text,1);
+                    if(confirmacionCambio != null && confirmacionCambio){
+                      cambiarYearEscolar(context,controlador.text,1);
+                    }
+                  }
+                }, child: Text('Asignar año escolar',style:TextStyle(fontSize: 20,fontWeight:FontWeight.w600))),
+                TextButton(onPressed: ()async {
+                  if (existeYearEscolar) {
+                    final confirmacionCambio = await confirmarCambio(context,controlador.text,2);
+                    if(confirmacionCambio != null && confirmacionCambio){
+                      cambiarYearEscolar(context,controlador.text,2);
+                    }
+                  }
+                }, child: Text('Avanzar año escolar',style:TextStyle(fontSize: 20,fontWeight:FontWeight.w600)))
+              
+              ],
+            )
           ]
         )
       )
     );
   }
 
-  Future<bool?> confirmarCambio(BuildContext context, String yearEscolarInicio) async {
+  Future<bool?> confirmarCambio(BuildContext context, String yearEscolarInicio, int caso) async {
 
-    final int yearEscolarFin = int.parse(yearEscolarInicio) + 1;
-    Admin? viejoPeriodo = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
+    if(caso == 1){
+      final int yearEscolarFin = int.parse(yearEscolarInicio) + 1;
+      Admin? viejoPeriodo = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
 
-    return showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Confirmar cambios'),
-        content: SingleChildScrollView(
-          child:Center(
-            child:ListBody(children:[
-              Center(child: Text('Esta seguro de querer cambiar el año escolar?')),
-              (existeYearEscolar) ? Center(child: Text('Viejo periodo: ${viejoPeriodo!.valor}')) : Center() ,
-              Center(child: Text('Nuevo periodo: $yearEscolarInicio - $yearEscolarFin'))
-            ])
-          )
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+      return showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('Confirmar cambios'),
+          content: SingleChildScrollView(
+            child:Center(
+              child:ListBody(children:[
+                Center(child: Text('Esta seguro de querer cambiar el año escolar?')),
+                Center(child: Text('Al hacer esta acción, toda información referente al año anterior sera eliminada!')),
+                (existeYearEscolar) ? Center(child: Text('Viejo periodo: ${viejoPeriodo!.valor}')) : Center() ,
+                Center(child: Text('Nuevo periodo: $yearEscolarInicio - $yearEscolarFin'))
+              ])
+            )
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirmar'),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Confirmar'),
+            ),
+          ],
+        )
+      );
+    }else{
+      if(await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR') == null) return false;
+      
+      Admin? viejoPeriodo = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
+
+      return showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('Confirmar cambios'),
+          content: SingleChildScrollView(
+            child:Center(
+              child:ListBody(children:[
+                Center(child: Text('Esta seguro de querer avanzar el año escolar?')),
+                Center(child: Text('Al hacer esta acción, toda información referente al año anterior sera eliminada!')),
+                (existeYearEscolar) ? Center(child: Text('Viejo periodo: ${viejoPeriodo!.valor}')) : Center() ,
+                Center(child: Text('Nuevo periodo: ${viejoPeriodo!.valor.split('-')[1]} - ${int.parse(viejoPeriodo.valor.split('-')[1]) + 1}'))
+              ])
+            )
           ),
-        ],
-      )
-    );
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Confirmar'),
+            ),
+          ],
+        )
+      );
+    }
 
   }
 
-  void cambiarYearEscolar(BuildContext context, String yearEscolarInicio) async {
+  void cambiarYearEscolar(BuildContext context, String yearEscolarInicio, int caso) async {
 
-    final int yearEscolarFin = int.parse(yearEscolarInicio) + 1;
-    Admin nuevaOpcion = Admin(opcion: 'AÑO_ESCOLAR',valor:'$yearEscolarInicio - $yearEscolarFin');
-    
-    if(existeYearEscolar){
-      final opcion = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
-      nuevaOpcion.id = opcion!.id;
+    if(caso == 1){
+      final int yearEscolarFin = int.parse(yearEscolarInicio) + 1;
+      Admin nuevaOpcion = Admin(opcion: 'AÑO_ESCOLAR',valor:'$yearEscolarInicio - $yearEscolarFin');
       
-    }
-    
-    ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+      if(existeYearEscolar){
+        final opcion = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
+        nuevaOpcion.id = opcion!.id;
+        
+      }
+      
+      ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+          message:'Cambiando el año escolar...',
+          onVisible: () async {
+            try {
+              if(existeYearEscolar){
+                await controladorAdmin.actualizarOpcion('AÑO_ESCOLAR', nuevaOpcion);
+              }else{
+                await controladorAdmin.registrarOpcion(nuevaOpcion);
+              }
+
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Año escolar actualizado al periodo: ${nuevaOpcion.valor}'));
+              Provider.of<PageProvider>(context,listen:false).goBack();
+            } catch (e) {
+              print(e);
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo cambiar el año escolar'));
+            }
+          }
+        )
+      );
+    }else{
+      Admin? viejoPeriodo = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
+      Admin nuevaOpcion = Admin(opcion: 'AÑO_ESCOLAR',valor:'${viejoPeriodo!.valor.split('-')[1]} - ${int.parse(viejoPeriodo.valor.split('-')[1]) + 1}');
+      
+      if(existeYearEscolar){
+        final opcion = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
+        nuevaOpcion.id = opcion!.id;        
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
         message:'Cambiando el año escolar...',
         onVisible: () async {
           try {
@@ -151,7 +230,6 @@ class _AdminCambiarYearEscolarState extends State<AdminCambiarYearEscolar> {
             }else{
               await controladorAdmin.registrarOpcion(nuevaOpcion);
             }
-
             ScaffoldMessenger.of(context).removeCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Año escolar actualizado al periodo: ${nuevaOpcion.valor}'));
             Provider.of<PageProvider>(context,listen:false).goBack();
@@ -161,8 +239,9 @@ class _AdminCambiarYearEscolarState extends State<AdminCambiarYearEscolar> {
             ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo cambiar el año escolar'));
           }
         }
-      )
-    );
+        )
+      );
+    }
 
   }
 }

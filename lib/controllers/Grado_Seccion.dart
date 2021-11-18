@@ -34,7 +34,7 @@ class _AmbientesController{
       results = await db.query(Ambiente.tableName,where:'grado = ?',whereArgs:[grado]);
       if(results.length == 0) return null;
     }else{
-      results = await db.query(Ambiente.tableName);
+      results = await db.query(Ambiente.tableName,orderBy:'grado,seccion');
       if(results.length == 0) return null;
     }
     
