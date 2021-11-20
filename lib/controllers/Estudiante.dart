@@ -1,11 +1,16 @@
 import 'package:proyecto_sgca_ebu/controllers/FichaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/controllers/Representante.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
+import 'package:proyecto_sgca_ebu/models/Asistencia.dart';
 import 'package:proyecto_sgca_ebu/models/Estudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Estudiante_U_Representante.dart';
 import 'package:proyecto_sgca_ebu/models/Ficha_Estudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
+import 'package:proyecto_sgca_ebu/models/Rendimiento.dart';
 import 'package:proyecto_sgca_ebu/models/Representante.dart';
+import 'package:proyecto_sgca_ebu/models/Record.dart';
+import 'package:proyecto_sgca_ebu/models/RecordFicha.dart';
+import 'package:proyecto_sgca_ebu/models/Matricula_Estudiante.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class _EstudianteControllers{
@@ -102,9 +107,25 @@ class _EstudianteControllers{
 
   Future<int> eliminarEstudiante(int estudianteID)async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
-
-    final result = await db.delete(Estudiante.tableName,where:'id = ?',whereArgs: [estudianteID]);
-
+    int result = 0;
+    //SE DEBE ELIMINAR CUALQUIER REGISTRO DE 8 TABLAS
+    //TABLA 1: ESTUDIANTE
+    result += await db.delete(Estudiante.tableName,where:'id = ?',whereArgs: [estudianteID]);
+    //TABLA 2: ESTUDIANTE U REPRESENTANTE
+    result += await db.delete(EstudianteURepresentante.tableName,where:'estudianteID = ?',whereArgs: [estudianteID]); 
+    //TABLA 3: FICHA INSCRIPCION
+    result += await db.delete(FichaEstudiante.tableName,where:'estudianteID = ?',whereArgs: [estudianteID]);
+    //TABLA 4: BOLETIN
+    result += await db.delete(Record.tableName,where:'estudianteID = ?',whereArgs: [estudianteID]);
+    //TABLA 5: ASISTENCIA
+    result += await db.delete(Asistencia.tableName,where:'estudianteID = ?',whereArgs: [estudianteID]);
+    //TABLA 6: RECORD DE FICHA
+    result += await db.delete(RecordFicha.tableName,where:'estudianteID = ?',whereArgs: [estudianteID]);
+    //TABLA 7: RENDIMIENTO
+    final matricula = (await db.query(MatriculaEstudiante.tableName,where:'estudianteID = ?',whereArgs: [estudianteID]))[0];
+    result += await db.delete(Rendimiento.tableName,where:'matricula_estudianteID = ?',whereArgs: [matricula['id']]);
+    //TABLA 8: MATRICULA
+    result += await db.delete(MatriculaEstudiante.tableName,where:'estudianteID = ?',whereArgs: [estudianteID]);
     db.close();
 
     return result;

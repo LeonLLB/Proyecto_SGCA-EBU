@@ -26,6 +26,7 @@ class EstudiantesMenu extends StatelessWidget {
             children: [
             SubMenuItem(icon: Icons.show_chart_sharp, label: 'Generar estadistica', route: '-estudiantes/estadistica'),
             SubMenuItem(icon: Icons.school, label: 'Constancia de estudio', route: '-estudiantes/constancia'),
+            SubMenuItem(icon: Icons.person_remove, label: 'Retiro estudiantil', route: '-estudiantes/retiro'),
           ])
         ]),
       );
