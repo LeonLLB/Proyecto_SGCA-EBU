@@ -29,24 +29,32 @@ class _RecordFichaController{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
     final yearEscolar = (await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR',false))!.valor;
+    final consultaPrevia = await obtenerRecords(fichaNueva.estudianteID,false);
+    
+    if(consultaPrevia![consultaPrevia.length -1].yearEscolar != yearEscolar){
+      final result = await creacionInicialRecordFicha(fichaNueva, fechaNacimiento);
+      return result;
+    }
+    else{
+      final nuevoRecordFicha = RecordFicha(
+        id: consultaPrevia[consultaPrevia.length - 1].id,
+        estudianteID: fichaNueva.estudianteID,
+        talla: fichaNueva.talla,
+        peso: fichaNueva.peso,
+        edad: calcularEdad(fechaNacimiento),
+        yearEscolar: yearEscolar
+      );
 
-    final nuevoRecordFicha = RecordFicha(
-      id: fichaNueva.id,
-      estudianteID: fichaNueva.estudianteID,
-      talla: fichaNueva.talla,
-      peso: fichaNueva.peso,
-      edad: calcularEdad(fechaNacimiento),
-      yearEscolar: yearEscolar
-    );
+      final result = db.update(RecordFicha.tableName,nuevoRecordFicha.toJson(),where:'id = ?',whereArgs:[nuevoRecordFicha.id]);
 
-    final result = db.update(RecordFicha.tableName,nuevoRecordFicha.toJson(),where:'id = ?',whereArgs:[fichaNueva.id]);
+      db.close();
 
-    db.close();
+      return result;
+    }
 
-    return result;
   }
 
-  Future<List<RecordFicha>?> obtenerRecords(int estudianteID) async{
+  Future<List<RecordFicha>?> obtenerRecords(int estudianteID,[bool closeDB = true]) async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     
     final results = await db.query(RecordFicha.tableName,where:'estudianteID = ?',whereArgs: [estudianteID]);
@@ -57,7 +65,7 @@ class _RecordFichaController{
       retornable.add(RecordFicha.fromMap(result));
     }
 
-    db.close();
+    if(closeDB){db.close();}
 
     return retornable;
   }
