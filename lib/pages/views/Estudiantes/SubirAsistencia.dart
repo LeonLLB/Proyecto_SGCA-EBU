@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:proyecto_sgca_ebu/components/AmbientePicker.dart';
-import 'package:proyecto_sgca_ebu/components/FailedSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/MesPicker.dart';
+import 'package:proyecto_sgca_ebu/components/Snackbars.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
-import 'package:proyecto_sgca_ebu/components/SuccesSnackbar.dart';
-import 'package:proyecto_sgca_ebu/components/loadingSnackbar.dart';
 import 'package:proyecto_sgca_ebu/controllers/Admin.dart';
 import 'package:proyecto_sgca_ebu/controllers/Asistencia.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
