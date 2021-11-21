@@ -11,7 +11,7 @@ class RepresentantesMenu extends StatelessWidget {
             mainAxisAlignment:MainAxisAlignment.spaceEvenly,
             children: [
             SubMenuItem(icon: Icons.person_add, label: 'Inscribir representante',route: '-representantes/inscribir'),
-            SubMenuItem(icon: Icons.edit, label: 'Actualizar representante',route: '-representantes/actualizar'),
+            SubMenuItem(icon: Icons.edit, label: 'Gestionar representante',route: '-representantes/actualizar'),
           ]),
           Row(
             mainAxisAlignment:MainAxisAlignment.spaceEvenly,

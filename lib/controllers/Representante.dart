@@ -1,4 +1,5 @@
 import 'package:proyecto_sgca_ebu/models/Representante.dart';
+import 'package:proyecto_sgca_ebu/models/index.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class _RepresentanteControllers{
@@ -12,7 +13,30 @@ class _RepresentanteControllers{
     return result;
   }
 
-  Future<Representante?> buscarRepresentante(int cedula,[bool closeDB = true]) async {
+  Future<int> actualizar(Representante representante,[bool closeDB = true]) async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final result = await db.update(Representante.tableName,representante.toJson(),where:'id = ?',whereArgs:[representante.id]);
+
+    if(closeDB){db.close();}
+    return result;
+  }
+
+  Future<int> eliminar(int representanteID,[bool closeDB = true]) async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final confirmationResult = await db.query(EstudianteURepresentante.tableName,where:'representanteID = ?',whereArgs:[representanteID]);
+    if(confirmationResult.length > 0) {if(closeDB){db.close();}return -1;} //ESTE REPRESENTANTE TIENE ESTUDIANTES, NO SE DEBE HACER EN ABSOLUTO NADA
+    
+    final result = await db.delete(Representante.tableName,where:'id = ?',whereArgs:[representanteID]);
+
+    if(closeDB){db.close();}
+    return result;
+  }
+
+  Future<Representante?> buscarRepresentante(int? cedula,[bool closeDB = true]) async {
+    if(cedula == null) return null;
+    
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
     final result = await db.query(Representante.tableName,where: 'cedula = ?',whereArgs: [cedula]);
