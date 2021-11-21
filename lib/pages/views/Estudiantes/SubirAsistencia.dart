@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:proyecto_sgca_ebu/components/AmbientePicker.dart';
 import 'package:proyecto_sgca_ebu/components/FailedSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/MesPicker.dart';

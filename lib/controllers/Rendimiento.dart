@@ -1,4 +1,3 @@
-import 'package:proyecto_sgca_ebu/controllers/Admin.dart';
 import 'package:proyecto_sgca_ebu/models/Rendimiento.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 

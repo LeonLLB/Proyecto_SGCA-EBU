@@ -1,6 +1,31 @@
 
 
 class Representante{
+
+  static final String getRepresentanteAndEstudiantes = '''
+  
+    SELECT
+      r.*,
+      e.nombres AS 'e.nombres',
+      e.apellidos AS 'e.apellidos',
+      e.cedula AS 'e.cedula',
+      e.fecha_nacimiento AS 'e.fecha_nacimiento',
+      e.genero AS 'e.genero',
+      am.grado,
+      am.seccion,
+      eur.parentesco
+    FROM Representantes r
+    LEFT OUTER JOIN Estudiante_U_Representante eur
+      ON eur.representanteID = r.id
+    LEFT OUTER JOIN Informacion_estudiantes e
+      ON eur.estudianteID = e.id
+    LEFT OUTER JOIN Matricula_Estudiantes me
+      ON me.estudianteID = e.id
+    LEFT OUTER JOIN Ambientes am
+      ON me.ambienteID = am.id
+    WHERE r.cedula = ?;
+  
+  ''';
   
   static final String tableName = "Representantes";
 

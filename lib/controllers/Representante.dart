@@ -36,6 +36,19 @@ class _RepresentanteControllers{
     return result;
   }
 
+  Future<List<Map<String,Object?>>?> getRepresentanteYEstudiantes(int? cedula)async{
+    if(cedula == null) return null;
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final results = await db.rawQuery(Representante.getRepresentanteAndEstudiantes,[cedula]);
+
+    if(results.length == 0) return null;
+
+    db.close();
+
+    return results;
+  }
+
 }
 
 final controladorRepresentante = _RepresentanteControllers();
