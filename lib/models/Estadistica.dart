@@ -12,9 +12,12 @@ class Estadistica{
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     ambienteID INTEGER NOT NULL,
     mes INTEGER NOT NULL,
-    ingresos INTEGER NOT NULL DEFAULT 0,
-    egresos INTEGER NOT NULL DEFAULT 0,
+    ingresos_varones INTEGER NOT NULL DEFAULT 0,
+    ingresos_hembras INTEGER NOT NULL DEFAULT 0,
+    egresos_varones INTEGER NOT NULL DEFAULT 0,
+    egresos_hembras INTEGER NOT NULL DEFAULT 0,
     dias_habiles INTEGER NOT NULL DEFAULT 0,
+
 
     FOREIGN KEY (ambienteID) REFERENCES Ambientes  (id)
       	ON UPDATE CASCADE
@@ -63,15 +66,47 @@ class Estadistica{
   
   ''';
 
-  static final String modificarMatriculaIngresos = '''
-
-  UPDATE $tableName SET ingresos = ? WHERE ambienteID = ? AND mes = ?;
+  static final String getMatriculas = '''
+  
+    SELECT
+      e.id,
+      e.genero,
+      ge.dias_habiles,
+      ge.ingresos_varones,
+      ge.ingresos_hembras,
+      ge.egresos_varones,
+      ge.egresos_hembras
+    FROM Gestion_Estadistica ge
+    LEFT OUTER JOIN Matricula_Estudiantes me
+      ON ge.ambienteID = me.ambienteID
+    LEFT OUTER JOIN Informacion_estudiantes e
+      ON me.estudianteID = e.id
+    LEFT OUTER JOIN Ambientes am
+      ON am.id = me.ambienteID
+    WHERE ge.mes = ? AND am.id = ?;
   
   ''';
 
-  static final String modificarMatriculaEgresos = '''
+  static final String modificarMatriculaIngresosHembras = '''
 
-  UPDATE $tableName SET egresos = ? WHERE ambienteID = ? AND mes = ?;
+  UPDATE $tableName SET ingresos_hembras = ? WHERE ambienteID = ? AND mes = ?;
+  
+  ''';
+
+  static final String modificarMatriculaEgresosHembras = '''
+
+  UPDATE $tableName SET egresos_hembras = ? WHERE ambienteID = ? AND mes = ?;
+  
+  ''';
+  static final String modificarMatriculaIngresosVarones = '''
+
+  UPDATE $tableName SET ingresos_varones = ? WHERE ambienteID = ? AND mes = ?;
+  
+  ''';
+
+  static final String modificarMatriculaEgresosVarones = '''
+
+  UPDATE $tableName SET egresos_varones = ? WHERE ambienteID = ? AND mes = ?;
   
   ''';
 
@@ -84,16 +119,20 @@ class Estadistica{
   int? id;
   int ambienteID;
   int mes;
-  int ingresos;
-  int egresos;
+  int ingresosHembras;
+  int egresosHembras;
+  int ingresosVarones;
+  int egresosVarones;
   int diasHabiles;
 
   Estadistica({
     this.id,
     required this.ambienteID,
     required this.mes,
-    required this.ingresos,
-    required this.egresos,
+    required this.ingresosHembras,
+    required this.ingresosVarones,
+    required this.egresosHembras,
+    required this.egresosVarones,
     required this.diasHabiles,
   });
 
@@ -101,22 +140,28 @@ class Estadistica{
     id = estadistica['id'],
     ambienteID = estadistica['ambienteID'],
     mes = estadistica['mes'],
-    ingresos = estadistica['ingresos'],
-    egresos = estadistica['egresos'],
+    ingresosVarones = estadistica['ingresos_varones'],
+    egresosVarones = estadistica['egresos_varones'],
+    ingresosHembras = estadistica['ingresos_hembras'],
+    egresosHembras = estadistica['egresos_hembras'],
     diasHabiles = estadistica['dias_habiles'];
 
   Map<String,dynamic> toJson({bool withId = true})=>(withId)?{
     'id':id,
     'ambienteID' : ambienteID,
     'mes' : mes,
-    'ingresos' : ingresos,
-    'egresos' : egresos,
+    'ingresos_hembras' : ingresosHembras,
+    'egresos_hembras' : egresosHembras,
+    'ingresos_varones' : ingresosVarones,
+    'egresos_varones' : egresosVarones,
     'dias_habiles' :diasHabiles
   }:{
     'ambienteID' : ambienteID,
     'mes' : mes,
-    'ingresos' : ingresos,
-    'egresos' : egresos,
+    'ingresos_hembras' : ingresosHembras,
+    'egresos_hembras' : egresosHembras,
+    'ingresos_varones' : ingresosVarones,
+    'egresos_varones' : egresosVarones,
     'dias_habiles' :diasHabiles
   };
 

@@ -179,6 +179,65 @@ class _EstadisticaController{
 
   }
 
+  Future<Map<String,Map<String,int>>?> getMatricula(int? ambienteID,int? mes,[bool closeDB = true]) async {
+    if(ambienteID == null || mes == null) return null;
+
+    Map<String,int> _abstractMap = {
+      'V':0,
+      'H':0,
+      'T':0
+    };
+
+    Map<String,int> diasHabiles = {..._abstractMap};
+    Map<String,int> matricula = {..._abstractMap};
+    Map<String,int> primerDia = {..._abstractMap};
+    Map<String,int> egresos = {..._abstractMap};
+    Map<String,int> ingresos = {..._abstractMap};
+
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final results = await db.rawQuery(Estadistica.getMatriculas,[mes,ambienteID]);
+
+    if(results.length == 0) {if(closeDB){db.close();}return null;}
+
+    if(closeDB){db.close();}
+
+    //PASO 1: DIAS HABILES
+    diasHabiles['V'] = diasHabiles['H'] =  diasHabiles['T'] = results[0]['dias_habiles'] as int;
+
+    //PASO 2: MATRICULA
+    matricula['V'] = results.where((result) => result['genero'] == 'M').toList().length;
+    matricula['H'] = results.where((result) => result['genero'] == 'F').toList().length;
+    matricula['T'] = matricula['H']! + matricula['V']!;
+
+    //PASO 3: EGRESOS
+    egresos['V'] = results[0]['egresos_varones'] as int ; 
+    egresos['H'] = results[0]['egresos_hembras'] as int ; 
+    egresos['T'] = (egresos['V'] as int) + (egresos['H'] as int); 
+
+    //PASO 4: INGRESOS
+    ingresos['V'] = results[0]['ingresos_varones'] as int ; 
+    ingresos['H'] = results[0]['ingresos_hembras'] as int ; 
+    ingresos['T'] = (ingresos['V'] as int) + (ingresos['H'] as int);
+
+    //PASO 5: 1° DIA DEL MES
+
+    primerDia['V'] = (egresos['V'] as int) + (matricula['V'] as int) - (ingresos['V'] as int);
+    primerDia['H'] = (egresos['H'] as int) + (matricula['H'] as int) - (ingresos['H'] as int);
+    primerDia['T'] = (egresos['T'] as int) + (matricula['T'] as int) - (ingresos['T'] as int);
+
+    Map<String,Map<String,int>> retornable = {
+      'Dias Habiles':diasHabiles,
+      'Matricula':matricula,
+      '1° Dia': primerDia,
+      'Egresos':egresos,
+      'Ingresos':ingresos,
+      'Matricula Final': matricula,
+    };
+
+    return retornable;
+  }
+
   Future<int> cambiarDiasHabiles(int ambienteID, int mes, int diasHabiles) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
@@ -191,9 +250,84 @@ class _EstadisticaController{
       final result = await db.rawUpdate(Estadistica.modificarAsistencia,[diasHabiles,ambienteID,mes]);
       return result;
     }
-
-
   }
+
+  Future<int> addIngreso(int mes, int ambienteID,String genero,[bool closeDB = true])async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final viejaGestion = await db.query(Estadistica.tableName, where:'mes = ? AND ambienteID = ?', whereArgs:[mes,ambienteID]);
+
+    if(viejaGestion.length == 0){
+      if (genero == 'M') {
+        final result = await db.insert(Estadistica.tableName,{'mes':mes,'ambienteID':ambienteID,'ingresos_varones':1});
+        
+        if(closeDB){db.close();}
+        
+        return result;
+      }else{
+        final result = await db.insert(Estadistica.tableName,{'mes':mes,'ambienteID':ambienteID,'ingresos_hembras':1});
+        
+        if(closeDB){db.close();}
+        
+        return result;
+      }
+    }
+    else{
+      if (genero == 'M') {
+        final result = await db.rawUpdate(Estadistica.modificarMatriculaIngresosVarones,[((viejaGestion[0]['ingresos_varones']! as int) + 1),ambienteID,mes]);
+        
+        if(closeDB){db.close();}
+        
+        return result;
+      }else{
+        final result = await db.rawUpdate(Estadistica.modificarMatriculaIngresosHembras,[((viejaGestion[0]['ingresos_varones']! as int) + 1),ambienteID,mes]);
+        
+        if(closeDB){db.close();}
+        
+        return result;
+      }
+    }
+    
+     
+  }
+  Future<int> addEgreso(int mes, int ambienteID,String genero,[bool closeDB = true])async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final viejaGestion = await db.query(Estadistica.tableName, where:'mes = ? AND ambienteID = ?', whereArgs:[mes,ambienteID]);
+
+    if(viejaGestion.length == 0){
+      if (genero == 'M') {
+        final result = await db.insert(Estadistica.tableName,{'mes':mes,'ambienteID':ambienteID,'egresos_varones':1});
+        
+        if(closeDB){db.close();}
+        
+        return result;
+      }else{
+        final result = await db.insert(Estadistica.tableName,{'mes':mes,'ambienteID':ambienteID,'egresos_hembras':1});
+        
+        if(closeDB){db.close();}
+        
+        return result;
+      }
+    }
+    else{
+      if (genero == 'M') {
+        final result = await db.rawUpdate(Estadistica.modificarMatriculaEgresosVarones,[((viejaGestion[0]['egresos_varones']! as int) + 1),ambienteID,mes]);
+        
+        if(closeDB){db.close();}
+        
+        return result;
+      }else{
+        final result = await db.rawUpdate(Estadistica.modificarMatriculaEgresosHembras,[((viejaGestion[0]['egresos_varones']! as int) + 1),ambienteID,mes]);
+        
+        if(closeDB){db.close();}
+        
+        return result;
+      }
+    }
+    
+  }
+
 
 }
 

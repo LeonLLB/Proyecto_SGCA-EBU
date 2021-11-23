@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 class MesPicker extends StatefulWidget {
 
   final void Function(int? mes) onChange;
+  final int? defMes;
+  final String? defLabel;
 
-  MesPicker({required this.onChange});
+  MesPicker({required this.onChange,this.defLabel,this.defMes});
 
   @override
   State<MesPicker> createState() => _MesPickerState(onChange:onChange);
@@ -36,6 +38,12 @@ class _MesPickerState extends State<MesPicker> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    mes = widget.defMes;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: ()async{ 
@@ -45,7 +53,7 @@ class _MesPickerState extends State<MesPicker> {
             onChange(mes);
             setState((){});
           }
-      }, child: Text((mes == null) ? 'Seleccionar mes' : mesesDisponibles[mes!-1])
+      }, child: Text((mes == null) ? 'Seleccionar mes' :(widget.defLabel != null)  ? widget.defLabel! + ' ' + mesesDisponibles[mes!-1] :  mesesDisponibles[mes!-1])
     );
   }
 }

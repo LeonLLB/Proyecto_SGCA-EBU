@@ -1,4 +1,5 @@
 import 'package:proyecto_sgca_ebu/controllers/Admin.dart';
+import 'package:proyecto_sgca_ebu/controllers/Estadistica.dart';
 import 'package:proyecto_sgca_ebu/controllers/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/controllers/Record.dart';
 import 'package:proyecto_sgca_ebu/models/Admin.dart';
@@ -100,10 +101,33 @@ class _MatriculaEstudianteController{
     return retornable;
   }
 
-  Future<int> cambiarMatricula(MatriculaEstudiante nuevaMatricula)async{
+  Future<int> cambiarMatricula(MatriculaEstudiante nuevaMatricula,int mesCambio,String genero)async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    //PARA LA ESTADISTICA DE LA MATRICULA
+
+    // PASO 1: CONSULTAR LA MATRICULA VIEJA
+    final matriculaVieja = await db.query(MatriculaEstudiante.tableName,where:'id = ?',whereArgs:[nuevaMatricula.id]);
+    if(matriculaVieja[0]['ambienteID'] != nuevaMatricula.ambienteID){
+
+      // PASO 2: CAMBIAR EN LA TABLA DE GESTION DE ESTADISTICA,
+      // DONDE EL AMBIENTE VIEJO Y DE ACUERDO EL MES, AÑADIRLE UNO A LOS EGRESOS
+      // PERO SOLO SI LA MATRICULA VIEJA EXISTE
+
+      if(matriculaVieja.length != 0){
+        await controladorEstadistica.addEgreso(mesCambio, matriculaVieja[0]['ambienteID'] as int,genero,false);
+      }
+
+
+      // PASO 3: CAMBIAR EN LA TABLA DE GESTIÓN DE ESTADISTICA,
+      // DONDE EL AMBIENTE NUEVO Y DE ACUERDO EL MES, AÑADIRLE UNO A LOS INGRESOS
+      await controladorEstadistica.addIngreso(mesCambio, nuevaMatricula.ambienteID,genero,false);
+
+    }
+    
     final result = await db.update(MatriculaEstudiante.tableName, nuevaMatricula.toJson(withId:true),where: 'id = ?',whereArgs: [nuevaMatricula.id]);
-    db.close();
+    
+    await db.close();
+
     return result;
   }
 

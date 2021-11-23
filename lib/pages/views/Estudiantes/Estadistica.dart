@@ -62,7 +62,10 @@ class _EstadisticaMatricula extends StatelessWidget {
   _EstadisticaMatricula({required this.ambiente, required this.mes});
 
   Future<dynamic> onLoad()async{
+    if(ambiente == null || mes == null) return null; 
+    final results = await controladorEstadistica.getMatricula(ambiente!.id,mes,false);
     
+    return results;
   }
 
   @override
@@ -77,7 +80,193 @@ class _EstadisticaMatricula extends StatelessWidget {
           return Center(child:Text('No hubo resultados, esto puede ser porque no haya estudiantes en el aula solicitada'));
         }
         else{
-          return Text('Estadistica matricula');
+          return Table(
+            border: TableBorder(horizontalInside: BorderSide(color:Colors.blue[200]!)),
+            children:[
+              TableRow(children: [
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Varones')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Hembras')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Total')),
+                  )
+                ),
+              ]),
+              TableRow(children: [
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Días habiles')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Dias Habiles']['V'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Dias Habiles']['V'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Dias Habiles']['V'].toString())),
+                  )
+                ),
+              ]),
+              TableRow(children: [
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Matrícula')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Matricula']['V'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Matricula']['H'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Matricula']['T'].toString())),
+                  )
+                ),
+              ]),
+              TableRow(children: [
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('1° Día del mes')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['1° Dia']['V'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['1° Dia']['H'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['1° Dia']['T'].toString())),
+                  )
+                ),
+              ]),
+              TableRow(children: [
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Egresos')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Egresos']['V'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Egresos']['H'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Egresos']['T'].toString())),
+                  )
+                ),
+              ]),
+              TableRow(children: [
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Ingresos')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Ingresos']['V'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Ingresos']['H'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Ingresos']['T'].toString())),
+                  )
+                ),
+              ]),
+              TableRow(children: [
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Matrícula final')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Matricula Final']['V'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Matricula Final']['H'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Matricula Final']['T'].toString())),
+                  )
+                ),
+              ]),
+            ]
+          );
         }
       },
     );
@@ -93,7 +282,7 @@ class _ClasificacionEdadSexo extends StatelessWidget {
 
   Future<dynamic> onLoad()async{
     if(ambiente == null) return null; 
-    final results = await controladorEstadistica.getClasificacionEdadSexo(ambiente!.id);
+    final results = await controladorEstadistica.getClasificacionEdadSexo(ambiente!.id,false);
     
     return results;
   }
@@ -351,19 +540,19 @@ class _EstadisticaAsistencia extends StatelessWidget {
                 TableCell(
                   child:  Padding(
                     padding: EdgeInsets.all(5),
-                    child: Center(child: Text(data.data['Porcentaje']['V'].toStringAsFixed(2) + '%')),
+                    child: Center(child: Text(((data.data['Porcentaje']['V'].toStringAsFixed(2) == 'NaN') ? '0.00' : data.data['Porcentaje']['V'].toStringAsFixed(2)) + '%')),
                   )
                 ),
                 TableCell(
                   child:  Padding(
                     padding: EdgeInsets.all(5),
-                    child: Center(child: Text(data.data['Porcentaje']['H'].toStringAsFixed(2) + '%')),
+                    child: Center(child: Text(((data.data['Porcentaje']['H'].toStringAsFixed(2) == 'NaN') ? '0.00' : data.data['Porcentaje']['H'].toStringAsFixed(2)) + '%')),
                   )
                 ),
                 TableCell(
                   child:  Padding(
                     padding: EdgeInsets.all(5),
-                    child: Center(child: Text(data.data['Porcentaje']['T'].toStringAsFixed(2) + '%')),
+                    child: Center(child: Text(((data.data['Porcentaje']['T'].toStringAsFixed(2) == 'NaN') ? '0.00' : data.data['Porcentaje']['T'].toStringAsFixed(2)) + '%')),
                   )
                 ),
               ]),

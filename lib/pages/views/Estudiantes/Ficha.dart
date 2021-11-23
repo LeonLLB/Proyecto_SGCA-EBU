@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_sgca_ebu/components/DateTimePicker.dart';
 import 'package:proyecto_sgca_ebu/components/DoubleTextFormFields.dart';
+import 'package:proyecto_sgca_ebu/components/MesPicker.dart';
 import 'package:proyecto_sgca_ebu/components/RadioInputsRowList.dart';
 import 'package:proyecto_sgca_ebu/components/snackbars.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
@@ -67,6 +68,8 @@ class _FichaEstudiantePageState extends State<FichaEstudiantePage> {
   final _formKeyEstudiante = GlobalKey<FormState>();
 
   Future<Map<String,Object?>?> fichaEstudiante = controladorFichaEstudiante.getFichaCompleta(null);
+
+  int mes = DateTime.now().month;
 
   @override
   Widget build(BuildContext context) {
@@ -456,14 +459,23 @@ class _FichaEstudiantePageState extends State<FichaEstudiantePage> {
                           Text(data.data['añoEscolar'] == null ? '' : 'Turno: ${(data.data['turno'] == 'M') ? 'Mañana' : 'Tarde' }'),   
                           Text((data.data['añoEscolar'] != null && data.data['d.nombres'] != null) ? 'Docente: ${data.data['d.nombres']} ${data.data['d.apellidos']}' : ''),   
                           Text((data.data['añoEscolar'] != null && data.data['d.nombres'] != null) ? 'C.I: ${data.data['d.cedula']}' : ''),   
-
+                          Padding(padding:EdgeInsets.symmetric(vertical:5)),
+                          MesPicker(
+                            defMes: mes,
+                            defLabel:'Mes seleccionado:',
+                            onChange: (mesSeleccionado){
+                              mes = mesSeleccionado!;
+                              
+                              setState((){});
+                            }
+                          ),
                           Padding(padding:EdgeInsets.symmetric(vertical:5)),
                           ElevatedButton(onPressed: ()async{
                             final resultCaso = await controladorMatriculaEstudiante.casoDeCambioDeMatricula(controladoresEstudiante['id']);
                             
                             final gradoSeleccionado = await seleccionarAmbienteAlCambiar(resultCaso['listado'], context);
                             if(gradoSeleccionado != null){
-                              cambiarMatricula(context,data.data['me.id'],resultCaso['caso'],controladoresEstudiante['id'],gradoSeleccionado,data.data['añoEscolar']);
+                              cambiarMatricula(context,data.data['me.id'],controladoresEstudiante['Genero'],resultCaso['caso'],controladoresEstudiante['id'],gradoSeleccionado,data.data['añoEscolar']);
                             }
                           }, child: Text('Cambiar o asignar matricula'))
                         ]))
@@ -600,7 +612,7 @@ class _FichaEstudiantePageState extends State<FichaEstudiantePage> {
     );
   }
 
-  void cambiarMatricula(BuildContext context,int matriculaID,int caso, int estudianteID, Ambiente ambienteSeleccionado, String yearEscolar) {
+  void cambiarMatricula(BuildContext context,int matriculaID,String genero,int caso, int estudianteID, Ambiente ambienteSeleccionado, String yearEscolar) {
     if(caso == 1){
       ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
         message:'Cambiando matrícula...',
@@ -611,7 +623,7 @@ class _FichaEstudiantePageState extends State<FichaEstudiantePage> {
               ambienteID: ambienteSeleccionado.id!,
               estudianteID: estudianteID,
               yearEscolar: yearEscolar
-            ));
+            ),mes,genero);
             ScaffoldMessenger.of(context).removeCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Se ha cambiado el grado del estudiante!'));
             fichaEstudiante = controladorFichaEstudiante.getFichaCompleta(int.parse(controladorConsulta.text));
