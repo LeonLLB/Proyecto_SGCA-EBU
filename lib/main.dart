@@ -19,7 +19,9 @@ class _ScrollBehavior extends MaterialScrollBehavior {
   };
 }
 
-void initTable(String tableInitializer,String testInitializer,db) async{
+Future<void> initTable(String tableInitializer,String testInitializer) async{
+  final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
   try {
     await db.rawQuery(testInitializer);
   } catch (e) {
@@ -27,28 +29,31 @@ void initTable(String tableInitializer,String testInitializer,db) async{
       await db.execute(tableInitializer);
     }
     else{
+      print(e);
       throw e;
-    }    
+    }  
   }
+
+  await db.close();
 }
 
 void initDB() async {
-
-  final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+  
   //Usuarios
-  initTable(Usuarios.tableInitializer,Usuarios.testInitializer,db);
-  initTable(Estudiante.tableInitializer,Estudiante.testInitializer,db);
-  initTable(Representante.tableInitializer,Representante.testInitializer,db);
-  initTable(EstudianteURepresentante.tableInitializer,EstudianteURepresentante.testInitializer,db);
-  initTable(Ambiente.tableInitializer,Ambiente.testInitializer,db);
-  initTable(MatriculaEstudiante.tableInitializer,MatriculaEstudiante.testInitializer,db);
-  initTable(MatriculaDocente.tableInitializer,MatriculaDocente.testInitializer,db);
-  initTable(Admin.tableInitializer,Admin.testInitializer,db);
-  initTable(Asistencia.tableInitializer,Asistencia.testInitializer,db);
-  initTable(Rendimiento.tableInitializer,Rendimiento.testInitializer,db);
-  initTable(Record.tableInitializer,Record.testInitializer,db);
-  initTable(FichaEstudiante.tableInitializer,FichaEstudiante.testInitializer,db);
-  initTable(RecordFicha.tableInitializer,RecordFicha.testInitializer,db);
+  await initTable(Usuarios.tableInitializer,Usuarios.testInitializer);
+  await initTable(Estudiante.tableInitializer,Estudiante.testInitializer);
+  await initTable(Representante.tableInitializer,Representante.testInitializer);
+  await initTable(EstudianteURepresentante.tableInitializer,EstudianteURepresentante.testInitializer);
+  await initTable(Ambiente.tableInitializer,Ambiente.testInitializer);
+  await initTable(MatriculaEstudiante.tableInitializer,MatriculaEstudiante.testInitializer);
+  await initTable(MatriculaDocente.tableInitializer,MatriculaDocente.testInitializer);
+  await initTable(Admin.tableInitializer,Admin.testInitializer);
+  await initTable(Asistencia.tableInitializer,Asistencia.testInitializer);
+  await initTable(Rendimiento.tableInitializer,Rendimiento.testInitializer);
+  await initTable(Record.tableInitializer,Record.testInitializer);
+  await initTable(FichaEstudiante.tableInitializer,FichaEstudiante.testInitializer);
+  await initTable(RecordFicha.tableInitializer,RecordFicha.testInitializer);
+  await initTable(Estadistica.tableInitializer,Estadistica.testInitializer);
 
 }
 void main() {

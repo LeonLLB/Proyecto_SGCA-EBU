@@ -13,3 +13,4 @@ export 'package:proyecto_sgca_ebu/models/Asistencia.dart';
 export 'package:proyecto_sgca_ebu/models/Rendimiento.dart';
 export 'package:proyecto_sgca_ebu/models/Record.dart';
 export 'package:proyecto_sgca_ebu/models/RecordFicha.dart';
+export 'package:proyecto_sgca_ebu/models/Estadistica.dart';

@@ -7,6 +7,7 @@ import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
 import 'package:proyecto_sgca_ebu/controllers/Admin.dart';
 import 'package:proyecto_sgca_ebu/controllers/Asistencia.dart';
+import 'package:proyecto_sgca_ebu/controllers/Estadistica.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/models/Asistencia.dart';
@@ -67,16 +68,16 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
           if(i == 1){
             switch(diaSemana){
               case 'mar.':
-                diasDelMesHabiles.addAll([null,null,i]);
+                diasDelMesHabiles.addAll([null,i]);
                 break;
               case 'mié.':
-                diasDelMesHabiles.addAll([null,null,null,i]);
+                diasDelMesHabiles.addAll([null,null,i]);
                 break;
               case 'jue.':
-                diasDelMesHabiles.addAll([null,null,null,null,i]);
+                diasDelMesHabiles.addAll([null,null,null,i]);
                 break;
               case 'vie.':
-                diasDelMesHabiles.addAll([null,null,null,null,null,i]);
+                diasDelMesHabiles.addAll([null,null,null,null,i]);
                 break;
               default:
                 diasDelMesHabiles.add(i);
@@ -87,7 +88,10 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
           }
         }
       }
-    
+
+      //PARA LA ASISTENCIA DE LOS ESTUDIANTES
+      controladorEstadistica.cambiarDiasHabiles(ambiente!.id!, mes!, diasDelMesHabiles.where((dia) => dia != null).toList().length);
+
       listaAsistenciasSeccion = [];   
       //PASO 3: POR CADA ESTUDIANTE, DEBE TENER SU ASISTENCIA MENSUAL
 

@@ -245,7 +245,7 @@ class _EstadisticaAsistencia extends StatelessWidget {
   _EstadisticaAsistencia({required this.ambiente, required this.mes});
 
   Future<dynamic> onLoad()async{
-
+    return await controladorEstadistica.getAsistencia(ambiente?.id, mes);
   }
 
   @override
@@ -260,7 +260,115 @@ class _EstadisticaAsistencia extends StatelessWidget {
           return Center(child:Text('No hubo resultados, esto puede ser porque no haya estudiantes en el aula solicitada'));
         }
         else{
-          return Text('Estadistica asistencia');
+          return Table(
+            border: TableBorder(horizontalInside: BorderSide(color:Colors.blue[200]!)),
+            children: [
+              TableRow(children: [
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Varones')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Hembras')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Total')),
+                  )
+                ),
+              ]),
+              TableRow(children: [
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Total de asistencias')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Total']['V'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Total']['H'].toString())),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Total']['T'].toString())),
+                  )
+                ),
+              ]),
+              TableRow(children: [
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Media')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Media']['V'].toStringAsFixed(2))),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Media']['H'].toStringAsFixed(2))),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Media']['T'].toStringAsFixed(2))),
+                  )
+                ),
+              ]),
+              TableRow(children: [
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text('Porcentaje')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Porcentaje']['V'].toStringAsFixed(2) + '%')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Porcentaje']['H'].toStringAsFixed(2) + '%')),
+                  )
+                ),
+                TableCell(
+                  child:  Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Center(child: Text(data.data['Porcentaje']['T'].toStringAsFixed(2) + '%')),
+                  )
+                ),
+              ]),
+            ],
+          );
         }
       },
     );
