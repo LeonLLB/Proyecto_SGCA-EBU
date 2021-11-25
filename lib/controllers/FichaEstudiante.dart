@@ -54,6 +54,16 @@ class _FichaEstudianteController{
     return result;
   }
 
+  Future<int> eliminarFicha(int estudianteID,[bool closeDB = true]) async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final result = await db.delete(FichaEstudiante.tableName,where:'estudianteID = ?',whereArgs:[estudianteID]);
+
+    if(closeDB){db.close();}
+
+    return result;
+  }
+
 }
 
 final controladorFichaEstudiante = _FichaEstudianteController();

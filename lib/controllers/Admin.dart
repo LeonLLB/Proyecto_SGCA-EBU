@@ -1,5 +1,9 @@
+import 'package:proyecto_sgca_ebu/controllers/Egresados.dart';
+import 'package:proyecto_sgca_ebu/controllers/FichaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/controllers/Record.dart';
 import 'package:proyecto_sgca_ebu/models/Admin.dart';
+import 'package:proyecto_sgca_ebu/models/Egresados.dart';
+import 'package:proyecto_sgca_ebu/models/Estadistica.dart';
 import 'package:proyecto_sgca_ebu/models/Matricula_Estudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Matricula_Docente.dart';
 import 'package:proyecto_sgca_ebu/models/Rendimiento.dart';
@@ -33,6 +37,23 @@ class _AdminController{
       await db.delete(MatriculaDocente.tableName);
       await db.delete(Rendimiento.tableName);
       await db.delete(Asistencia.tableName);
+      await db.delete(Estadistica.tableName);
+
+      //PASO 4: SI EXISTEN ESTUDIANTES DE 6TO GRADO APROBADOS, MIGRARLOS A EGRESADOS Y
+      //ELIMINAR SU FICHA DE INSCRIPCIÓN 
+
+      final estudiantesAEgresar = await db.rawQuery(Egresado.consultarPosiblesEgresados);
+
+      if(estudiantesAEgresar.length > 0){
+        List<Egresado> nuevosEgresados = [];
+        for(var estudiante in estudiantesAEgresar){
+          nuevosEgresados.add(Egresado.fromMap(estudiante));
+          await controladorFichaEstudiante.eliminarFicha(estudiante['estudianteID'] as int,false);
+        }
+        await controladorEgresados.egresar(nuevosEgresados,false);
+      }
+    
+    
     }
     
     db.close();
