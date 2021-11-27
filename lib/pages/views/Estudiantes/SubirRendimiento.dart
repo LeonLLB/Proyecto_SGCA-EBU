@@ -152,7 +152,7 @@ class _SubirRendimientoEstudianteState extends State<SubirRendimientoEstudiante>
                           subirRendimiento(context);
                         }
                       },
-                      child: Text('Subir asistencia')
+                      child: Text('Subir rendimiento')
                     ),
                     Padding(padding:EdgeInsets.symmetric(vertical: 5))
                   ]);

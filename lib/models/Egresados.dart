@@ -14,7 +14,7 @@ class Egresado {
     representanteID INTEGER NOT NULL,
     grado INTEGER NOT NULL,
     seccion VARCHAR(1) NOT NULL,
-    añoEscolarCursado VARCHAR(9) NOT NULL
+    añoEscolarCursado VARCHAR(9) NOT NULL,
 
     FOREIGN KEY (representanteID) REFERENCES Representantes (id)
       	ON UPDATE CASCADE
@@ -30,7 +30,10 @@ class Egresado {
   static final String consultarPosiblesEgresados = '''
   
   SELECT 
-    rbe.*,
+    rbe.estudianteID,
+    rbe.gradoCursado AS 'grado',
+    rbe.seccionCursada AS 'seccion',
+    rbe.'añoEscolar' AS 'añoEscolarCursado',
     eur.representanteID
   FROM Record_Boletin_Estudiantil rbe
   LEFT OUTER JOIN Estudiante_U_Representante eur

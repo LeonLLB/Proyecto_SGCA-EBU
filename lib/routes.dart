@@ -33,6 +33,9 @@ final Map<String, Widget> routes = {
   '-representantes/buscar'    :BuscarRepresentante(),
   '-representantes/visualizar':VisualizarRepresentante(),
 
+  '-egresados/nuevos'         :EgresadosNuevos(),
+  '-egresados/consulta'       :EgresadosConsulta(),
+
   '-admin/inscribirgrado':AdminInscribirGrado(),
   '-admin/vergrados':AdminVerGrado(),
   '-admin/cambiarañoescolar':AdminCambiarYearEscolar(),

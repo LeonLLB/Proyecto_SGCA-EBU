@@ -54,6 +54,7 @@ void initDB() async {
   await initTable(FichaEstudiante.tableInitializer,FichaEstudiante.testInitializer);
   await initTable(RecordFicha.tableInitializer,RecordFicha.testInitializer);
   await initTable(Estadistica.tableInitializer,Estadistica.testInitializer);
+  await initTable(Egresado.tableInitializer,Egresado.testInitializer);
 
 }
 void main() {

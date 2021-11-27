@@ -29,7 +29,6 @@ class _AdminController{
       await controladorRecord.registrarRecords(false);
     }
 
-    final result = await db.update(Admin.tableName, opcionActualizada.toJson(withId:true),where: 'opcion = ?',whereArgs:[opcionACambiar] ); //(Admin.tableName,opcion.toJson(withId:false));
     
     if(opcionACambiar == 'AÑO_ESCOLAR'){
       //PASO 3: ELIMINAR TODA LA INFORMACIÓN DE LAS MATRICULAS, RENDIMIENTO Y ASISTENCIA
@@ -51,10 +50,10 @@ class _AdminController{
           await controladorFichaEstudiante.eliminarFicha(estudiante['estudianteID'] as int,false);
         }
         await controladorEgresados.egresar(nuevosEgresados,false);
-      }
-    
-    
+      }    
     }
+    
+    final result = await db.update(Admin.tableName, opcionActualizada.toJson(withId:true),where: 'opcion = ?',whereArgs:[opcionACambiar] ); //(Admin.tableName,opcion.toJson(withId:false));
     
     db.close();
 

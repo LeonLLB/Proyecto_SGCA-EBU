@@ -21,7 +21,9 @@ class MatriculaDocente{
   LEFT OUTER JOIN Usuarios d
     ON d.id = md.docenteID
   LEFT OUTER JOIN Matricula_Estudiantes me
-    ON me.ambienteID = md.ambienteID;
+    ON me.ambienteID = md.ambienteID
+  ORDER BY am.grado, am.seccion;
+
   
   ''';
 
