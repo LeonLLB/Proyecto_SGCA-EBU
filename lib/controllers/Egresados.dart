@@ -18,6 +18,17 @@ class _EgresadosController{
 
   }
 
+  Future<List<Map<String,Object?>>?> getEgresadosActuales() async {
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final result = await db.rawQuery(Egresado.getEgresadosActuales);
+    if(result.length == 0){
+      db.close();
+      return null;
+    }
+    return result;
+  }
+
 }
 
 final controladorEgresados = _EgresadosController();

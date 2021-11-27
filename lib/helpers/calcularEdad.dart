@@ -6,7 +6,6 @@ int calcularEdad(dynamic fechaNacimiento){
     fechaNacimiento as DateTime
   ;
 
-
   DateTime fechaActual = DateTime.now();
   if(
     fechaNacimientoPulida.month < fechaActual.month ||

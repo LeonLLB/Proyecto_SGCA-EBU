@@ -27,6 +27,27 @@ class Egresado {
   
   ''';
 
+  static final String getEgresadosActuales = '''
+  
+  SELECT
+    eg.grado,
+    eg.seccion,
+    eg.añoEscolarCursado,
+    r.nombres AS 'r.nombres',
+    r.apellidos AS 'r.apellidos',
+    r.cedula AS 'r.cedula',
+    e.nombres AS 'e.nombres',
+    e.apellidos AS 'e.apellidos',
+    e.cedula AS 'e.cedula',
+    e.fecha_nacimiento
+  FROM Egresados eg
+  LEFT OUTER JOIN Representantes r
+    ON r.id = eg.representanteID
+  LEFT OUTER JOIN Informacion_estudiantes e
+    ON e.id = eg.estudianteID
+  
+  ''';
+
   static final String consultarPosiblesEgresados = '''
   
   SELECT 
