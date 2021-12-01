@@ -97,10 +97,11 @@ class _BuscarEstudianteState extends State<BuscarEstudiante> {
                           ]),
                           Text(calcularEdad(snapshot.data[i]["estudiante.fecha_nacimiento"]).toString() + ' años')
                         ],mainAxisAlignment:MainAxisAlignment.spaceBetween),
+                        (snapshot.data[i]['añoEscolar'] != null) ?
                         Row(children: [
                           Text(snapshot.data[i]['añoEscolar']),
                           Text(snapshot.data[i]['grado'].toString() + '° "${snapshot.data[i]['seccion']}"')
-                        ],mainAxisAlignment:MainAxisAlignment.spaceBetween),
+                        ],mainAxisAlignment:MainAxisAlignment.spaceBetween):SizedBox(),                        
                         Text('${snapshot.data[i]["representante.nombres"]} ${snapshot.data[i]["representante.apellidos"]}',
                           style:TextStyle(fontWeight:FontWeight.bold)),
                         Row(children: [

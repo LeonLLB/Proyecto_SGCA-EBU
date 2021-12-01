@@ -9,7 +9,7 @@ class _RecordController{
     final data = await db.rawQuery(Record.getData);
 
     for(var info in data){
-      await db.insert(Record.tableName, info);
+      await db.insert(Record.tableName, {...info,'aprobado':(info['aprobado'] != null) ? info['aprobado'] : 0});
     }
 
     if(closeDB)db.close();
@@ -35,12 +35,12 @@ class _RecordController{
   Future<Record?> obtenerUltimoRecord(int estudianteID,[bool closeDB = true])async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
-    final result = await db.query(Record.tableName,where:'estudianteID = ?',whereArgs: [estudianteID],orderBy: 'añoEscolar DESC',limit:1);
+    final result = await db.query(Record.tableName,where:'estudianteID = ?',orderBy:'añoEscolar DESC',whereArgs: [estudianteID],limit:1);
 
     if(closeDB){db.close();}
 
     if(result.length == 0) return null;
-
+    
     return Record.fromMap(result[0]);
   }
 

@@ -162,6 +162,15 @@ class _EstudianteControllers{
     return result;
   }
 
+  Future<Estudiante?> buscarEstudiantePorID(int estudianteID,[bool closeDB = true]) async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final result = await db.query(Estudiante.tableName,where:'id = ?',whereArgs:[estudianteID]);
+    if(closeDB){db.close();}
+    if(result.length == 0) return null;
+    return Estudiante.fromMap(result[0]);
+  }
+
 }
 
 final controladorEstudiante = _EstudianteControllers();

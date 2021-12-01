@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_sgca_ebu/components/DateTimePicker.dart';
+import 'package:proyecto_sgca_ebu/components/Snackbars.dart';
+import 'package:proyecto_sgca_ebu/components/loadingSnackbar.dart';
 import 'package:proyecto_sgca_ebu/controllers/Egresados.dart';
 import 'package:proyecto_sgca_ebu/helpers/calcularEdad.dart';
+import 'package:proyecto_sgca_ebu/services/PDF.dart';
 
 class EgresadosNuevos extends StatefulWidget {
 
@@ -121,7 +124,21 @@ class _EgresadosNuevosState extends State<EgresadosNuevos> {
                         child:Padding(
                           padding: EdgeInsets.all(5),
                           child: Center(child: TextButton.icon(
-                            onPressed: (){},
+                            onPressed: ()async{
+                              ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+                                message:'Generando boletin...',
+                                onVisible: () async {
+                                  final bool seGenero = await generarBoletin(egresado['id']);
+                                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                  if(seGenero){
+                                    ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Se ha generado correctamente el boletin, revise el directorio de descargas'));
+                                  }else{
+                                    ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo generar el boletin'));
+                                  }
+                                }
+                                )
+                              );
+                            },
                             icon: Icon(Icons.save),
                             label: Text(''))),
                         )

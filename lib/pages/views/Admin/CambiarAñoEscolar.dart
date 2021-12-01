@@ -214,7 +214,7 @@ class _AdminCambiarYearEscolarState extends State<AdminCambiarYearEscolar> {
       );
     }else{
       Admin? viejoPeriodo = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
-      Admin nuevaOpcion = Admin(opcion: 'AÑO_ESCOLAR',valor:'${viejoPeriodo!.valor.split('-')[1]} - ${int.parse(viejoPeriodo.valor.split('-')[1]) + 1}');
+      Admin nuevaOpcion = Admin(opcion: 'AÑO_ESCOLAR',valor:'${viejoPeriodo!.valor.split(' - ')[1]} - ${int.parse(viejoPeriodo.valor.split(' - ')[1]) + 1}');
       
       if(existeYearEscolar){
         final opcion = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');

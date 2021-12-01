@@ -30,6 +30,7 @@ class Egresado {
   static final String getEgresadosActuales = '''
   
   SELECT
+    e.id,
     eg.grado,
     eg.seccion,
     eg.añoEscolarCursado,
