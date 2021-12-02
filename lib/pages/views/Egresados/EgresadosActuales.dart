@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_sgca_ebu/Providers/PageProvider.dart';
 import 'package:proyecto_sgca_ebu/components/DateTimePicker.dart';
 import 'package:proyecto_sgca_ebu/components/Snackbars.dart';
-import 'package:proyecto_sgca_ebu/components/loadingSnackbar.dart';
 import 'package:proyecto_sgca_ebu/controllers/Egresados.dart';
 import 'package:proyecto_sgca_ebu/helpers/calcularEdad.dart';
 import 'package:proyecto_sgca_ebu/services/PDF.dart';
@@ -148,14 +149,39 @@ class _EgresadosNuevosState extends State<EgresadosNuevos> {
                 ),
                 Padding(padding:EdgeInsets.symmetric(vertical:5)),   
                 DateTimePicker(
-                  onChange: (fechaGraducion){},
+                  onChange: (fechaGraduacion){
+                    final newDate = fechaGraduacion!.toIso8601String().split('T')[0].split('-');
+                    fechaGraduacionEgresados = '${newDate[2]}/${newDate[1]}/${newDate[0]}';
+                    setState((){});
+                  },
                   defaultText: 'Fecha de graduación',
                   maxDate: DateTime.now(),
                   defaultDate: DateTime.now(),
                   lastDate: fechaGraduacionEgresados
                 ),
                 Padding(padding:EdgeInsets.symmetric(vertical:5)),   
-                ElevatedButton(onPressed: (){}, child: Text('Graduar estudiantes')),
+                ElevatedButton(onPressed: (){
+                  if(fechaGraduacionEgresados != ''){
+                    ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+                      message: 'Graduando y respaldando egresados y sus boletines...',
+                      onVisible:()async{
+                        try {
+                          await controladorEgresados.graduar(fechaGraduacionEgresados);
+                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Graduandos migrados de forma exitosa!'));
+                          Provider.of<PageProvider>(context, listen: false).goBack();
+                        } catch (e) {
+                          print(e);
+                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se ha migrado los egresados ni sus boletines'));
+                        }
+                      }
+                      )
+                    );
+                  }else{
+                    ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Es necesaria la fecha en la que se llevo a cabo la graduacion'));
+                  }
+                }, child: Text('Graduar estudiantes')),
                 Padding(padding:EdgeInsets.symmetric(vertical:5))  
               ]);
             }

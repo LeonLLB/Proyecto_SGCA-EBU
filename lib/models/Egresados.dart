@@ -42,6 +42,7 @@ class Egresado {
     e.cedula AS 'e.cedula',
     e.fecha_nacimiento,
     e.lugar_nacimiento,
+    e.genero AS 'e.genero',
     e.estado_nacimiento
   FROM Egresados eg
   LEFT OUTER JOIN Representantes r

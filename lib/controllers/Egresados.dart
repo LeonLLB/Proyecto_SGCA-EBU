@@ -35,27 +35,30 @@ class _EgresadosController{
 
   Future<List<int>> graduar(String fechaGraduacion) async{
     final dbMain = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
-    final dbBackup = await databaseFactoryFfi.openDatabase('sgca-ebu-database-egresados.db');
-  
-    final egresados = await dbMain.query(Egresado.getEgresadosActuales);
     
-    String sqlWhere = 'WHERE ';
+    
+    final egresados = await dbMain.rawQuery(Egresado.getEgresadosActuales);
 
-    for(var egresado in egresados){
-      if(egresado == egresados[egresados.length-1]){
+    String sqlWhere = '';
+
+    for (var i = 0; i < egresados.length; i++) {
+      if(i == egresados.length - 1){
         sqlWhere = sqlWhere + ' estudianteID = ? ';
       }else{
         sqlWhere = sqlWhere + ' estudianteID = ? OR';
       }
-    }
-    
-    final boletines = await dbMain.query(Record.tableName,where: sqlWhere, whereArgs:[egresados[0]['añoEscolarCursado'],...egresados.map((e)=>e['id']).toList()]);
+    }    
+
+    final boletines = await dbMain.query(Record.tableName,where: sqlWhere, whereArgs:[...egresados.map((e)=>e['id']).toList()]);
 
     await dbMain.delete(Egresado.tableName);
     await dbMain.delete(Record.tableName,where:sqlWhere,whereArgs:[...egresados.map((e)=>e['id']).toList()]);
 
     await dbMain.close();
+    final dbBackup = await databaseFactoryFfi.openDatabase('sgca-ebu-database-egresados.db');
 
+    List<Future<int>> listadoEgresados = [];
+    List<Future<int>> listadoBoletines = [];
     List<int> retornable = [];
 
     for (var egresado in egresados) {
@@ -69,11 +72,11 @@ class _EgresadosController{
           'nombres' : egresado['e.nombres'],
           'apellidos' : egresado['e.apellidos'],
           'cedula' : egresado['e.cedula'],
-          'fecha_nacimiento' : egresado['e.fecha_nacimiento'],
+          'fecha_nacimiento' : egresado['fecha_nacimiento'],
           'genero' : egresado['e.genero'],
-          'edad_al_graduarse' : calcularEdad(egresado['e.fecha_nacimiento']),
-          'lugar_nacimiento' : egresado['e.lugar_nacimiento'],
-          'estado_nacimiento' : egresado['e.estado_nacimiento']
+          'edad_al_graduarse' : calcularEdad(egresado['fecha_nacimiento']),
+          'lugar_nacimiento' : egresado['lugar_nacimiento'],
+          'estado_nacimiento' : egresado['estado_nacimiento']
         },
         representante: {
           'nombres' : egresado['r.nombres'],
@@ -81,11 +84,11 @@ class _EgresadosController{
           'cedula' : egresado['r.cedula'],
         }
       );
-
-      final resultEgresado = await dbBackup.insert(EgresadoRespaldado.tableName, nuevoEgresado.toJson());
-      retornable.add(resultEgresado);
+      
+      listadoEgresados.add(dbBackup.insert(EgresadoRespaldado.tableName, nuevoEgresado.toJson()));
+      
       final recordsDelEgresado = boletines.where((boletin) => boletin['estudianteID'] == egresado['id']);
-
+      
       for(var records in recordsDelEgresado){
         final nuevoRecord = BoletinRespaldo(
           egresadoID: egresado['id'] as int,
@@ -95,12 +98,19 @@ class _EgresadosController{
           yearEscolar: records['añoEscolar'] as String,
           fechaInscripcion: records['fechaInscripcion'] as String
         );
-        final result = await dbBackup.insert(BoletinRespaldo.tableName,nuevoRecord.toJson(false));
-        retornable.add(result);
+        
+        listadoBoletines.add(dbBackup.insert(BoletinRespaldo.tableName,nuevoRecord.toJson(false)));     
+        
       }
-
+      
     }
-    await dbBackup.close();
+    
+    retornable.addAll(await Future.wait(listadoEgresados));
+    
+    retornable.addAll(await Future.wait(listadoBoletines));
+    
+    await dbBackup.close();   
+    
     return retornable;
   }
 
