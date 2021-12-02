@@ -15,3 +15,6 @@ export 'package:proyecto_sgca_ebu/models/Record.dart';
 export 'package:proyecto_sgca_ebu/models/RecordFicha.dart';
 export 'package:proyecto_sgca_ebu/models/Estadistica.dart';
 export 'package:proyecto_sgca_ebu/models/Egresados.dart';
+
+export 'package:proyecto_sgca_ebu/models/EgresadosRespaldo.dart';
+export 'package:proyecto_sgca_ebu/models/BoletinRespaldo.dart';

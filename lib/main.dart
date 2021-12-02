@@ -19,8 +19,8 @@ class _ScrollBehavior extends MaterialScrollBehavior {
   };
 }
 
-Future<void> initTable(String tableInitializer,String testInitializer) async{
-  final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+Future<void> initTable(String tableInitializer,String testInitializer, [bool mainDB = true]) async{
+  final db = await databaseFactoryFfi.openDatabase((mainDB) ? 'sgca-ebu-database.db' : 'sgca-ebu-database-egresados.db');
 
   try {
     await db.rawQuery(testInitializer);
@@ -55,6 +55,9 @@ void initDB() async {
   await initTable(RecordFicha.tableInitializer,RecordFicha.testInitializer);
   await initTable(Estadistica.tableInitializer,Estadistica.testInitializer);
   await initTable(Egresado.tableInitializer,Egresado.testInitializer);
+
+  await initTable(EgresadoRespaldado.tableInitializer,EgresadoRespaldado.testInitializer,false);
+  await initTable(BoletinRespaldo.tableInitializer,BoletinRespaldo.testInitializer,false);
 
 }
 void main() {

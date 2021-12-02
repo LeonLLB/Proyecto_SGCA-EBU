@@ -40,7 +40,9 @@ class Egresado {
     e.nombres AS 'e.nombres',
     e.apellidos AS 'e.apellidos',
     e.cedula AS 'e.cedula',
-    e.fecha_nacimiento
+    e.fecha_nacimiento,
+    e.lugar_nacimiento,
+    e.estado_nacimiento
   FROM Egresados eg
   LEFT OUTER JOIN Representantes r
     ON r.id = eg.representanteID
