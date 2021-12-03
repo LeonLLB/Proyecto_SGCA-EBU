@@ -44,6 +44,23 @@ class _RecordController{
     return Record.fromMap(result[0]);
   }
 
+  Future<List<BoletinRespaldo>?> obtenerRecordsDeEgresadoR(int egresadoID,[bool closeDB = true])async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database-egresados.db');
+
+    final results = await db.query(BoletinRespaldo.tableName,where:'egresadoID = ?',whereArgs: [egresadoID]);
+
+    if(results.length == 0) return null;
+    List<BoletinRespaldo> retornable = [];
+    for(var result in results){
+      retornable.add(BoletinRespaldo.fromMap(result));
+    }
+
+    if(closeDB){db.close();}
+
+    return retornable;
+
+  }
+
 }
 
 final controladorRecord = _RecordController();

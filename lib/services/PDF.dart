@@ -4,6 +4,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:proyecto_sgca_ebu/controllers/Egresados.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estudiante.dart';
 import 'package:proyecto_sgca_ebu/controllers/Record.dart';
 import 'package:proyecto_sgca_ebu/helpers/getMonth.dart';
@@ -116,6 +117,97 @@ Future<bool> imprimirConstanciaEstudianteCompleta(Map<String,Object?> estudiante
   }
 
 }
+
+Future<bool> generarBoletinR(int egresadoID) async{
+
+  final pw.Document doc = pw.Document(); 
+
+  final cintillo = pw.MemoryImage(
+    (await rootBundle.load('assets/Cintillo pdf.png')).buffer.asUint8List()
+  ); 
+
+  final egresado = await controladorEgresados.buscarEgresadoPorIDR(egresadoID,false);
+  final records = await controladorRecord.obtenerRecordsDeEgresadoR(egresadoID);
+
+  final plantilla = pw.MultiPage(
+      header:(pw.Context context){
+        return pw.Column(children: [
+          pw.Image(cintillo),
+          pw.Row(
+            mainAxisAlignment:pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text('GRUPO ESCOLAR \"URIAPARA\"',style:pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text('COD. DEA OD05711012',style:pw.TextStyle(fontWeight: pw.FontWeight.bold))
+            ]
+          )
+        ]) ;
+      },
+      footer:(pw.Context context){
+        return pw.Center(
+          child:pw.Text('Dirección: Calle Prolongación Bolivar, Sector La Puente frente a la redoma, TLF: 0287752325 Barrancas del Orinoco',
+            style:pw.TextStyle(fontSize: 8)
+          )
+        );
+      },
+      pageFormat: PdfPageFormat.letter,
+      build: (pw.Context context){
+        return [
+          pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:65)),
+          pw.Center(
+          child: pw.Column(
+            children:[
+              pw.Center(
+                child:pw.Text('BOLETIN ESTUDIANTIL',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Center(
+                child:pw.Text('FECHA DE GRADUACION: ${egresado!.fechaGraduacion}',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Center(
+                child:pw.Text('${egresado.estudiante['nombres']} ${egresado.estudiante['apellidos']} C.E: ${egresado.estudiante['cedula']}',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:10)),
+              pw.Table.fromTextArray(
+                border: pw.TableBorder(horizontalInside: pw.BorderSide()),
+                data: [
+                  ['Rendimiento','Grado y Seccion','Año Escolar','Fecha de Inscripcion'],
+                  ...records!.map((record) => [
+                    (record.aprobado)?'Aprobado':'Reprobado',
+                    '${record.gradoCursado}° "${record.seccionCursada}"',
+                    record.yearEscolar,
+                    record.fechaInscripcion
+                  ]).toList()
+                ]
+              ),
+            ]
+          )
+        )];
+      }
+    );
+
+    doc.addPage(plantilla);
+  try {
+    Directory? directorio = await getDownloadsDirectory();
+    String path = directorio!.path + '/sgca_ebu documentos/';
+    if(await Directory(path).exists() != true){
+      new Directory(path).createSync(recursive: true);
+      final File archivo = File(path + "Boletin egresado ${egresado!.estudiante['nombres']} ${egresado.estudiante['apellidos']} ${egresado.estudiante['cedula']} ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
+      archivo.writeAsBytesSync(await doc.save());
+      return true;
+    } else {
+      final File archivo = File(path + "Boletin egresado ${egresado!.estudiante['nombres']} ${egresado.estudiante['apellidos']} ${egresado.estudiante['cedula']} ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
+      archivo.writeAsBytesSync(await doc.save());
+      return true;
+    }
+  } catch (e) {
+    print(e);
+    return false;
+  }
+
+}
+
 
 Future<bool> generarBoletin(int estudianteID) async{
 
