@@ -86,6 +86,22 @@ class _EgresadosConsultaState extends State<EgresadosConsulta> {
               Padding(padding:EdgeInsets.symmetric(vertical:5)),
               Center(child:Text('Fecha de graduación: ${(data.data[0] as EgresadoRespaldado).fechaGraduacion}',style:TextStyle(fontSize:22,fontWeight:FontWeight.bold))),
               Padding(padding:EdgeInsets.symmetric(vertical:5)),
+              ElevatedButton(onPressed: (){
+                ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+                  message:'Generando documento de los egresados...',
+                  onVisible: () async {
+                    final bool seGenero = await generarDocumentoEgresadosR('${mainYear.text} - ${int.parse(mainYear.text) + 1}');
+                    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                    if(seGenero){
+                      ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Se ha generado correctamente el documento, revise el directorio de descargas'));
+                    }else{
+                      ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo generar el documento'));
+                    }
+                  }
+                  )
+                );
+              }, child: Text('Generar PDF')),
+              Padding(padding:EdgeInsets.symmetric(vertical: 5)),
               Table(
                 border: TableBorder(horizontalInside: BorderSide(color:Colors.blue[200]!)),
                 children: [

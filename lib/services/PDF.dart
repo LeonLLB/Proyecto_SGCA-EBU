@@ -214,6 +214,95 @@ Future<bool> generarBoletinR(int egresadoID) async{
 
 }
 
+Future<bool> generarDocumentoEgresadosR(String yearEscolar) async {
+  final pw.Document doc = pw.Document(); 
+
+  final cintillo = pw.MemoryImage(
+    (await rootBundle.load('assets/Cintillo pdf.png')).buffer.asUint8List()
+  );
+
+  final results = await controladorEgresados.consultarEgresadosR(yearEscolar);
+
+  final plantilla = pw.MultiPage(
+      header:(pw.Context context){
+        return pw.Column(children: [
+          pw.Image(cintillo),
+          pw.Row(
+            mainAxisAlignment:pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text('GRUPO ESCOLAR \"URIAPARA\"',style:pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text('COD. DEA OD05711012',style:pw.TextStyle(fontWeight: pw.FontWeight.bold))
+            ]
+          )
+        ]) ;
+      },
+      footer:(pw.Context context){
+        return pw.Center(
+          child:pw.Text('Dirección: Calle Prolongación Bolivar, Sector La Puente frente a la redoma, TLF: 0287752325 Barrancas del Orinoco',
+            style:pw.TextStyle(fontSize: 8)
+          )
+        );
+      },
+      pageFormat: PdfPageFormat.letter,
+      build: (pw.Context context){
+        return [
+          pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+          pw.Center(
+          child: pw.Column(
+            children:[
+              pw.Center(
+                child:pw.Text('EGRESADOS DEL AÑO ESCOLAR: $yearEscolar',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Center(
+                child:pw.Text('FECHA DE GRADUACIÓN: ${results![0].fechaGraduacion} TOTAL: ${results.length}',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Table.fromTextArray(
+                cellStyle:pw.TextStyle(fontSize:8.5),
+                headerStyle:pw.TextStyle(fontSize:8.5),
+                border: pw.TableBorder(horizontalInside: pw.BorderSide()),
+                data: [
+                  ['Graduando','Cedula','Representante','Cedula','Grado','Fecha de Nacimiento','Edad al graduarse'],
+                  ...results.map((egresado)=>[
+                   '${egresado.estudiante['nombres']} ${egresado.estudiante['apellidos']}', 
+                   '${egresado.estudiante['cedula']}', 
+                   '${egresado.representante['nombres']} ${egresado.representante['apellidos']}', 
+                   '${egresado.representante['cedula']}', 
+                   '${egresado.grado}° "${egresado.seccion}"', 
+                   '${egresado.estudiante['fecha_nacimiento']}', 
+                   '${egresado.estudiante['edad_al_graduarse']}', 
+                  ])
+                ]
+              ),
+            ]
+          )
+        )];
+      }
+    );
+
+    doc.addPage(plantilla);
+  try {
+    Directory? directorio = await getDownloadsDirectory();
+    String path = directorio!.path + '/sgca_ebu documentos/';
+    if(await Directory(path).exists() != true){
+      new Directory(path).createSync(recursive: true);
+      final File archivo = File(path + "Egresados $yearEscolar ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
+      archivo.writeAsBytesSync(await doc.save());
+      return true;
+    } else {
+      final File archivo = File(path + "Egresados $yearEscolar ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
+      archivo.writeAsBytesSync(await doc.save());
+      return true;
+    }
+  } catch (e) {
+    print(e);
+    return false;
+  }
+}
+
 Future<bool> generarDocumentoMatriculaDocentes() async {
   final pw.Document doc = pw.Document(); 
 
