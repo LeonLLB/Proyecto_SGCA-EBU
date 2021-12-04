@@ -1,3 +1,4 @@
+import 'package:proyecto_sgca_ebu/models/Matricula_Docente.dart';
 import 'package:proyecto_sgca_ebu/models/Usuarios.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -90,6 +91,29 @@ class _UsuariosControllers {
     final result = await db.query(Usuarios.tableName,where:'rol = ? AND cedula = ?',whereArgs:['A',cedulaAdmin]);
     if(closeDB){db.close();}
     return (result.length == 0) ? null : Usuarios.fromMap(result[0]); 
+  }
+
+  Future<int> actualizarDocente(Usuarios docenteNuevo) async {
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    final result = await db.update(Usuarios.tableName,docenteNuevo.toJson(),where:'rol = ? AND id = ?',whereArgs:['D',docenteNuevo.id]);
+    await db.close();
+    return result;
+  }
+
+  Future<int> eliminarDocente(int docenteID) async {
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    
+    final resultMatricula = await db.query(MatriculaDocente.tableName,where:'docenteID = ?',whereArgs:[docenteID]);
+
+    if(resultMatricula.length > 0){
+      await db.close();
+      return -1;
+    }
+    final result = await db.delete(Usuarios.tableName,where:'rol = ? AND id = ?',whereArgs:['D',docenteID]);
+    
+    await db.close();
+
+    return result;
   }
 
 }

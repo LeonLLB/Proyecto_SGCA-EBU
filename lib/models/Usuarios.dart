@@ -62,6 +62,7 @@ class Usuarios {
   });
 
   Usuarios.fromForm(Map<String,dynamic> usuario) :
+    id = usuario['id'],
     nombres = usuario['Nombres'],
     apellidos = usuario['Apellidos'],
     contrasena = usuario['Contraseña'],
