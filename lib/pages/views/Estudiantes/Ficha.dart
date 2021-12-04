@@ -18,6 +18,7 @@ import 'package:proyecto_sgca_ebu/models/Ficha_Estudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/models/Representante.dart';
 import 'package:proyecto_sgca_ebu/models/Matricula_Estudiante.dart';
+import 'package:proyecto_sgca_ebu/services/PDF.dart';
 
 class FichaEstudiantePage extends StatefulWidget {
   @override
@@ -165,8 +166,10 @@ class _FichaEstudiantePageState extends State<FichaEstudiantePage> {
                 return Form(
                   key: _formKeyEstudiante,
                   child: Column(children:[
-                    Row(
-                      mainAxisAlignment:MainAxisAlignment.spaceEvenly,
+                    Wrap(
+                      spacing:5,
+                      runSpacing:5,
+                      alignment:WrapAlignment.spaceEvenly,
                       children:[
                         ElevatedButton.icon(
                           onPressed: (){
@@ -221,7 +224,37 @@ class _FichaEstudiantePageState extends State<FichaEstudiantePage> {
                           },
                           icon: Icon(Icons.delete),
                           label: Text('Eliminar estudiante')
-                        )
+                        ),
+                        ElevatedButton(onPressed:(){
+                          ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+                            message:'Generando documento de ficha...',
+                            onVisible: () async {
+                              final bool seGenero = await generarDocumentoFicha(int.parse(controladoresEstudiante['Cedula'].text));
+                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                              if(seGenero){
+                                ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Se ha generado correctamente el documento, revise el directorio de descargas'));
+                              }else{
+                                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo generar el documento'));
+                              }
+                            }
+                            )
+                          );
+                        },child:Text('Generar PDF de Ficha')),
+                        ElevatedButton(onPressed:(){
+                          ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+                            message:'Generando boletin...',
+                            onVisible: () async {
+                              final bool seGenero = await generarBoletin(controladoresEstudiante['id']);
+                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                              if(seGenero){
+                                ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Se ha generado correctamente el boletin, revise el directorio de descargas'));
+                              }else{
+                                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo generar el boletin'));
+                              }
+                            }
+                            )
+                          );
+                        },child:Text('Generar PDF de Boletin')),
                       ]
                     ),
                     Padding(padding:EdgeInsets.symmetric(vertical:5)),

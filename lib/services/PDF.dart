@@ -8,10 +8,12 @@ import 'package:proyecto_sgca_ebu/controllers/Admin.dart';
 import 'package:proyecto_sgca_ebu/controllers/Egresados.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estadistica.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estudiante.dart';
+import 'package:proyecto_sgca_ebu/controllers/FichaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/controllers/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaDocente.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/controllers/Record.dart';
+import 'package:proyecto_sgca_ebu/controllers/RecordFicha.dart';
 import 'package:proyecto_sgca_ebu/helpers/calcularEdad.dart';
 import 'package:proyecto_sgca_ebu/helpers/getMonth.dart';
 import 'package:proyecto_sgca_ebu/models/Usuarios.dart';
@@ -605,6 +607,183 @@ Future<bool> generarDocumentoEstadistica(int ambienteID, int mes)async{
       return true;
     } else {
       final File archivo = File(path + "Estadistica ${ambiente!.grado}° ${ambiente.seccion} ${monthNumIntoString(mes)} ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
+      archivo.writeAsBytesSync(await doc.save());
+      return true;
+    }
+  } catch (e) {
+    print(e);
+    return false;
+  }
+
+}
+
+Future<bool> generarDocumentoFicha(int cedulaEstudiante) async{
+
+  final pw.Document doc = pw.Document(); 
+
+  final cintillo = pw.MemoryImage(
+    (await rootBundle.load('assets/Cintillo pdf.png')).buffer.asUint8List()
+  ); 
+
+  final ficha = await controladorFichaEstudiante.getFichaCompleta(cedulaEstudiante);
+  print(ficha);
+  final plantilla = pw.MultiPage(
+      header:(pw.Context context){
+        return pw.Column(children: [
+          pw.Image(cintillo),
+          pw.Row(
+            mainAxisAlignment:pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text('GRUPO ESCOLAR \"URIAPARA\"',style:pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text('COD. DEA OD05711012',style:pw.TextStyle(fontWeight: pw.FontWeight.bold))
+            ]
+          )
+        ]) ;
+      },
+      footer:(pw.Context context){
+        return pw.Center(
+          child:pw.Text('Dirección: Calle Prolongación Bolivar, Sector La Puente frente a la redoma, TLF: 0287752325 Barrancas del Orinoco',
+            style:pw.TextStyle(fontSize: 8)
+          )
+        );
+      },
+      pageFormat: PdfPageFormat.letter,
+      build: (pw.Context context){
+        return [
+          pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+          pw.Center(
+          child: pw.Column(
+            children:[
+              pw.Center(
+                child:pw.Text('FICHA DE INSCRIPCION: ${ficha!['nombres']} ${ficha['apellidos']}',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Center(
+                child:pw.Text('C.E: ${ficha['cedula']} FECHA DE NACIMIENTO: ${ficha['fecha_nacimiento']} EDAD ACTUAL: ${calcularEdad(ficha['fecha_nacimiento'])} AÑOS',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Center(
+                child:pw.Text('LUGAR DE NACIMIENTO ESTADO: ${ficha['estado_nacimiento']} CIUDAD: ${ficha['lugar_nacimiento']}',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Center(
+                child:pw.Text('DATOS ACTUALES',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Text('ALTURA: ${ficha['talla']}cm PESO: ${ficha['peso']}kg TIPO DE ESTUDIANTE: ${ficha['tipo_estudiante']}'),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Text('REPRESENTANTE: ${ficha['r.nombres']} ${ficha['r.apellidos']} C.I: ${ficha['r.cedula']} PARENTESCO: ${(ficha['r.parentesco'] == null) ? 'N/A': ficha['r.parentesco']}'),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Center(
+                child:pw.Text('INFORMACIÓN MEDICA',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Table.fromTextArray(
+                tableWidth:pw.TableWidth.min,
+                data:[
+                  ['Patología','Si','No'],
+                  ['Alergía',(ficha['alergia'] == 1)?'X':'',(ficha['alergia'] == 1)?'':'X'],
+                  ['Asma',(ficha['asma'] == 1)?'X':'',(ficha['asma'] == 1)?'':'X'],
+                  ['Respiratorio',(ficha['respiratorio'] == 1)?'X':'',(ficha['respiratorio'] == 1)?'':'X'],
+                  ['Cardiaco',(ficha['cardiaco'] == 1)?'X':'',(ficha['cardiaco'] == 1)?'':'X'],
+                  ['Tipaje',(ficha['tipaje'] == 1)?'X':'',(ficha['tipaje'] == 1)?'':'X'],
+                ]
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Text('DETALLES: ${ficha['detalles']}'),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Center(
+                child:pw.Text('CURSANDO ACTUALMENTE',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              (ficha['añoEscolar'] == null) ? pw.Text('No esta inscrito al año actual') : pw.Text('${ficha['grado']}° "${ficha['seccion']}" TURNO: ${(ficha['turno'] == 'M')?'Mañana':'Tarde'}'),
+              (ficha['añoEscolar'] != null && ficha['d.nombres'] != null)?pw.Text('DOCENTE: ${ficha['d.nombres']} ${ficha['d.apellidos']} C.I ${ficha['d.cedula']}'):pw.Text('Docente no asignado!'),
+            ]
+          )
+        )];
+      }
+    );
+
+    final records = await controladorRecordFicha.obtenerRecords(ficha!['e.id'] as int);
+
+    final plantilla2 = pw.MultiPage(
+      header:(pw.Context context){
+        return pw.Column(children: [
+          pw.Image(cintillo),
+          pw.Row(
+            mainAxisAlignment:pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text('GRUPO ESCOLAR \"URIAPARA\"',style:pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text('COD. DEA OD05711012',style:pw.TextStyle(fontWeight: pw.FontWeight.bold))
+            ]
+          )
+        ]) ;
+      },
+      footer:(pw.Context context){
+        return pw.Center(
+          child:pw.Text('Dirección: Calle Prolongación Bolivar, Sector La Puente frente a la redoma, TLF: 0287752325 Barrancas del Orinoco',
+            style:pw.TextStyle(fontSize: 8)
+          )
+        );
+      },
+      pageFormat: PdfPageFormat.letter,
+      build: (pw.Context context){
+        return [
+          pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+          pw.Center(
+          child: pw.Column(
+            children:[
+              pw.Center(
+                child:pw.Text('MEDIDAS ANTROPOMETICAS: ${ficha['nombres']} ${ficha['apellidos']}',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Center(
+                child:pw.Text('C.E: ${ficha['cedula']} FECHA DE NACIMIENTO: ${ficha['fecha_nacimiento']} EDAD ACTUAL: ${calcularEdad(ficha['fecha_nacimiento'])} AÑOS',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Center(
+                child:pw.Text('DATOS PASADOS',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Table.fromTextArray(
+                tableWidth:pw.TableWidth.min,
+                data: [
+                  ['Año Escolar','Edad','Altura','Peso'],
+                  ...records!.map((record)=>[
+                    record.yearEscolar,
+                    record.edad.toString() + ' Años',
+                    record.talla.toString() + 'cm',
+                    record.peso.toString() + 'kg'
+                  ]).toList()
+                ]
+              )  
+            ]
+          )
+        )];
+      }
+    );
+
+    doc.addPage(plantilla);
+    doc.addPage(plantilla2);
+  try {
+    Directory? directorio = await getDownloadsDirectory();
+    String path = directorio!.path + '/sgca_ebu documentos/';
+    if(await Directory(path).exists() != true){
+      new Directory(path).createSync(recursive: true);
+      final File archivo = File(path + "Ficha de inscripción ${ficha['nombres']} ${ficha['apellidos']} ${ficha['cedula']} ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
+      archivo.writeAsBytesSync(await doc.save());
+      return true;
+    } else {
+      final File archivo = File(path + "Ficha de inscripción ${ficha['nombres']} ${ficha['apellidos']} ${ficha['cedula']} ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
       archivo.writeAsBytesSync(await doc.save());
       return true;
     }

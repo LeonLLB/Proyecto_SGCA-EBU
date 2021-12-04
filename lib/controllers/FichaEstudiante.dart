@@ -12,7 +12,7 @@ class _FichaEstudianteController{
     
     final result = await db.rawQuery(FichaEstudiante.getFichaCompleta,[cedulaEscolar]);
     
-    db.close(); 
+    await db.close(); 
     if(result.length == 0) return null;
     return result[0];   
   }
