@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_sgca_ebu/components/Snackbars.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaDocente.dart';
+import 'package:proyecto_sgca_ebu/services/PDF.dart';
 
 class MatriculaDocente extends StatelessWidget {
 
@@ -14,40 +16,112 @@ class MatriculaDocente extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: controladorMatriculaDocente.obtenerMatriculaCompleta(),
-      initialData: [],
-      builder: (BuildContext context, AsyncSnapshot data) {
-        if(data.connectionState == ConnectionState.waiting){
-          return Center(child: CircularProgressIndicator());
-        }
-        else if(data.data == null){
-          return Center(child:Text('No hay matriculas, o no hay ambientes para las matriculas'));
-        }
-        else{
-          return Expanded(
-            child: ListView.separated(
-              itemCount:data.data.length,
-              itemBuilder: (_,i)=>ListTile(                
-                leading: CircleAvatar(
-                  backgroundColor: colorList[data.data[i]['grado']-1],
-                  child: Text(data.data[i]['grado'].toString()+'° ')
-                ),
-                title: Column(children:[
-                  Text('\"'+data.data[i]['seccion']+'\" ' + "${(data.data[i]['turno'] == 'M') ? 'Mañana' : 'Tarde'} "),
-                  (data.data[i]['id'] == null) ? Row(mainAxisAlignment:MainAxisAlignment.center,children:[
-                    Icon(Icons.warning,color:Colors.red),
-                    Text('  No hay docente para esta aula',style:TextStyle(color:Colors.red))
-                  ]) : Text('Docente: ' + data.data[i]['nombres'] + ' ' + data.data[i]['apellidos'] + ' '),
-                  (data.data[i]['id'] == null) ? SizedBox() : Text('Estudiantes: ' + ((data.data[i]['CantidadEstudiantes'] == null) ? '0' : data.data[i]['CantidadEstudiantes'].toString() )) 
-
-                ])
-              ),
-              separatorBuilder: (_,i)=> Divider(),
-            ),
-          );
-        }
-      }
+    return Expanded(
+      child: SingleChildScrollView(
+        child: FutureBuilder(
+          future: controladorMatriculaDocente.obtenerMatriculaCompleta(),
+          initialData: [],
+          builder: (BuildContext context, AsyncSnapshot data) {
+            if(data.connectionState == ConnectionState.waiting){
+              return Center(child: CircularProgressIndicator());
+            }
+            else if(data.data == null){
+              return Center(child:Text('No hay matriculas, o no hay ambientes para las matriculas'));
+            }
+            else{
+              return Column(
+                children: [
+                  ElevatedButton(onPressed: (){
+                    ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+                      message:'Generando documento de la matrícula de los docentes...',
+                      onVisible: () async {
+                        final bool seGenero = await generarDocumentoMatriculaDocentes();
+                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                        if(seGenero){
+                          ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Se ha generado correctamente el documento, revise el directorio de descargas'));
+                        }else{
+                          ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo generar el documento'));
+                        }
+                      }
+                      )
+                    );
+                  },child:Text('Generar PDF')),
+                  Padding(padding:EdgeInsets.symmetric(vertical: 5)),
+                  Table(
+                    border: TableBorder(horizontalInside: BorderSide(color:Colors.blue[200]!)),
+                    children:[
+                      TableRow(children:[
+                        TableCell(
+                          child:  Padding(
+                            padding: EdgeInsets.all(5),
+                            child: Center(child: Text('Aula')),
+                          )
+                        ),
+                        TableCell(
+                          child:  Padding(
+                            padding: EdgeInsets.all(5),
+                            child: Center(child: Text('Turno')),
+                          )
+                        ),
+                        TableCell(
+                          child:  Padding(
+                            padding: EdgeInsets.all(5),
+                            child: Center(child: Text('Docente')),
+                          )
+                        ),
+                        TableCell(
+                          child:  Padding(
+                            padding: EdgeInsets.all(5),
+                            child: Center(child: Text('Estudiantes')),
+                          )
+                        ),
+                      ]),
+                      ...data.data.map((matricula)=>TableRow(children:[
+                        TableCell(
+                          child:  Padding(
+                            padding: EdgeInsets.all(5),
+                            child: Center(child: Text('${matricula['grado']}° "${matricula['seccion']}"',style:TextStyle(backgroundColor:colorList[matricula['grado']-1]))),
+                          )
+                        ),
+                        TableCell(
+                          child:  Padding(
+                            padding: EdgeInsets.all(5),
+                            child: Center(child: Text('${(matricula['turno']) == 'M' ? 'Mañana' : 'Tarde'}')),
+                          )
+                        ),
+                        TableCell(
+                          child:  Padding(
+                            padding: EdgeInsets.all(5),
+                            child: Center(child: (matricula['id'] == null)?
+                              Wrap(
+                                alignment:WrapAlignment.center,
+                                children: [
+                                  Icon(Icons.warning,color:Colors.red),
+                                  Text('No hay docente para esta aula',style:TextStyle(color:Colors.red))
+                                ]):
+                              Text('${matricula['nombres']} ${matricula['apellidos']}')
+                            ),
+                          )
+                        ),
+                        TableCell(
+                          child:  Padding(
+                            padding: EdgeInsets.all(5),
+                            child: Center(child: (matricula['id'] == null)?
+                              SizedBox():
+                              Text('${matricula['CantidadEstudiantes']}')
+                            ),
+                          )
+                        ),
+                      ])).toList()
+                    ]
+                  ),
+                  Padding(padding:EdgeInsets.symmetric(vertical: 5)),                  
+                ],
+              );
+            }
+          }
+        ),
+      ),
     );
   }
 }
