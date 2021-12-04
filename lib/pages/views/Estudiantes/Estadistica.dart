@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_sgca_ebu/components/Snackbars.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estadistica.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/components/AmbientePicker.dart';
 import 'package:proyecto_sgca_ebu/components/MesPicker.dart';
+import 'package:proyecto_sgca_ebu/services/PDF.dart';
 
 class EstadisticaEstudiante extends StatefulWidget {
 
@@ -49,6 +51,24 @@ class _EstadisticaEstudianteState extends State<EstadisticaEstudiante> {
       Center(child:Text('Estadística de la asistencia',style:TextStyle(fontSize:18,fontWeight:FontWeight.bold))),
       Padding(padding:EdgeInsets.symmetric(vertical: 5)),
       _EstadisticaAsistencia(mes:mes,ambiente:ambiente),
+      Padding(padding:EdgeInsets.symmetric(vertical: 5)),
+      ElevatedButton(onPressed: (){
+        if (ambiente != null && mes != null) {
+          ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+            message:'Generando documento de estadistica...',
+            onVisible: () async {
+              final bool seGenero = await generarDocumentoEstadistica(ambiente!.id!,mes!);
+              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+              if(seGenero){
+                ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Se ha generado correctamente el documento, revise el directorio de descargas'));
+              }else{
+                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo generar el documento'));
+              }
+            }
+            )
+          );
+        }
+      }, child: Text('Generar PDF')),
       Padding(padding:EdgeInsets.symmetric(vertical: 5)),
     ])));
   }

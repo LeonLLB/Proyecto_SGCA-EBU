@@ -45,7 +45,7 @@ class _AsistenciaController {
     
     if(resultados.length == 0) return null;
 
-    db.close();
+    await db.close();
 
     return resultados;
   }

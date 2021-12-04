@@ -5,7 +5,9 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:proyecto_sgca_ebu/controllers/Egresados.dart';
+import 'package:proyecto_sgca_ebu/controllers/Estadistica.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estudiante.dart';
+import 'package:proyecto_sgca_ebu/controllers/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/controllers/Record.dart';
 import 'package:proyecto_sgca_ebu/helpers/getMonth.dart';
 import 'package:proyecto_sgca_ebu/models/Usuarios.dart';
@@ -208,6 +210,150 @@ Future<bool> generarBoletinR(int egresadoID) async{
 
 }
 
+Future<bool> generarDocumentoEstadistica(int ambienteID, int mes)async{
+
+  final pw.Document doc = pw.Document(); 
+
+  final cintillo = pw.MemoryImage(
+    (await rootBundle.load('assets/Cintillo pdf.png')).buffer.asUint8List()
+  ); 
+
+  final ambiente = await controladorAmbientes.obtenerAmbientePorID(ambienteID,false);
+  final resultsMatricula = await controladorEstadistica.getMatricula(ambienteID,mes,false);
+  final resultsClasificacion = await controladorEstadistica.getClasificacionEdadSexo(ambienteID,false);
+  final resultsAsistencia = await controladorEstadistica.getAsistencia(ambienteID, mes);
+
+
+  final plantilla = pw.MultiPage(
+      header:(pw.Context context){
+        return pw.Column(children: [
+          pw.Image(cintillo),
+          pw.Row(
+            mainAxisAlignment:pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text('GRUPO ESCOLAR \"URIAPARA\"',style:pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text('COD. DEA OD05711012',style:pw.TextStyle(fontWeight: pw.FontWeight.bold))
+            ]
+          )
+        ]) ;
+      },
+      footer:(pw.Context context){
+        return pw.Center(
+          child:pw.Text('Dirección: Calle Prolongación Bolivar, Sector La Puente frente a la redoma, TLF: 0287752325 Barrancas del Orinoco',
+            style:pw.TextStyle(fontSize: 8)
+          )
+        );
+      },
+      pageFormat: PdfPageFormat.letter,
+      build: (pw.Context context){
+        return [
+          pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:1)),
+          pw.Center(
+          child: pw.Column(
+            children:[
+              pw.Center(
+                child:pw.Text('ESTADISTICA DE ${ambiente!.grado}° "${ambiente.seccion}" MES: ${monthNumIntoString(mes)}',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:1)),
+              pw.Center(
+                child:pw.Text('Estadística de la matrícula',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:1)),
+              pw.Table.fromTextArray(
+                border: pw.TableBorder(horizontalInside: pw.BorderSide()),
+                data: [
+                  ['','Varones','Hembras','Total'],
+                  ['Días habiles',resultsMatricula!['Dias Habiles']!['V'],resultsMatricula['Dias Habiles']!['V'],resultsMatricula['Dias Habiles']!['V']],
+                  ['Matrícula',resultsMatricula['Matricula']!['V'],resultsMatricula['Matricula']!['H'],resultsMatricula['Matricula']!['T']],
+                  ['1° Día del mes',resultsMatricula['1° Dia']!['V'],resultsMatricula['1° Dia']!['H'],resultsMatricula['1° Dia']!['T']],
+                  ['Egresos',resultsMatricula['Egresos']!['V'],resultsMatricula['Egresos']!['H'],resultsMatricula['Egresos']!['T']],
+                  ['Ingresos',resultsMatricula['Ingresos']!['V'],resultsMatricula['Ingresos']!['H'],resultsMatricula['Ingresos']!['T']],
+                  ['Matrícula final',resultsMatricula['Matricula Final']!['V'],resultsMatricula['Matricula Final']!['H'],resultsMatricula['Matricula Final']!['T']],
+                ]
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:1)),
+              pw.Center(
+                child:pw.Text('Clasificación por edad y sexo',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:1)),
+              pw.Table.fromTextArray(
+                border: pw.TableBorder(horizontalInside: pw.BorderSide()),
+                data: [
+                  ['Edad','Varones','Hembras','Total'],
+                  ...resultsClasificacion![0].map((clafGeneral) => [
+                    (clafGeneral['edad'] == null) ? 'TOTAL' : clafGeneral['edad'],
+                    (clafGeneral['edad'] == null) ? clafGeneral['TV'] : clafGeneral['V'],
+                    (clafGeneral['edad'] == null) ? clafGeneral['TH'] : clafGeneral['H'],
+                    (clafGeneral['edad'] == null) ? clafGeneral['TT'] : clafGeneral['T']
+                  ]).toList()
+                ]
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:1)),
+              pw.Center(
+                child:pw.Text('Clasificación de los repitientes',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:1)),
+              pw.Table.fromTextArray(
+                border: pw.TableBorder(horizontalInside: pw.BorderSide()),
+                data: [
+                  ['Edad','Varones','Hembras','Total'],
+                  ...resultsClasificacion[1].map((clafGeneral) => [
+                    (clafGeneral['edad'] == null) ? 'TOTAL' : clafGeneral['edad'],
+                    (clafGeneral['edad'] == null) ? clafGeneral['TV'] : clafGeneral['V'],
+                    (clafGeneral['edad'] == null) ? clafGeneral['TH'] : clafGeneral['H'],
+                    (clafGeneral['edad'] == null) ? clafGeneral['TT'] : clafGeneral['T']
+                  ]).toList()
+                ]
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:1)),
+              pw.Center(
+                child:pw.Text('Estadística de la asistencia',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:1)),
+              pw.Table.fromTextArray(
+                border: pw.TableBorder(horizontalInside: pw.BorderSide()),
+                data: [
+                  ['','Varones','Hembras','Total'],
+                  ['Total de asistencias',resultsAsistencia!['Total']!['V'],resultsAsistencia['Total']!['H'],resultsAsistencia['Total']!['T']],
+                  ['Media',resultsAsistencia['Media']!['V'].toStringAsFixed(2),resultsAsistencia['Media']!['H'].toStringAsFixed(2),resultsAsistencia['Media']!['T'].toStringAsFixed(2)],
+                  ['Porcentaje',
+                    ((resultsAsistencia['Porcentaje']!['V'].toStringAsFixed(2) == 'NaN') ? '0.00' : resultsAsistencia['Porcentaje']!['V'].toStringAsFixed(2)) + '%',
+                    ((resultsAsistencia['Porcentaje']!['H'].toStringAsFixed(2) == 'NaN') ? '0.00' : resultsAsistencia['Porcentaje']!['H'].toStringAsFixed(2)) + '%',
+                    ((resultsAsistencia['Porcentaje']!['T'].toStringAsFixed(2) == 'NaN') ? '0.00' : resultsAsistencia['Porcentaje']!['T'].toStringAsFixed(2)) + '%'
+                  ],
+                ]
+              ),
+            ]
+          )
+        )];
+      }
+    );
+
+    doc.addPage(plantilla);
+  try {
+    Directory? directorio = await getDownloadsDirectory();
+    String path = directorio!.path + '/sgca_ebu documentos/';
+    if(await Directory(path).exists() != true){
+      new Directory(path).createSync(recursive: true);
+      final File archivo = File(path + "Estadistica ${ambiente!.grado}° ${ambiente.seccion} ${monthNumIntoString(mes)} ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
+      archivo.writeAsBytesSync(await doc.save());
+      return true;
+    } else {
+      final File archivo = File(path + "Estadistica ${ambiente!.grado}° ${ambiente.seccion} ${monthNumIntoString(mes)} ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
+      archivo.writeAsBytesSync(await doc.save());
+      return true;
+    }
+  } catch (e) {
+    print(e);
+    return false;
+  }
+
+}
 
 Future<bool> generarBoletin(int estudianteID) async{
 

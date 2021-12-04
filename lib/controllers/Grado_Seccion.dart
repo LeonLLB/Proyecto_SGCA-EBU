@@ -88,6 +88,18 @@ class _AmbientesController{
     return (listaDeAmbientes.length == 0 ) ? null : listaDeAmbientes;
   }
 
+  Future<Ambiente?> obtenerAmbientePorID(int id,[bool closeDB = true]) async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final result = await db.query(Ambiente.tableName,where:'id = ?',whereArgs:[id]);
+
+    if(closeDB){db.close();}
+
+    if(result.length == 0) return null;
+
+    return Ambiente.fromMap(result[0]);
+  }
+
   Future<List<Ambiente>?> obtenerGrados()async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 

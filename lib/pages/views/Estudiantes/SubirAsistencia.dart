@@ -48,8 +48,8 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
 
       //PASO 2: SACAR LOS DIAS HABILES
       for(var i = 1; i <= 31; i++){
-        final yearEscolar = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR');
-
+        final yearEscolar = await controladorAdmin.obtenerOpcion('AÑO_ESCOLAR',false);
+        
         final fechaActual = DateTime((mes! >= 6) ? (int.parse(yearEscolar!.valor.split('-')[0])) : (int.parse(yearEscolar!.valor.split('-')[1])),mes!,i);
         
         if(fechaActual.month != mes!){
@@ -90,13 +90,13 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
       }
 
       //PARA LA ASISTENCIA DE LOS ESTUDIANTES
-      controladorEstadistica.cambiarDiasHabiles(ambiente!.id!, mes!, diasDelMesHabiles.where((dia) => dia != null).toList().length);
+      await controladorEstadistica.cambiarDiasHabiles(ambiente!.id!, mes!, diasDelMesHabiles.where((dia) => dia != null).toList().length);
 
       listaAsistenciasSeccion = [];   
       //PASO 3: POR CADA ESTUDIANTE, DEBE TENER SU ASISTENCIA MENSUAL
 
       if(diasDelMesNoHabiles.length > 0 && diasDelMesNoHabiles != mementoDiasDelMesNoHabiles){
-        controladorAsistencia.eliminarAsistencias(mes!,ambiente!.id!,diasDelMesNoHabiles);
+        await controladorAsistencia.eliminarAsistencias(mes!,ambiente!.id!,diasDelMesNoHabiles);
         mementoDiasDelMesNoHabiles = diasDelMesNoHabiles;
       }
 
