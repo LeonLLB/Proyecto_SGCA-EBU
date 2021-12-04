@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_sgca_ebu/components/AmbientePicker.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
+import 'package:proyecto_sgca_ebu/components/Snackbars.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/helpers/calcularEdad.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
+import 'package:proyecto_sgca_ebu/services/PDF.dart';
 
 class MatriculaEstudiante extends StatefulWidget {
 
@@ -133,7 +135,26 @@ class _MatriculaEstudianteState extends State<MatriculaEstudiante> {
                         ]
                       )).toList()
                     ]
-                  )
+                  ),
+                  Padding(padding:EdgeInsets.symmetric(vertical: 5)),
+                  ElevatedButton(onPressed: (){
+                    if (ambiente != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
+                        message:'Generando documento de la matrícula de los estudiantes...',
+                        onVisible: () async {
+                          final bool seGenero = await generarDocumentoMatriculaEstudiantes(ambiente!.id!);
+                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                          if(seGenero){
+                            ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Se ha generado correctamente el documento, revise el directorio de descargas'));
+                          }else{
+                            ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se pudo generar el documento'));
+                          }
+                        }
+                        )
+                      );
+                    }
+                  }, child: Text('Generar PDF')),
+                  Padding(padding:EdgeInsets.symmetric(vertical: 5)),
                 ]);
               }
             },

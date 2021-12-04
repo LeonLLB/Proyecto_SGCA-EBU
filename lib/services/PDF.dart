@@ -8,7 +8,9 @@ import 'package:proyecto_sgca_ebu/controllers/Egresados.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estadistica.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estudiante.dart';
 import 'package:proyecto_sgca_ebu/controllers/Grado_Seccion.dart';
+import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/controllers/Record.dart';
+import 'package:proyecto_sgca_ebu/helpers/calcularEdad.dart';
 import 'package:proyecto_sgca_ebu/helpers/getMonth.dart';
 import 'package:proyecto_sgca_ebu/models/Usuarios.dart';
 
@@ -200,6 +202,93 @@ Future<bool> generarBoletinR(int egresadoID) async{
       return true;
     } else {
       final File archivo = File(path + "Boletin egresado ${egresado!.estudiante['nombres']} ${egresado.estudiante['apellidos']} ${egresado.estudiante['cedula']} ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
+      archivo.writeAsBytesSync(await doc.save());
+      return true;
+    }
+  } catch (e) {
+    print(e);
+    return false;
+  }
+
+}
+
+Future<bool> generarDocumentoMatriculaEstudiantes(int ambienteID) async {
+  
+  final pw.Document doc = pw.Document(); 
+
+  final cintillo = pw.MemoryImage(
+    (await rootBundle.load('assets/Cintillo pdf.png')).buffer.asUint8List()
+  );
+  
+  List<Map<String,Object?>>? matricula = await controladorMatriculaEstudiante.getMatricula(ambienteID);
+
+  final plantilla = pw.MultiPage(
+      header:(pw.Context context){
+        return pw.Column(children: [
+          pw.Image(cintillo),
+          pw.Row(
+            mainAxisAlignment:pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text('GRUPO ESCOLAR \"URIAPARA\"',style:pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+              pw.Text('COD. DEA OD05711012',style:pw.TextStyle(fontWeight: pw.FontWeight.bold))
+            ]
+          )
+        ]) ;
+      },
+      footer:(pw.Context context){
+        return pw.Center(
+          child:pw.Text('Dirección: Calle Prolongación Bolivar, Sector La Puente frente a la redoma, TLF: 0287752325 Barrancas del Orinoco',
+            style:pw.TextStyle(fontSize: 8)
+          )
+        );
+      },
+      pageFormat: PdfPageFormat.letter,
+      build: (pw.Context context){
+        return [
+          pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+          pw.Center(
+          child: pw.Column(
+            children:[
+              pw.Center(
+                child:pw.Text('MATRICULA DE ${matricula![0]['grado']}° "${matricula[0]['seccion']}" TURNO: ${(matricula[0]['turno'] == 'M') ? 'Mañana' : 'Tarde'} AÑO ESCOLAR: ${matricula[0]['añoEscolar']}',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Center(
+                child:pw.Text('DOCENTE: ${matricula[0]['docente.nombres']} ${matricula[0]['docente.apellidos']} ESTUDIANTES: ${matricula[0]['CantidadEstudiantes']}',
+                style:pw.TextStyle(fontWeight:pw.FontWeight.bold,decoration: pw.TextDecoration.underline))
+              ),
+              pw.Padding(padding:pw.EdgeInsets.symmetric(vertical:5)),
+              pw.Table.fromTextArray(
+                border: pw.TableBorder(horizontalInside: pw.BorderSide()),
+                data: [
+                  ['Nombres','Apellidos','Cedula Escolar','Fecha de Nacimiento','Edad'],
+                  ...matricula.map((estudiante)=>[
+                    estudiante['estudiante.nombres'],
+                    estudiante['estudiante.apellidos'],
+                    estudiante['cedula'],
+                    estudiante['fecha_nacimiento'],
+                    calcularEdad(estudiante['fecha_nacimiento']).toString()  + ' años'
+                  ])
+                ]
+              ),
+            ]
+          )
+        )];
+      }
+    );
+
+    doc.addPage(plantilla);
+  try {
+    Directory? directorio = await getDownloadsDirectory();
+    String path = directorio!.path + '/sgca_ebu documentos/';
+    if(await Directory(path).exists() != true){
+      new Directory(path).createSync(recursive: true);
+      final File archivo = File(path + "Matrícula ${matricula![0]['grado']}° ${matricula[0]['seccion']} ${matricula[0]['añoEscolar']} ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
+      archivo.writeAsBytesSync(await doc.save());
+      return true;
+    } else {
+      final File archivo = File(path + "Matrícula ${matricula![0]['grado']}° ${matricula[0]['seccion']} ${matricula[0]['añoEscolar']} ${DateTime.now().toIso8601String().split('T')[0]}.pdf");
       archivo.writeAsBytesSync(await doc.save());
       return true;
     }
