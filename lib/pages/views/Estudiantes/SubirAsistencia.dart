@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_sgca_ebu/Providers/SessionProvider.dart';
 import 'package:proyecto_sgca_ebu/components/AmbientePicker.dart';
 import 'package:proyecto_sgca_ebu/components/MesPicker.dart';
 import 'package:proyecto_sgca_ebu/components/Snackbars.dart';
@@ -8,6 +10,7 @@ import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
 import 'package:proyecto_sgca_ebu/controllers/Admin.dart';
 import 'package:proyecto_sgca_ebu/controllers/Asistencia.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estadistica.dart';
+import 'package:proyecto_sgca_ebu/controllers/MatriculaDocente.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaEstudiante.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/models/Asistencia.dart';
@@ -35,9 +38,18 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
   TextEditingController controllerDiasNoHabiles = TextEditingController();
 
 
-  Future<List<Map<String,Object?>>?> dualChange () async {
+  Future<List<Map<String,Object?>>?> dualChange (BuildContext context) async {
     diasDelMesNoHabiles = [];
     diasDelMesHabiles = [];   
+
+    //PASO 0: IDENTIFICAR EL CASO
+    final session = Provider.of<SessionProvider>(context,listen:false).usuario;
+    if(session.rol == 'D'){
+      final ambienteDocente = await controladorMatriculaDocente.obtenerAmbienteAsignado(session.id);
+      if(ambienteDocente == null) return null; 
+      ambiente = ambienteDocente;
+      matriculaSeleccionada = await controladorMatriculaEstudiante.getMatricula(ambienteDocente.id);
+    }
 
     if(matriculaSeleccionada != null && mes != null){
 
@@ -145,19 +157,19 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
 
   @override
   Widget build(BuildContext context) {
-
+    final session = Provider.of<SessionProvider>(context,listen:false).usuario;
     return Expanded(
       child: SingleChildScrollView(
         child:Column(children: [
           Row(
             mainAxisAlignment:MainAxisAlignment.spaceEvenly,
             children: [
-              AmbientePicker(onChange: (ambienteSeleccionado)async{
+              (session.rol=='A')?AmbientePicker(onChange: (ambienteSeleccionado)async{
                 ambiente = ambienteSeleccionado;
                 matriculaSeleccionada = await controladorMatriculaEstudiante.getMatricula(ambiente!.id);
                                 
                 setState((){});
-              }),
+              }):SizedBox(),
               MesPicker(onChange: (mesSeleccionado){
                 mes = mesSeleccionado!;
                 
@@ -185,7 +197,7 @@ class _SubirAsistenciaEstudianteState extends State<SubirAsistenciaEstudiante> {
           //BOTON PARA ACTUALIZAR
           Padding(padding:EdgeInsets.symmetric(vertical: 5)),
           FutureBuilder(
-            future: dualChange(),
+            future: dualChange(context),
             builder: (BuildContext context, AsyncSnapshot data) {
               if(data.connectionState == ConnectionState.waiting){
                 return Center(child: CircularProgressIndicator());

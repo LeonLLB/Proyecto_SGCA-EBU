@@ -27,7 +27,7 @@ class _RendimientoController{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     final result = await db.query(Rendimiento.tableName, where: 'matricula_estudianteID = ?',whereArgs: [matriculaID]);
 
-    if(closeDB){db.close();}
+    if(closeDB){await db.close();}
     if(result.length == 0) return null;
     return Rendimiento.fromMap(result[0]);
   }

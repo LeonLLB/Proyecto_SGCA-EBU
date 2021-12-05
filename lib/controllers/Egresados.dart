@@ -40,15 +40,12 @@ class _EgresadosController{
     final egresados = await dbMain.rawQuery(Egresado.getEgresadosActuales);
 
     String sqlWhere = '';
-    String sqlEstudiantes = '';
 
     for (var i = 0; i < egresados.length; i++) {
       if(i == egresados.length - 1){
         sqlWhere = sqlWhere + ' estudianteID = ? ';
-        sqlEstudiantes = sqlEstudiantes + ' id = ? ';
       }else{
         sqlWhere = sqlWhere + ' estudianteID = ? OR';
-        sqlEstudiantes = sqlEstudiantes + ' id = ? OR';
       }
     }    
 
@@ -57,7 +54,7 @@ class _EgresadosController{
     await dbMain.delete(Egresado.tableName);
     await dbMain.delete(Record.tableName,where:sqlWhere,whereArgs:[...egresados.map((e)=>e['id']).toList()]);
     await dbMain.delete(Estudiante.tableName,where:sqlWhere,whereArgs:[...egresados.map((e)=>e['id']).toList()]);
-
+    await dbMain.delete(EstudianteURepresentante.tableName,where:sqlWhere,whereArgs:[...egresados.map((e)=>e['id']).toList()]);
 
     await dbMain.close();
     final dbBackup = await databaseFactoryFfi.openDatabase('sgca-ebu-database-egresados.db');

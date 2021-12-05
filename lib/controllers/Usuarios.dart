@@ -86,7 +86,8 @@ class _UsuariosControllers {
     return (result.length == 0) ? null : Usuarios.fromMap(result[0]);  
   }
 
-  Future<Usuarios?> buscarAdmin(int cedulaAdmin,[bool closeDB = true]) async {
+  Future<Usuarios?> buscarAdmin(int? cedulaAdmin,[bool closeDB = true]) async {
+    if(cedulaAdmin == null) return null;
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     final result = await db.query(Usuarios.tableName,where:'rol = ? AND cedula = ?',whereArgs:['A',cedulaAdmin]);
     if(closeDB){db.close();}
@@ -110,6 +111,29 @@ class _UsuariosControllers {
       return -1;
     }
     final result = await db.delete(Usuarios.tableName,where:'rol = ? AND id = ?',whereArgs:['D',docenteID]);
+    
+    await db.close();
+
+    return result;
+  }
+
+  Future<int> actualizarAdministrador(Usuarios adminNuevo) async {
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    final result = await db.update(Usuarios.tableName,adminNuevo.toJson(),where:'rol = ? AND id = ?',whereArgs:['A',adminNuevo.id]);
+    await db.close();
+    return result;
+  }
+
+  Future<int> eliminarAdministrador(int adminID) async {
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    
+    final resultCantidad = await db.query(Usuarios.tableName,where:'rol = ?',whereArgs:['A']);
+
+    if(resultCantidad.length == 1){
+      await db.close();
+      return -1;
+    }
+    final result = await db.delete(Usuarios.tableName,where:'rol = ? AND id = ?',whereArgs:['A',adminID]);
     
     await db.close();
 

@@ -15,6 +15,8 @@ class HomeMenu extends StatelessWidget {
   final ScrollController controller = ScrollController();
   @override
   Widget build(BuildContext context) {
+    final session = Provider.of<SessionProvider>(context,listen:false).usuario;
+
     return ChangeNotifierProvider(
       create: (_) => PageProvider() ,
       child: UI(
@@ -27,31 +29,7 @@ class HomeMenu extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border(right: BorderSide(color:Colors.grey,width:2)),/* (color: Color(0xff7C83FD), width: 4) */
               ),
-              child:ListView(controller:controller,children: [
-                CustomSideBarItem(icon: Icons.home, label: 'Principal', route: '/home'),
-                CustomSideBarItem(icon: Icons.face, label: 'Estudiantes', route: '-estudiantes'),
-                CustomSideBarItem(icon: Icons.assignment_ind, label: 'Docentes', route: '-docentes'),
-                CustomSideBarItem(icon: Icons.supervisor_account, label: 'Representantes', route: '-representantes'),
-                CustomSideBarItem(icon: Icons.school, label: 'Egresados', route: '-egresados'),
-                CustomSideBarItem(icon: Icons.settings, label: 'Administrativo y configuración', route: '-admin'),
-                ListTile(
-                  leading:Icon(Icons.vpn_key,color:Colors.black),
-                  title:Text('Cerrar sesión',style:TextStyle(color: Colors.black)),onTap:(){
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      loadingSnackbar(
-                        message: 'Cerrando sesión...',
-                        onVisible:(){
-                          Provider.of<SessionProvider>(context,listen:false).isLogged = false;
-                          Provider.of<SessionProvider>(context,listen:false).usuario = null;
-                          Navigator.pushReplacement(context, toPage('/login'));
-                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                          ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Sesión cerrada con exito!'));
-                        }
-                        )
-                      );
-                })
-              ])
+              child:(session.rol == 'A')?AdminSideBar(controller: controller):DocenteSideBar(controller: controller)
             ),
             Expanded(child: 
               Container(
@@ -70,5 +48,75 @@ class HomeMenu extends StatelessWidget {
         )
         ),
     );
+  }
+}
+
+class AdminSideBar extends StatelessWidget {
+  const AdminSideBar({
+    required this.controller,
+  });
+
+  final ScrollController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(controller:controller,children: [
+      CustomSideBarItem(icon: Icons.home, label: 'Principal', route: '/home'),
+      CustomSideBarItem(icon: Icons.face, label: 'Estudiantes', route: '-estudiantes'),
+      CustomSideBarItem(icon: Icons.assignment_ind, label: 'Docentes', route: '-docentes'),
+      CustomSideBarItem(icon: Icons.supervisor_account, label: 'Representantes', route: '-representantes'),
+      CustomSideBarItem(icon: Icons.school, label: 'Egresados', route: '-egresados'),
+      CustomSideBarItem(icon: Icons.settings, label: 'Administrativo y configuración', route: '-admin'),
+      ListTile(
+        leading:Icon(Icons.vpn_key,color:Colors.black),
+        title:Text('Cerrar sesión',style:TextStyle(color: Colors.black)),onTap:(){
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            loadingSnackbar(
+              message: 'Cerrando sesión...',
+              onVisible:(){
+                Provider.of<SessionProvider>(context,listen:false).isLogged = false;
+                Provider.of<SessionProvider>(context,listen:false).usuario = null;
+                Navigator.pushReplacement(context, toPage('/login'));
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Sesión cerrada con exito!'));
+              }
+              )
+            );
+      })
+    ]);
+  }
+}
+
+class DocenteSideBar extends StatelessWidget {
+  const DocenteSideBar({
+    required this.controller,
+  });
+
+  final ScrollController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(controller:controller,children: [
+      CustomSideBarItem(icon: Icons.home, label: 'Principal', route: '/home'),
+      CustomSideBarItem(icon: Icons.face, label: 'Estudiantes', route: '-estudiantes'),      
+      ListTile(
+        leading:Icon(Icons.vpn_key,color:Colors.black),
+        title:Text('Cerrar sesión',style:TextStyle(color: Colors.black)),onTap:(){
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            loadingSnackbar(
+              message: 'Cerrando sesión...',
+              onVisible:(){
+                Provider.of<SessionProvider>(context,listen:false).isLogged = false;
+                Provider.of<SessionProvider>(context,listen:false).usuario = null;
+                Navigator.pushReplacement(context, toPage('/login'));
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Sesión cerrada con exito!'));
+              }
+              )
+            );
+      })
+    ]);
   }
 }

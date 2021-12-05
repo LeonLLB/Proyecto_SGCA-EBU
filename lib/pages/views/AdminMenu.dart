@@ -14,6 +14,12 @@ class AdminMenu extends StatelessWidget {
             SubMenuItem(icon: Icons.assignment, label: 'Ver ambientes',route:'-admin/vergrados'),            
             SubMenuItem(icon: Icons.calendar_today,label: 'Actualizar año escolar',route:'-admin/cambiarañoescolar')
           ]),
+          Row(
+            mainAxisAlignment:MainAxisAlignment.spaceEvenly,
+            children: [
+            SubMenuItem(icon: Icons.person_add, label: 'Inscribir administrador',route:'-admin/inscribiradmin'),
+            SubMenuItem(icon: Icons.edit, label: 'Gestionar administrador',route:'-admin/gestionaradmin'),
+          ]),
       ])
     );
   }

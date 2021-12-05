@@ -35,3 +35,5 @@ export 'package:proyecto_sgca_ebu/pages/views/Egresados/EgresadosActuales.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Admin/InscribirGrado.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Admin/VerGrados.dart';
 export 'package:proyecto_sgca_ebu/pages/views/Admin/CambiarAñoEscolar.dart';
+export 'package:proyecto_sgca_ebu/pages/views/Admin/InscribirAdmin.dart';
+export 'package:proyecto_sgca_ebu/pages/views/Admin/ModificarAdmin.dart';

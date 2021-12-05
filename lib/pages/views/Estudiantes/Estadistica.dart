@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_sgca_ebu/Providers/SessionProvider.dart';
 import 'package:proyecto_sgca_ebu/components/Snackbars.dart';
 import 'package:proyecto_sgca_ebu/controllers/Estadistica.dart';
+import 'package:proyecto_sgca_ebu/controllers/MatriculaDocente.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/components/AmbientePicker.dart';
 import 'package:proyecto_sgca_ebu/components/MesPicker.dart';
@@ -20,15 +23,16 @@ class _EstadisticaEstudianteState extends State<EstadisticaEstudiante> {
   
   @override
   Widget build(BuildContext context) {
+    final session = Provider.of<SessionProvider>(context,listen:false).usuario;
     return Expanded(child:SingleChildScrollView(child:Column(children: [
       Row(
         mainAxisAlignment:MainAxisAlignment.spaceEvenly,
         children: [
-          AmbientePicker(onChange: (ambienteSeleccionado)async{
+          (session.rol == 'A')?AmbientePicker(onChange: (ambienteSeleccionado)async{
             ambiente = ambienteSeleccionado;
 
             setState((){});
-          }),
+          }):SizedBox(),
           MesPicker(onChange: (mesSeleccionado){
             mes = mesSeleccionado!;
             
@@ -81,8 +85,21 @@ class _EstadisticaMatricula extends StatelessWidget {
 
   _EstadisticaMatricula({required this.ambiente, required this.mes});
 
-  Future<dynamic> onLoad()async{
-    if(ambiente == null || mes == null) return null; 
+  Future<dynamic> onLoad(BuildContext context)async{
+    final session = Provider.of<SessionProvider>(context,listen:false).usuario;
+
+    if(session.rol == 'D'){
+      if(mes == null) return null;
+      final ambienteDocente = await controladorMatriculaDocente.obtenerAmbienteAsignado(session.id,false);
+      if(ambienteDocente == null) return null; 
+      final results = await controladorEstadistica.getMatricula(ambienteDocente.id,mes,false);
+    
+      return results;
+
+    }
+
+    if(ambiente == null || mes == null) return null;
+    
     final results = await controladorEstadistica.getMatricula(ambiente!.id,mes,false);
     
     return results;
@@ -91,7 +108,7 @@ class _EstadisticaMatricula extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: onLoad(),
+      future: onLoad(context),
       builder: (BuildContext context, AsyncSnapshot data) {
         if(data.connectionState == ConnectionState.waiting){
           return Center(child: CircularProgressIndicator());
@@ -300,7 +317,17 @@ class _ClasificacionEdadSexo extends StatelessWidget {
 
   _ClasificacionEdadSexo({required this.ambiente, required this.mes});
 
-  Future<dynamic> onLoad()async{
+  Future<dynamic> onLoad(BuildContext context)async{
+    final session = Provider.of<SessionProvider>(context,listen:false).usuario;
+
+    if(session.rol == 'D'){
+      final ambienteDocente = await controladorMatriculaDocente.obtenerAmbienteAsignado(session.id,false);
+      if(ambienteDocente == null) return null; 
+      final results = await controladorEstadistica.getClasificacionEdadSexo(ambienteDocente.id,false);
+    
+      return results;
+    }
+
     if(ambiente == null) return null; 
     final results = await controladorEstadistica.getClasificacionEdadSexo(ambiente!.id,false);
     
@@ -310,7 +337,7 @@ class _ClasificacionEdadSexo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: onLoad(),
+      future: onLoad(context),
       builder: (BuildContext context, AsyncSnapshot data) {
         if(data.connectionState == ConnectionState.waiting){
           return Center(child: CircularProgressIndicator());
@@ -379,7 +406,7 @@ class _ClasificacionEdadSexo extends StatelessWidget {
                 ]
               ),
               Padding(padding:EdgeInsets.symmetric(vertical: 5)),
-              Center(child:Text('Clasificación por edad y sexo',style:TextStyle(fontSize:18,fontWeight:FontWeight.bold))),
+              Center(child:Text('Clasificación de repitientes',style:TextStyle(fontSize:18,fontWeight:FontWeight.bold))),
               Padding(padding:EdgeInsets.symmetric(vertical: 5)),
               Table(
                 border: TableBorder(horizontalInside: BorderSide(color:Colors.blue[200]!)),
@@ -453,14 +480,23 @@ class _EstadisticaAsistencia extends StatelessWidget {
 
   _EstadisticaAsistencia({required this.ambiente, required this.mes});
 
-  Future<dynamic> onLoad()async{
+  Future<dynamic> onLoad(BuildContext context)async{
+    final session = Provider.of<SessionProvider>(context,listen:false).usuario;
+    if(session.rol=='D'){
+      if(mes == null) return null;
+      final ambienteDocente = await controladorMatriculaDocente.obtenerAmbienteAsignado(session.id,false);
+      if(ambienteDocente == null) return null; 
+      final results = await controladorEstadistica.getAsistencia(ambienteDocente.id,mes);
+    
+      return results;
+    }
     return await controladorEstadistica.getAsistencia(ambiente?.id, mes);
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: onLoad(),
+      future: onLoad(context),
       builder: (BuildContext context, AsyncSnapshot data) {
         if(data.connectionState == ConnectionState.waiting){
           return Center(child: CircularProgressIndicator());

@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_sgca_ebu/pages/index.dart';
 
 final Map<String, Widget> routes = {
-  '/login'                    :LoginPage(),
-  '/registrar'                :RegisterPage(),
-  '/home'                     :HomeMenu(),
-  '-estudiantes'              :EstudiantesMenu(),
-  '-docentes'                 :DocentesMenu(),
-  '-representantes'           :RepresentantesMenu(),
-  '-egresados'                :EgresadosMenu(),
-  '-admin'                    :AdminMenu(),
+  '/login'                      :LoginPage(),
+  '/registrar'                  :RegisterPage(),
+  '/home'                       :HomeMenu(),
+  '-estudiantes'                :EstudiantesMenu(),
+  '-docentes'                   :DocentesMenu(),
+  '-representantes'             :RepresentantesMenu(),
+  '-egresados'                  :EgresadosMenu(),
+  '-admin'                      :AdminMenu(),
 
   '-estudiantes/inscribir'      :InscribirEstudiante(),
   '-estudiantes/fichaestudiante':FichaEstudiantePage(),
@@ -22,23 +22,25 @@ final Map<String, Widget> routes = {
   '-estudiantes/constancia'     :EstudianteGenerarConstancia(),
   '-estudiantes/retiro'         :RetiroEstudiante(),
 
-  '-docentes/inscribir'       :InscribirDocente(),
-  '-docentes/actualizar'      :ActualizarDocente(),
-  '-docentes/buscar'          :BuscarDocente(),
-  '-docentes/matricula'       :MatriculaDocente(),
-  '-docentes/asignar'         :AsignarDocente(),
+  '-docentes/inscribir'         :InscribirDocente(),
+  '-docentes/actualizar'        :ActualizarDocente(),
+  '-docentes/buscar'            :BuscarDocente(),
+  '-docentes/matricula'         :MatriculaDocente(),
+  '-docentes/asignar'           :AsignarDocente(),
 
-  '-representantes/inscribir' :InscribirRepresentante(),
-  '-representantes/actualizar':ActualizarRepresentante(),
-  '-representantes/buscar'    :BuscarRepresentante(),
-  '-representantes/visualizar':VisualizarRepresentante(),
+  '-representantes/inscribir'   :InscribirRepresentante(),
+  '-representantes/actualizar'  :ActualizarRepresentante(),
+  '-representantes/buscar'      :BuscarRepresentante(),
+  '-representantes/visualizar'  :VisualizarRepresentante(),
 
-  '-egresados/nuevos'         :EgresadosNuevos(),
-  '-egresados/consulta'       :EgresadosConsulta(),
+  '-egresados/nuevos'           :EgresadosNuevos(),
+  '-egresados/consulta'         :EgresadosConsulta(),
 
-  '-admin/inscribirgrado':AdminInscribirGrado(),
-  '-admin/vergrados':AdminVerGrado(),
-  '-admin/cambiarañoescolar':AdminCambiarYearEscolar(),
+  '-admin/inscribirgrado'       :AdminInscribirGrado(),
+  '-admin/vergrados'            :AdminVerGrado(),
+  '-admin/cambiarañoescolar'    :AdminCambiarYearEscolar(),
+  '-admin/inscribiradmin'       :InscribirAdministrador(),
+  '-admin/gestionaradmin'       :GestionarAdministrador(),
 };
 
 Route toPage (String pageName){

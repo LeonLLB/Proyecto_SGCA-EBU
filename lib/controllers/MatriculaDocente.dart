@@ -1,4 +1,5 @@
 import 'package:proyecto_sgca_ebu/controllers/Admin.dart';
+import 'package:proyecto_sgca_ebu/controllers/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/controllers/Usuarios.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -129,6 +130,22 @@ class _MatriculaDocenteController{
         return -1;
     }
 
+  }
+
+  Future<Ambiente?> obtenerAmbienteAsignado(int? docenteID,[bool closeDB = true]) async {
+    if(docenteID == null) return null;
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final matricula = await db.query(MatriculaDocente.tableName,where:'docenteID = ?',whereArgs:[docenteID]);
+    if(matricula.length == 0){
+      await db.close();
+      return null;
+    }
+    final ambiente = await controladorAmbientes.obtenerAmbientePorID(matricula[0]['ambienteID'] as int,false);
+    
+    if(closeDB){await db.close();}
+
+    return ambiente;
   }
 
 }
