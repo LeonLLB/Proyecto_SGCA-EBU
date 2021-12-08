@@ -34,7 +34,7 @@ class Record {
     CREATE TABLE $tableName (
       id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
       estudianteID INTEGER NOT NULL,
-      aprobado BOOL,
+      aprobado BOOL DEFAULT false,
       gradoCursado INTEGER NOT NULL,
       seccionCursada VARCHAR(1) NOT NULL,
       añoEscolar VARCHAR(9) NOT NULL,

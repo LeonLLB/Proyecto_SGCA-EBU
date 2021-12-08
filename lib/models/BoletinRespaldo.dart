@@ -11,7 +11,7 @@ static final String tableName = 'BoletinesR';
   CREATE TABLE $tableName (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     egresadoID INTEGER NOT NULL,
-    aprobado BOOL,
+    aprobado BOOL DEFAULT false,
     gradoCursado INTEGER NOT NULL,
     seccionCursada VARCHAR(1) NOT NULL,
     añoEscolar VARCHAR(9) NOT NULL,
