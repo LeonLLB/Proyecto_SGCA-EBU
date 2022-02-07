@@ -10,9 +10,9 @@ import 'package:proyecto_sgca_ebu/models/Admin.dart';
 class HomeMenuPage extends StatelessWidget {
 
   final fecha = {
-    'dia':(DateTime.now().day) < 10 ? '0${(DateTime.now().day)}' : (DateTime.now().day),
-    'mes':(DateTime.now().month) < 10 ? '0${(DateTime.now().month)}' : (DateTime.now().month),
-    'año':DateTime.now().year,
+    'dia': (DateTime.now().day) < 10 ? '0${(DateTime.now().day)}' : (DateTime.now().day),
+    'mes': (DateTime.now().month),
+    'año': DateTime.now().year,
   };
 
   final Future<Admin?> yearEscolar = controladorAdmin.obtenerOpcion('AÑO_ESCOLAR',false);
@@ -30,7 +30,7 @@ class HomeMenuPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return SingleChildScrollView(      
       child: Column(children:[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -56,7 +56,7 @@ class HomeMenuPage extends StatelessWidget {
                       Column(
                         mainAxisAlignment:MainAxisAlignment.spaceEvenly,
                         children: [
-                        Text('${fecha["dia"]}/${fecha["mes"]}/${fecha["año"]}',style:simpleTextStyle),
+                        Text('${fecha["dia"]}/${(fecha['mes']! as int) < 10 ? '0${(fecha['mes'])}' : (fecha['mes'])}/${fecha["año"]}',style:simpleTextStyle),
                         Row(children:[
                           Text('Mes: ',style:simpleTextStyle),
                           Text(monthNumIntoString(fecha['mes']! as int),style:detailTextStyle)
