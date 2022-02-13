@@ -1,4 +1,5 @@
 import 'package:proyecto_sgca_ebu/models/Matricula_Estudiante.dart';
+import 'package:proyecto_sgca_ebu/models/index.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:proyecto_sgca_ebu/models/Grado_Seccion.dart';
 
@@ -88,7 +89,41 @@ class _AmbientesController{
     return (listaDeAmbientes.length == 0 ) ? null : listaDeAmbientes;
   }
 
-  Future<Ambiente?> obtenerAmbientePorID(int id,[bool closeDB = true]) async{
+  Future<int> cambiarTurno(int ambienteID,String turnoNuevo) async {
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final result = await db.update(Ambiente.tableName,{'turno':turnoNuevo},where:'id = ?',whereArgs:[ambienteID]);
+
+    db.close();
+
+    return result;
+
+  }
+
+  Future<int> eliminarAmbiente(int ambienteID) async {
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+
+    final queryMatDocentes = await db.query(MatriculaDocente.tableName,where:'ambienteID = ?',whereArgs:[ambienteID]);
+    final queryMatEstudiantes = await db.query(MatriculaEstudiante.tableName,where:'ambienteID = ?',whereArgs:[ambienteID]);
+
+    if(queryMatEstudiantes.length > 0){
+      return -1; // HAY UNA MATRICULA DE ESTUDIANTES CON ESTE AMBIENTE
+    }
+    if(queryMatDocentes.length > 0){
+      return -2; // HAY UNA MATRICULA DE DOCENTES CON ESTE AMBIENTE
+    }
+
+    final result = await db.delete(Ambiente.tableName,where:'id = ?',whereArgs:[ambienteID]);
+    await db.delete(Estadistica.tableName,where:'ambienteID = ?',whereArgs:[ambienteID]);
+
+    db.close();
+
+    return result;
+
+  }
+
+  Future<Ambiente?> obtenerAmbientePorID(int? id,[bool closeDB = true]) async{
+    if(id == null) return null; 
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
 
     final result = await db.query(Ambiente.tableName,where:'id = ?',whereArgs:[id]);

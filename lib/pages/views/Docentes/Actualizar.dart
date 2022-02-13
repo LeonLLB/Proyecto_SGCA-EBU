@@ -25,15 +25,18 @@ class _ActualizarDocenteState extends State<ActualizarDocente> {
 
   Future<Usuarios?> docenteF = controladorUsuario.buscarDocente(null);
 
-  Map<String, dynamic> controladores = {
-    'Nombres': TextEditingController(),
-    'Apellidos': TextEditingController(),    
-    'Cedula':TextEditingController(),
-    'Contraseña':TextEditingController(),
+  Map<String, dynamic> controladoresDocente = {
+    'nombres': TextEditingController(),
+    'apellidos': TextEditingController(),    
+    'cedula':TextEditingController(),
+    'correo': TextEditingController(),
+    'numero':TextEditingController(),
+    'direccion':TextEditingController(),
+  };
+
+  Map<String, dynamic> controladoresContrasena = {    
+    'contraseña':TextEditingController(),
     'Confirmar_Contraseña':TextEditingController(),
-    'Correo': TextEditingController(),
-    'Numero':TextEditingController(),
-    'Direccion':TextEditingController(),
   };
 
   @override
@@ -76,17 +79,14 @@ class _ActualizarDocenteState extends State<ActualizarDocente> {
             return Center(child:Text('No existe el docente'));
           }
           else{
-            controladores = {
+            controladoresDocente = {
               'id':data.data.id,
-              'Nombres': TextEditingController(text: (data.data as Usuarios).nombres),
-              'Apellidos': TextEditingController(text: (data.data as Usuarios).apellidos),    
-              'Cedula':TextEditingController(text: (data.data as Usuarios).cedula.toString()),
-              'Contraseña':TextEditingController(),
-              'Confirmar_Contraseña':TextEditingController(),
-              'Correo': TextEditingController(text: (data.data as Usuarios).correo),
-              'Numero':TextEditingController(text: (data.data as Usuarios).numero),
-              'Direccion':TextEditingController(text: (data.data as Usuarios).direccion),
-              'Rol':'D'
+              'nombres': TextEditingController(text: (data.data as Usuarios).nombres),
+              'apellidos': TextEditingController(text: (data.data as Usuarios).apellidos),    
+              'cedula':TextEditingController(text: (data.data as Usuarios).cedula.toString()),
+              'correo': TextEditingController(text: (data.data as Usuarios).correo),
+              'numero':TextEditingController(text: (data.data as Usuarios).numero),
+              'direccion':TextEditingController(text: (data.data as Usuarios).direccion)              
             };
 
             return Column(
@@ -101,7 +101,10 @@ class _ActualizarDocenteState extends State<ActualizarDocente> {
                           message:'Actualizando al docente...',
                           onVisible:()async{
                             try {
-                              await controladorUsuario.actualizarDocente(Usuarios.fromForm(formInfoIntoMap(controladores)));
+                              await controladorUsuario.actualizarUsuario(formInfoIntoMap(controladoresDocente),'D');
+                              if(controladoresContrasena['contrasena'].text != ''){
+                                await controladorUsuario.cambiarContrasena(controladoresContrasena['contrasena'].text,controladoresDocente['id'],'D');
+                              }
                               ScaffoldMessenger.of(context).removeCurrentSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(successSnackbar('El docente fue modificado!'));
                               modoEditar=false;
@@ -127,7 +130,7 @@ class _ActualizarDocenteState extends State<ActualizarDocente> {
                         final confirmacion = await confirmarEliminacion(context);
                         if(confirmacion != null && confirmacion){
                           try {
-                            final result = await controladorUsuario.eliminarDocente(controladores['id']);
+                            final result = await controladorUsuario.eliminarDocente(controladoresDocente['id']);
                             if(result != -1){
                               ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Docente eliminado con exito'));
                               docenteF = controladorUsuario.buscarDocente(null);
@@ -151,8 +154,8 @@ class _ActualizarDocenteState extends State<ActualizarDocente> {
                     children: [
                     DoubleTextFormFields(
                       controladores: [
-                        controladores['Nombres'],
-                        controladores['Apellidos']
+                        controladoresDocente['nombres'],
+                        controladoresDocente['apellidos']
                       ],
                       enabled: modoEditar,          
                       iconos: [Icon(Icons.person)],
@@ -164,8 +167,8 @@ class _ActualizarDocenteState extends State<ActualizarDocente> {
                     ),
                     DoubleTextFormFields(
                       controladores: [
-                        controladores['Cedula'],
-                        controladores['Numero']
+                        controladoresDocente['cedula'],
+                        controladoresDocente['numero']
                       ],
                       enabled: modoEditar,  
                       iconos: [
@@ -184,8 +187,8 @@ class _ActualizarDocenteState extends State<ActualizarDocente> {
                     ),
                     DoubleTextFormFields(
                       controladores: [
-                        controladores['Correo'],
-                        controladores['Direccion']
+                        controladoresDocente['correo'],
+                        controladoresDocente['direccion']
                       ],
                       enabled: modoEditar,  
                       iconos: [
@@ -203,8 +206,8 @@ class _ActualizarDocenteState extends State<ActualizarDocente> {
                     ),
                     DoubleTextFormFields(
                       controladores: [
-                        controladores['Contraseña'],
-                        controladores['Confirmar_Contraseña']
+                        controladoresContrasena['contraseña'],
+                        controladoresContrasena['Confirmar_Contraseña']
                       ],
                       enabled: modoEditar,  
                       iconos: [
@@ -216,7 +219,7 @@ class _ActualizarDocenteState extends State<ActualizarDocente> {
                       validators: [
                         TextFormFieldValidators(required:true),
                         TextFormFieldValidators(required:true,extraValidator:(val){
-                          if(val != controladores['Contraseña'].text) return 'Las contraseñas no coinciden';
+                          if(val != controladoresContrasena['contraseña'].text) return 'Las contraseñas no coinciden';
                         })
                       ]
                     ),

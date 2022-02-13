@@ -1,4 +1,6 @@
-import 'package:proyecto_sgca_ebu/models/index.dart';
+import 'package:proyecto_sgca_ebu/models/Record.dart';
+import 'package:proyecto_sgca_ebu/models/BoletinRespaldo.dart';
+import 'package:proyecto_sgca_ebu/models/Ficha_Estudiante.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class _RecordController{
@@ -10,6 +12,7 @@ class _RecordController{
 
     for(var info in data){
       await db.insert(Record.tableName, {...info,'aprobado':(info['aprobado'] != null) ? info['aprobado'] : 0});
+      await db.update(FichaEstudiante.tableName,{'tipo_estudiante':(info['aprobado'] != null && info['aprobado'] == 1) ? 'Regular' : 'Repitiente'},where:'estudianteID = ?',whereArgs:[info['estudianteID']]);
     }
 
     if(closeDB)db.close();

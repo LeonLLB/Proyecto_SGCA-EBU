@@ -94,13 +94,6 @@ class _UsuariosControllers {
     return (result.length == 0) ? null : Usuarios.fromMap(result[0]); 
   }
 
-  Future<int> actualizarDocente(Usuarios docenteNuevo) async {
-    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
-    final result = await db.update(Usuarios.tableName,docenteNuevo.toJson(),where:'rol = ? AND id = ?',whereArgs:['D',docenteNuevo.id]);
-    await db.close();
-    return result;
-  }
-
   Future<int> eliminarDocente(int docenteID) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     
@@ -117,9 +110,16 @@ class _UsuariosControllers {
     return result;
   }
 
-  Future<int> actualizarAdministrador(Usuarios adminNuevo) async {
+  Future<int> actualizarUsuario(Map<String,dynamic> usuarioNuevo, String rol) async {
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
-    final result = await db.update(Usuarios.tableName,adminNuevo.toJson(),where:'rol = ? AND id = ?',whereArgs:['A',adminNuevo.id]);
+    final result = await db.update(Usuarios.tableName,usuarioNuevo,where:'rol = ? AND id = ?',whereArgs:[rol,usuarioNuevo['id']]);
+    await db.close();
+    return result;
+  }
+
+  Future<int> cambiarContrasena(String unhashedPassword,int userID,String rol) async{
+    final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
+    final result = await db.update(Usuarios.tableName,{'contraseña':Usuarios.hashPassword(unhashedPassword)},where:'rol = ? AND id = ?',whereArgs:[rol,userID]);
     await db.close();
     return result;
   }

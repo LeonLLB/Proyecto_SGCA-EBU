@@ -25,7 +25,8 @@ class _AdminController{
   Future<int> actualizarOpcion(String opcionACambiar,Admin opcionActualizada)async{
     final db = await databaseFactoryFfi.openDatabase('sgca-ebu-database.db');
     if(opcionACambiar == 'AÑO_ESCOLAR'){
-      //PASO 1 Y 2: REGISTRAR BOLETINES
+      //PASO 1: REGISTRAR BOLETINES
+      //PASO 2: CAMBIAR ESTADO DE REPITIENTE O REGULAR, SEGUN RENDIMIENTO
       await controladorRecord.registrarRecords(false);
     }
 

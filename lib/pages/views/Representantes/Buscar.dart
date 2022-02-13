@@ -79,7 +79,7 @@ class _BuscarRepresentanteState extends State<BuscarRepresentante> {
                         Row(children: [
                           Row(children: [
                             Text('C.I: ',style:TextStyle(fontWeight:FontWeight.bold)),
-                            Text(snapshot.data[i].cedula.toString()),
+                            SelectableText(snapshot.data[i].cedula.toString()),
                           ]),
                           Text(snapshot.data[i].numero)
                         ],mainAxisAlignment:MainAxisAlignment.spaceBetween),

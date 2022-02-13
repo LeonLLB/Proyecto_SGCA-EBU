@@ -56,6 +56,9 @@ class _VisualizarRepresentanteState extends State<VisualizarRepresentante> {
           else if(data.data == null){
             return Center(child:Text('No existe el representante solicitado'));
           }
+          else if(data.data[0]['e.nombres'] == null){
+            return Center(child:Text('El representante existe, pero no tiene estudiantes'));
+          }
           else{
             return Container(
               width: MediaQuery.of(context).size.width - 200 ,

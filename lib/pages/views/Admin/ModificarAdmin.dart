@@ -22,16 +22,18 @@ final _formKey = GlobalKey<FormState>();
 
   Future<Usuarios?> adminF = controladorUsuario.buscarAdmin(null);
 
-  Map<String, dynamic> controladores = {
-    'Nombres': TextEditingController(),
-    'Apellidos': TextEditingController(),    
-    'Cedula':TextEditingController(),
-    'Contraseña':TextEditingController(),
+  Map<String, dynamic> controladoresAdmin = {
+    'nombres': TextEditingController(),
+    'apellidos': TextEditingController(),    
+    'cedula':TextEditingController(),    
+    'correo': TextEditingController(),
+    'numero':TextEditingController(),
+    'direccion':TextEditingController()
+  };
+
+  Map<String,dynamic> controladoresContrasena = {
+    'contraseña':TextEditingController(),
     'Confirmar_Contraseña':TextEditingController(),
-    'Correo': TextEditingController(),
-    'Numero':TextEditingController(),
-    'Direccion':TextEditingController(),
-    'Rol':'A'
   };
 
   @override
@@ -74,17 +76,14 @@ final _formKey = GlobalKey<FormState>();
             return Center(child:Text('No existe el administrador'));
           }
           else{
-            controladores = {
+            controladoresAdmin = {
               'id':data.data.id,
-              'Nombres': TextEditingController(text: (data.data as Usuarios).nombres),
-              'Apellidos': TextEditingController(text: (data.data as Usuarios).apellidos),    
-              'Cedula':TextEditingController(text: (data.data as Usuarios).cedula.toString()),
-              'Contraseña':TextEditingController(),
-              'Confirmar_Contraseña':TextEditingController(),
-              'Correo': TextEditingController(text: (data.data as Usuarios).correo),
-              'Numero':TextEditingController(text: (data.data as Usuarios).numero),
-              'Direccion':TextEditingController(text: (data.data as Usuarios).direccion),
-              'Rol':'A'
+              'nombres': TextEditingController(text: (data.data as Usuarios).nombres),
+              'apellidos': TextEditingController(text: (data.data as Usuarios).apellidos),    
+              'cedula':TextEditingController(text: (data.data as Usuarios).cedula.toString()),
+              'correo': TextEditingController(text: (data.data as Usuarios).correo),
+              'numero':TextEditingController(text: (data.data as Usuarios).numero),
+              'direccion':TextEditingController(text: (data.data as Usuarios).direccion)
             };
 
             return Column(
@@ -96,10 +95,13 @@ final _formKey = GlobalKey<FormState>();
                       if(modoEditar){
                         //TODA LA LOGICA DE MODIFICACIÓN
                         ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
-                          message:'Actualizando al docente...',
+                          message:'Actualizando al administrador...',
                           onVisible:()async{
                             try {
-                              await controladorUsuario.actualizarAdministrador(Usuarios.fromForm(formInfoIntoMap(controladores)));
+                              await controladorUsuario.actualizarUsuario(formInfoIntoMap(controladoresAdmin),'A');
+                              if(controladoresContrasena['contrasena'].text != ''){
+                                await controladorUsuario.cambiarContrasena(controladoresContrasena['contrasena'].text,controladoresAdmin['id'],'A');
+                              }
                               ScaffoldMessenger.of(context).removeCurrentSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(successSnackbar('El administrador fue modificado!'));
                               modoEditar=false;
@@ -125,7 +127,7 @@ final _formKey = GlobalKey<FormState>();
                         final confirmacion = await confirmarEliminacion(context);
                         if(confirmacion != null && confirmacion){
                           try {
-                            final result = await controladorUsuario.eliminarAdministrador(controladores['id']);
+                            final result = await controladorUsuario.eliminarAdministrador(controladoresAdmin['id']);
                             if(result != -1){
                               ScaffoldMessenger.of(context).showSnackBar(successSnackbar('Administrador eliminado con exito'));
                               adminF = controladorUsuario.buscarAdmin(null);
@@ -149,8 +151,8 @@ final _formKey = GlobalKey<FormState>();
                     children: [
                     DoubleTextFormFields(
                       controladores: [
-                        controladores['Nombres'],
-                        controladores['Apellidos']
+                        controladoresAdmin['nombres'],
+                        controladoresAdmin['apellidos']
                       ],
                       enabled: modoEditar,          
                       iconos: [Icon(Icons.person)],
@@ -162,8 +164,8 @@ final _formKey = GlobalKey<FormState>();
                     ),
                     DoubleTextFormFields(
                       controladores: [
-                        controladores['Cedula'],
-                        controladores['Numero']
+                        controladoresAdmin['cedula'],
+                        controladoresAdmin['numero']
                       ],
                       enabled: modoEditar,  
                       iconos: [
@@ -182,8 +184,8 @@ final _formKey = GlobalKey<FormState>();
                     ),
                     DoubleTextFormFields(
                       controladores: [
-                        controladores['Correo'],
-                        controladores['Direccion']
+                        controladoresAdmin['correo'],
+                        controladoresAdmin['direccion']
                       ],
                       enabled: modoEditar,  
                       iconos: [
@@ -201,8 +203,8 @@ final _formKey = GlobalKey<FormState>();
                     ),
                     DoubleTextFormFields(
                       controladores: [
-                        controladores['Contraseña'],
-                        controladores['Confirmar_Contraseña']
+                        controladoresContrasena['contraseña'],
+                        controladoresContrasena['Confirmar_Contraseña']
                       ],
                       enabled: modoEditar,  
                       iconos: [
@@ -214,7 +216,7 @@ final _formKey = GlobalKey<FormState>();
                       validators: [
                         TextFormFieldValidators(required:true),
                         TextFormFieldValidators(required:true,extraValidator:(val){
-                          if(val != controladores['Contraseña'].text) return 'Las contraseñas no coinciden';
+                          if(val != controladoresContrasena['contraseña'].text) return 'Las contraseñas no coinciden';
                         })
                       ]
                     ),

@@ -45,7 +45,7 @@ class Usuarios {
   
   ''';
 
-  String hashPassword(String password)
+  static String hashPassword(String password)
   =>  DBCrypt().hashpw(password, DBCrypt().gensalt());
 
   bool comparePassword(String password) => DBCrypt().checkpw(password, this.contrasena);

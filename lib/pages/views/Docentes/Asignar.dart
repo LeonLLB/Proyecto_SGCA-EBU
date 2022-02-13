@@ -5,7 +5,6 @@ import 'package:proyecto_sgca_ebu/components/SimplifiedContainer.dart';
 import 'package:proyecto_sgca_ebu/components/SimplifiedTextFormField.dart';
 import 'package:proyecto_sgca_ebu/components/SuccesSnackbar.dart';
 import 'package:proyecto_sgca_ebu/components/loadingSnackbar.dart';
-import 'package:proyecto_sgca_ebu/controllers/Grado_Seccion.dart';
 import 'package:proyecto_sgca_ebu/controllers/MatriculaDocente.dart';
 import 'package:proyecto_sgca_ebu/controllers/Usuarios.dart';
 import 'package:proyecto_sgca_ebu/models/index.dart';
@@ -24,7 +23,6 @@ class _AsignarDocenteState extends State<AsignarDocente> {
   
   Future<Usuarios?> docenteSolicitado = controladorUsuario.buscarDocente(null);
   Future<Map<String,Object?>?> matriculaSegunAmbiente = controladorMatriculaDocente.buscarPorGrado(null);
-  final Future<List<Ambiente>?> listaAmbientesDisponibles = controladorAmbientes.obtenerGrados();
 
   bool asignable = false;
 
