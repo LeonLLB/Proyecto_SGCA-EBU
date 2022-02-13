@@ -100,20 +100,26 @@ class _ActualizarDocenteState extends State<ActualizarDocente> {
                         ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
                           message:'Actualizando al docente...',
                           onVisible:()async{
-                            try {
-                              await controladorUsuario.actualizarUsuario(formInfoIntoMap(controladoresDocente),'D');
-                              if(controladoresContrasena['contraseña'].text != ''){
-                                await controladorUsuario.cambiarContrasena(controladoresContrasena['contraseña'].text,controladoresDocente['id'],'D');
+                            if(controladoresContrasena['contraseña'].text != controladoresContrasena['Confirmar_Contraseña'].text && controladoresContrasena['contraseña'].text != ''){
+                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                              ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Las contraseñas no coinciden'));
+                            }
+                            else{
+                              try {
+                                await controladorUsuario.actualizarUsuario(formInfoIntoMap(controladoresDocente),'D');
+                                if(controladoresContrasena['contraseña'].text != ''){
+                                  await controladorUsuario.cambiarContrasena(controladoresContrasena['contraseña'].text,controladoresDocente['id'],'D');
+                                }
+                                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                ScaffoldMessenger.of(context).showSnackBar(successSnackbar('El docente fue modificado!'));
+                                modoEditar=false;
+                                docenteF = controladorUsuario.buscarDocente(controladorConsulta.text == '' ? null: int.parse(controladorConsulta.text));
+                                setState((){});
+                              } catch (e) {
+                                print(e);
+                                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se ha podido actualizar al docente'));
                               }
-                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(successSnackbar('El docente fue modificado!'));
-                              modoEditar=false;
-                              docenteF = controladorUsuario.buscarDocente(controladorConsulta.text == '' ? null: int.parse(controladorConsulta.text));
-                              setState((){});
-                            } catch (e) {
-                              print(e);
-                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se ha podido actualizar al docente'));
                             }
                           }
                         ));

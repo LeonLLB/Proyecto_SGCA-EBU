@@ -97,20 +97,25 @@ final _formKey = GlobalKey<FormState>();
                         ScaffoldMessenger.of(context).showSnackBar(loadingSnackbar(
                           message:'Actualizando al administrador...',
                           onVisible:()async{
-                            try {
-                              await controladorUsuario.actualizarUsuario(formInfoIntoMap(controladoresAdmin),'A');
-                              if(controladoresContrasena['contraseña'].text != ''){
-                                await controladorUsuario.cambiarContrasena(controladoresContrasena['contraseña'].text,controladoresAdmin['id'],'A');
+                            if(controladoresContrasena['contraseña'].text != controladoresContrasena['Confirmar_Contraseña'].text && controladoresContrasena['contraseña'].text != ''){
+                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                              ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('Las contraseñas no coinciden'));
+                            }else{
+                              try {
+                                await controladorUsuario.actualizarUsuario(formInfoIntoMap(controladoresAdmin),'A');
+                                if(controladoresContrasena['contraseña'].text != ''){
+                                  await controladorUsuario.cambiarContrasena(controladoresContrasena['contraseña'].text,controladoresAdmin['id'],'A');
+                                }
+                                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                ScaffoldMessenger.of(context).showSnackBar(successSnackbar('El administrador fue modificado!'));
+                                modoEditar=false;
+                                adminF = controladorUsuario.buscarAdmin(controladorConsulta.text == '' ? null: int.parse(controladorConsulta.text));
+                                setState((){});
+                              } catch (e) {
+                                print(e);
+                                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se ha podido actualizar al administrador'));
                               }
-                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(successSnackbar('El administrador fue modificado!'));
-                              modoEditar=false;
-                              adminF = controladorUsuario.buscarAdmin(controladorConsulta.text == '' ? null: int.parse(controladorConsulta.text));
-                              setState((){});
-                            } catch (e) {
-                              print(e);
-                              ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(failedSnackbar('No se ha podido actualizar al administrador'));
                             }
                           }
                         ));
