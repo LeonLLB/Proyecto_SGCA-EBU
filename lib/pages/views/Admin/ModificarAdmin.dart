@@ -99,8 +99,8 @@ final _formKey = GlobalKey<FormState>();
                           onVisible:()async{
                             try {
                               await controladorUsuario.actualizarUsuario(formInfoIntoMap(controladoresAdmin),'A');
-                              if(controladoresContrasena['contrasena'].text != ''){
-                                await controladorUsuario.cambiarContrasena(controladoresContrasena['contrasena'].text,controladoresAdmin['id'],'A');
+                              if(controladoresContrasena['contraseña'].text != ''){
+                                await controladorUsuario.cambiarContrasena(controladoresContrasena['contraseña'].text,controladoresAdmin['id'],'A');
                               }
                               ScaffoldMessenger.of(context).removeCurrentSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(successSnackbar('El administrador fue modificado!'));

@@ -63,8 +63,11 @@ class _GestionarGradoState extends State<GestionarGrado> {
                   }
                 ),
                 Padding(padding:EdgeInsets.symmetric(vertical: 5)),
-                Row(children:[
+                Row(
+                  mainAxisAlignment:MainAxisAlignment.center,
+                  children:[
                   ElevatedButton(onPressed: (){cambiarTurno(context);}, child: Text('Cambiar turno')),
+                  Padding(padding:EdgeInsets.symmetric(horizontal: 5)),
                   ElevatedButton(onPressed: ()async{
                     final confirmacion = await confirmarEliminacion(context);
                     if(confirmacion != null && confirmacion ){
