@@ -38,6 +38,7 @@ final Map<String, Widget> routes = {
 
   '-admin/inscribirgrado'       :AdminInscribirGrado(),
   '-admin/vergrados'            :AdminVerGrado(),
+  '-admin/gestiongrado'         :GestionarGrado(),
   '-admin/cambiarañoescolar'    :AdminCambiarYearEscolar(),
   '-admin/inscribiradmin'       :InscribirAdministrador(),
   '-admin/gestionaradmin'       :GestionarAdministrador(),
