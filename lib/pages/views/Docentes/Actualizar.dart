@@ -102,8 +102,8 @@ class _ActualizarDocenteState extends State<ActualizarDocente> {
                           onVisible:()async{
                             try {
                               await controladorUsuario.actualizarUsuario(formInfoIntoMap(controladoresDocente),'D');
-                              if(controladoresContrasena['contrasena'].text != ''){
-                                await controladorUsuario.cambiarContrasena(controladoresContrasena['contrasena'].text,controladoresDocente['id'],'D');
+                              if(controladoresContrasena['contraseña'].text != ''){
+                                await controladorUsuario.cambiarContrasena(controladoresContrasena['contraseña'].text,controladoresDocente['id'],'D');
                               }
                               ScaffoldMessenger.of(context).removeCurrentSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(successSnackbar('El docente fue modificado!'));
